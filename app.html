@@ -280,7 +280,8 @@ game.board.init = function() {
             cx: null,
             cy: null,
             vertices: vhex[i],
-            robber: 0,
+            robber: types[i] == 0 ? 1 : 0,
+			circle: null,
         }
 
         for(var j = 0; j < 6; j++) {
@@ -440,8 +441,22 @@ game.board.draw = function(w, h) {
         }
     }
 
-    //TODO: draw the robber on the desert hex
- 
+    // Create a placeholder robber at each hex
+	var circle;
+	for(var i = 0; i < 19; i++) {
+		var circle = document.createElementNS(game.ns, 'circle');
+		circle.setAttribute('cx', this.hexes[i].cx);
+		circle.setAttribute('cy', this.hexes[i].cy);
+		circle.setAttribute('fill', '#000000');
+		circle.setAttribute('r', '20');
+		if (this.hexes[i].robber == 0) {
+			circle.setAttribute('visibility', 'hidden');
+		} else {
+			circle.setAttribute('visibility', 'visible');
+		}
+		this.hexes[i].circle = circle;
+		game.svg.appendChild(circle);
+	}
     // Create placeholder object at each edge
     var e;
     for(var i = 0; i < 72; i++) {
@@ -692,6 +707,15 @@ game.board.getPaths = function(player, edge, edge_path, vertex_path, paths) {
     return edge_path;
 };
 
+game.board.highlightRobber = function(i) {
+	this.hexes[i].circle.setAttribute('visibility', 'visible');
+	this.hexes[i].circle.setAttribute('onclick', 'game.actions.selectRobber(' + i + ')');
+};
+
+game.board.unhighlightRobber = function(i) {
+    this.hexes[i].circle.setAttribute('visibility', 'hidden');
+    this.hexes[i].circle.setAttribute('onclick', '');
+};
 
 game.state = {
     phase: 0,
@@ -886,9 +910,7 @@ game.actions.rollDice = function() {
     console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
 
     if(d == 7) {
-        this.game.state.next_action = 'moveRobber';
-        gapi.hangout.data.submitDelta({'next_action': 'moveRobber'});
-        this.game.actions.getRobbed();
+        
     } else {
         var h, v, obj;
         for(var i = 0; i < 19; i++) {
@@ -921,16 +943,31 @@ game.actions.rollDice = function() {
 
 game.actions.getRobbed = function() {
     // TODO: each player with >7 cards has to select cards
-    
-    this.game.proceed();
+    this.game.state.next_action = 'moveRobber';
+    gapi.hangout.data.submitDelta({'next_action': 'moveRobber'});
 };
 
 game.actions.moveRobber = function() {
-    // TODO: move the robber
+    // Move the robber
+	for (var i = 0; i < 19; i++) {
+		game.board.hexes[i].circle.setAttribute('visibility', 'hidden');
+		game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
+		game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
+	}
+};
 
-    this.game.state.next_action = 'playerControl';
+game.actions.selectRobber = function(i) {
+	for (var j = 0; j < 19; j++) {
+		this.hexes[j].robber = 0;
+		this.hexes[j].circle.setAttribute('onmouseover', '');
+		this.hexes[j].circle.setAttribute('onmouseout', '');
+		this.heses[j].circle.setAttribute('onclick', '');
+	}
+	this.hexes[i].robber = 1;
+	this.game.state.next_action = 'playerControl';
     gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
-}
+	this.game.proceed();
+};
 
 game.actions.buyDevCard = function() {
 
