@@ -910,7 +910,7 @@ game.actions.rollDice = function() {
     console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
 
     if(d == 7) {
-        
+        game.actions.moveRobber();
     } else {
         var h, v, obj;
         for(var i = 0; i < 19; i++) {
