@@ -639,15 +639,26 @@ game.board.draw = function(w, h) {
                     prob.textContent = "\u2022\u2022\u2022\u2022";
                 } else if (this.hexes[i].num == 6 || this.hexes[i].num == 8) {
                     prob.textContent = "\u2022\u2022\u2022\u2022\u2022";
+                    prob.setAttribute('fill', '#ff0000');
+                    text.setAttribute('fill', '#ff0000');
                 }            
             }
 
+            group.appendChild(hex);
+            if (this.hexes[i].type != 0) {
+                circle = document.createElementNS(game.ns, 'circle');
+                circle.setAttribute('cx', this.hexes[i].cx);
+                circle.setAttribute('cy', this.hexes[i].cy);
+                circle.setAttribute('fill', '#faf0e6');
+                circle.setAttribute('r', '27');
+                group.appendChild(circle);
+            }
             // Create a placeholder robber
             circle = document.createElementNS(game.ns, 'circle');
             circle.setAttribute('cx', this.hexes[i].cx);
             circle.setAttribute('cy', this.hexes[i].cy);
             circle.setAttribute('fill', '#000000');
-            circle.setAttribute('r', '20');
+            circle.setAttribute('r', '27');
             if (this.hexes[i].robber == 0) {
                 circle.setAttribute('fill', 'rgba(0,0,0,0)');
             } else {
@@ -656,7 +667,6 @@ game.board.draw = function(w, h) {
             this.hexes[i].circle = circle;
 
             // The order of appendChild calls determines the z-index in SVG
-            group.appendChild(hex);
             if(text != null) {
                 group.appendChild(text);
             }
