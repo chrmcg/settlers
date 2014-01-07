@@ -1064,8 +1064,31 @@ game.actions.selectRobber = function(i) {
         this.game.board.hexes[j].circle.setAttribute('onclick', '');
     }
     this.game.board.hexes[i].robber = 1;
+
+    this.game.state.next_action = 'stealFrom';
+    gapi.hangout.data.submitDelta({'next_action': 'stealFrom'});
+    this.game.proceed();
+};
+
+game.actions.stealFrom = function() {
+
+    var robberhex = null;
+    for(var j = 0; j < 19; j++) {
+        if(this.game.board.hexes[j].robber == 1) robberhex = j;
+    }
+
+    var owners = [];
+    var o;
+    for(var i = 0; i < 6; i++) {
+        o = this.game.board.vertices[this.game.board.hexes[robberhex].vertices[i]].owner;
+        if(o != null && o != this.game.state.turn && owners.indexOf(o) == -1) owners.push(o);
+    }
+
     this.game.state.next_action = 'playerControl';
     gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
+
+    console.log('Choose one of (' + owners.join(', ') + ') to steal a card from');
+    // TODO: user chooses from (owners) and randomly gets one of their cards
     this.game.proceed();
 };
 
