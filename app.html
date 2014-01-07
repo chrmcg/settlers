@@ -358,7 +358,7 @@ game.board.checkNums = function(nums) {
             v = this.hexes[i].vertices[j];
 
             for(var k = 0; k < this.vertices[v].hexes.length; k++) {
-                if(this.vertices[v].hexes[k] != i ) {
+                if(this.vertices[v].hexes[k] != i) {
                     n = nums[this.vertices[v].hexes[k]];
                     if((nums[i] == 6 || nums[i] == 8) && (n == 6 || n == 8)) {
                         return false;
@@ -648,7 +648,6 @@ game.board.hideEmptyEdges = function() {
         this.edges[i].e.setAttribute('onclick', '');
     }
 };
-
 
 game.board.highlightVertex = function(i, type, player) {
     if(this.game.state.turn == player) {
@@ -1328,7 +1327,6 @@ game.actions.selectEdge = function(i) {
 game.actions.winGame = function() {
     console.log('Player ' + this.game.state.turn + ' wins the game!');
 };
-
 
 game.state.downloadState = function() {
     var s = gapi.hangout.data.getState();
