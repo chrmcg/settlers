@@ -283,7 +283,7 @@ game.board.init = function() {
     // Initialize game.board.hexes
     for(var i = 0; i < 19; i++) {
         this.hexes[i] = {
-            num: types[i] == 0 ? 0 : nums.push(),
+            num: types[i] == 0 ? 0 : nums.pop(),
             type: types[i],
             cx: null,
             cy: null,
