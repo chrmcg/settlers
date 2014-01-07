@@ -8,6 +8,8 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    overflow: hidden;
+    height: 0px; /* dumb hack to make the page not scroll */
 }    
 #board {
     text-align: center;
@@ -18,6 +20,9 @@ svg {
 }
 .menu-item {
     cursor: pointer;
+}
+text {
+    cursor: default;
 }
 -->
 </style>
@@ -174,6 +179,7 @@ game.menu = {
     game: game,
     wrapper_outer: null,
     buttons: [],
+    devcards: [],
 
 };
 
@@ -184,7 +190,6 @@ game.menu.init = function() {
         'buildSettlement': 'Settlement',
         'buildCity': 'City',
         'buyDevCard': 'Buy Dev Card',
-        'playDevCard': 'Play Dev Card',
         'trade': 'Trade',
         'endTurn': 'DONE',
 
@@ -192,7 +197,6 @@ game.menu.init = function() {
     var positions = {
         'trade':            [540,  50, 70],
 
-        'playDevCard':      [475, 200, 100],
         'buyDevCard':       [475, 310, 100],
 
         'buildRoad':        [615, 200, 80],
@@ -230,6 +234,87 @@ game.menu.init = function() {
         game.svg.appendChild(g);
         this.buttons.push(g);
 
+        i++;
+    }
+
+    // Display dev cards
+    g = document.createElementNS(game.ns, 'g');
+    var g2, text2;
+    for(var i = 1; i <= 4; i++) { 
+        g2 = document.createElementNS(game.ns, 'g');
+        g2.setAttribute('transform', 'translate(110, ' + (25 * (i-1)) + ')');
+
+        text = document.createElementNS(game.ns, 'text');
+        text.setAttribute('x', '0');
+        text.setAttribute('y', '0');
+        text.setAttribute('transform', 'translate(0, ' + (25 * (i-1)) + ')');
+        text.textContent = '';
+        g.appendChild(text);
+
+        r = document.createElementNS(game.ns, 'rect');
+        r.setAttribute('x', '0');
+        r.setAttribute('y', '-15');
+        r.setAttribute('width', '30');
+        r.setAttribute('height', '20');
+        r.setAttribute('fill', 'gray');
+        r.setAttribute('stroke', 'black');
+        g2.appendChild(r);
+
+        text2 = document.createElementNS(game.ns, 'text');
+        text2.setAttribute('x', '15');
+        text2.setAttribute('y', '0');
+        text2.setAttribute('text-anchor', 'middle');
+        text2.textContent = 'Play';
+        g2.appendChild(text2);
+
+        g2.setAttribute('visibility', 'hidden');
+
+        g.appendChild(g2);
+        this.devcards.push({text: text, button: g2});
+    }
+
+    g.setAttribute('transform', 'translate(455, 210)');
+    game.svg.appendChild(g);
+};
+
+game.menu.refreshDevCards = function() {
+    var p = game.state['p'+(game.state.turn-1)];
+    // TODO: show local player only
+
+    for(var j = 0; j < this.devcards.length; j++) {
+        this.devcards[j].text.textContent = '';
+        this.devcards[j].button.setAttribute('onclick', '');
+        this.devcards[j].text.setAttribute('visibility', 'hidden');
+        this.devcards[j].button.setAttribute('visibility', 'hidden');
+    }
+
+    var i = 0;
+    if(p.cK > 0) {
+        this.devcards[i].text.setAttribute('visibility', 'visible');
+        this.devcards[i].button.setAttribute('visibility', 'visible');
+        this.devcards[i].text.textContent = 'Knight' + (p.cK > 1 ? ' x'+p.cK : '');
+        this.devcards[i].button.setAttribute('onclick', 'game.actions.playDevCard("K")');
+        i++;
+    }
+    if(p.cM > 0) {
+        this.devcards[i].text.setAttribute('visibility', 'visible');
+        this.devcards[i].button.setAttribute('visibility', 'visible');
+        this.devcards[i].text.textContent = 'Monopoly' + (p.cM > 1 ? ' x'+p.cM : '');
+        this.devcards[i].button.setAttribute('onclick', 'game.actions.playDevCard("M")');
+        i++;
+    }
+    if(p.cR > 0) {
+        this.devcards[i].text.setAttribute('visibility', 'visible');
+        this.devcards[i].button.setAttribute('visibility', 'visible');
+        this.devcards[i].text.textContent = 'Road Building' + (p.cR > 1 ? ' x'+p.cR : '');
+        this.devcards[i].button.setAttribute('onclick', 'game.actions.playDevCard("R")');
+        i++;
+    }
+    if(p.cY > 0) {
+        this.devcards[i].text.setAttribute('visibility', 'visible');
+        this.devcards[i].button.setAttribute('visibility', 'visible');
+        this.devcards[i].text.textContent = 'Year of Plenty' + (p.cY > 1 ? ' x'+p.cY : '');
+        this.devcards[i].button.setAttribute('onclick', 'game.actions.playDevCard("Y")');
         i++;
     }
 };
@@ -1021,6 +1106,10 @@ game.actions = {
 };
 
 game.actions.rollDice = function() {
+    
+    game.statusbox.viewPlayer(game.state.turn);
+    game.menu.refreshDevCards();
+
     this.game.state.next_action = 'playerControl';
     gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
 
@@ -1149,6 +1238,7 @@ game.actions.buyDevCard = function() {
             this.game.state['p'+(this.game.state.turn-1)]['c'+card]++;
             //gapi.hangout.data.submitDelta({('p'+(this.game.state.turn-1)): JSON.stringify(p)});
             console.log('Player ' + this.game.state.turn + ' buys a ' + card + ' card');
+            game.menu.refreshDevCards();
         }
     } else {
         console.log('Player ' + this.game.state.turn + ' cannot afford a dev card');
@@ -1160,7 +1250,8 @@ game.actions.buyDevCard = function() {
     this.game.proceed();
 };
 
-game.actions.playDevCard = function() {
+game.actions.playDevCard = function(type) {
+    console.log(type + ' card played');
     //TODO
     //Knight, Year of Plenty, Road Building, Monopoly
 
@@ -1212,14 +1303,13 @@ game.actions.trade = function() {
 };
 
 game.actions.playerControl = function() {
-    
+
     // TODO: activate controls only if game.state.turn == local player
     
     var obj = {
         'buildRoad': game.state.playerHas(game.state.turn, {1:1, 4:1}),
         'buildSettlement': game.state.playerHas(game.state.turn, {1:1, 2:1, 3:1, 4:1}),
         'buildCity': game.state.playerHas(game.state.turn, {3:2, 5:3}),
-        'playDevCard': false,
         'buyDevCard': game.state.playerHas(game.state.turn, {2:1, 3:1, 5:1}),
         'endTurn': true
     }
@@ -1238,6 +1328,15 @@ game.actions.playerControl = function() {
             this.game.menu.buttons[i].setAttribute('onclick', '');
             this.game.menu.buttons[i].setAttribute('class', '');
 
+        }
+    }
+
+    game.menu.refreshDevCards();
+    for(var i = 0; i < game.menu.devcards.length; i++) {
+        if(game.menu.devcards[i].text.textContent.length > 0) {
+            game.menu.devcards[i].button.children[0].setAttribute('fill', 'white');
+        } else {
+            game.menu.devcards[i].button.children[0].setAttribute('fill', 'gray');
         }
     }
 
