@@ -281,7 +281,7 @@ game.board.init = function() {
             cy: null,
             vertices: vhex[i],
             robber: types[i] == 0 ? 1 : 0,
-			circle: null,
+            circle: null,
         }
 
         for(var j = 0; j < 6; j++) {
@@ -403,7 +403,7 @@ game.board.draw = function(w, h) {
     this.hexes[17].cx = Cx;         this.hexes[17].cy = Cy + 3*ry;
     this.hexes[18].cx = Cx + 2*rx;  this.hexes[18].cy = Cy + 3*ry;
 
-    var hex, text, group, bbox, points;
+    var hex, text, circle, group, bbox, points;
     for(var i = 0; i < 19; i++) {
         if(typeof this.hexes[i].cx != 'undefined') {
             group = document.createElementNS(game.ns, 'g');
@@ -428,8 +428,23 @@ game.board.draw = function(w, h) {
                 text.textContent = this.hexes[i].num;
             }
 
+            // Create a placeholder robber
+            circle = document.createElementNS(game.ns, 'circle');
+            circle.setAttribute('cx', this.hexes[i].cx);
+            circle.setAttribute('cy', this.hexes[i].cy);
+            circle.setAttribute('fill', '#000000');
+            circle.setAttribute('r', '20');
+            if (this.hexes[i].robber == 0) {
+                circle.setAttribute('fill', 'rgba(0,0,0,0)');
+            } else {
+                circle.setAttribute('fill', 'rgba(1,1,1,0.6)');
+            }
+            this.hexes[i].circle = circle;
+
+            // The order of appendChild calls determines the z-index in SVG
             group.appendChild(hex);
             group.appendChild(text);
+            group.appendChild(circle);
             game.svg.appendChild(group);
 
             // Fix centering of nums
@@ -441,22 +456,7 @@ game.board.draw = function(w, h) {
         }
     }
 
-    // Create a placeholder robber at each hex
-	var circle;
-	for(var i = 0; i < 19; i++) {
-		var circle = document.createElementNS(game.ns, 'circle');
-		circle.setAttribute('cx', this.hexes[i].cx);
-		circle.setAttribute('cy', this.hexes[i].cy);
-		circle.setAttribute('fill', '#000000');
-		circle.setAttribute('r', '20');
-		if (this.hexes[i].robber == 0) {
-			circle.setAttribute('visibility', 'hidden');
-		} else {
-			circle.setAttribute('visibility', 'visible');
-		}
-		this.hexes[i].circle = circle;
-		game.svg.appendChild(circle);
-	}
+
     // Create placeholder object at each edge
     var e;
     for(var i = 0; i < 72; i++) {
@@ -708,12 +708,12 @@ game.board.getPaths = function(player, edge, edge_path, vertex_path, paths) {
 };
 
 game.board.highlightRobber = function(i) {
-	this.hexes[i].circle.setAttribute('visibility', 'visible');
-	this.hexes[i].circle.setAttribute('onclick', 'game.actions.selectRobber(' + i + ')');
+    this.hexes[i].circle.setAttribute('fill', 'rgba(1,1,1,0.6)');
+    this.hexes[i].circle.setAttribute('onclick', 'game.actions.selectRobber(' + i + ')');
 };
 
 game.board.unhighlightRobber = function(i) {
-    this.hexes[i].circle.setAttribute('visibility', 'hidden');
+    this.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
     this.hexes[i].circle.setAttribute('onclick', '');
 };
 
@@ -910,28 +910,30 @@ game.actions.rollDice = function() {
     console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
 
     if(d == 7) {
-        game.actions.moveRobber();
+        this.game.state.next_action = 'getRobbed';
+        gapi.hangout.data.submitDelta({'next_action': 'getRobbed'});
     } else {
         var h, v, obj;
         for(var i = 0; i < 19; i++) {
             h = this.game.board.hexes[i]
             if(h.num == d) {
                 for(var j = 0; j < this.game.board.hexes[i].vertices.length; j++) {
-                    // TODO: check for the robber
-                    v = this.game.board.vertices[this.game.board.hexes[i].vertices[j]];
-                    obj = {};
-                    switch(v.contents) {
-                        case 1:
-                        obj[h.type] = 1;
-                        this.game.state.collect(v.owner, obj);
-                        break;
-                        case 2:
-                        obj[h.type] = 2;
-                        this.game.state.collect(v.owner, obj);
-                        break;
-                        case 0: default:
+                    if(this.game.board.hexes[i].robber == 0) {
+                        v = this.game.board.vertices[this.game.board.hexes[i].vertices[j]];
+                        obj = {};
+                        switch(v.contents) {
+                            case 1:
+                            obj[h.type] = 1;
+                            this.game.state.collect(v.owner, obj);
+                            break;
+                            case 2:
+                            obj[h.type] = 2;
+                            this.game.state.collect(v.owner, obj);
+                            break;
+                            case 0: default:
 
-                        break;
+                            break;
+                        }
                     }
                 }
             }
@@ -942,31 +944,36 @@ game.actions.rollDice = function() {
 };
 
 game.actions.getRobbed = function() {
-    // TODO: each player with >7 cards has to select cards
+    
     this.game.state.next_action = 'moveRobber';
     gapi.hangout.data.submitDelta({'next_action': 'moveRobber'});
+
+    // TODO: select cards (game.actions.selectCards ?)
+    console.log('Each player with >7 cards has to select cards now...');
+
+    this.game.proceed();
 };
 
 game.actions.moveRobber = function() {
     // Move the robber
-	for (var i = 0; i < 19; i++) {
-		game.board.hexes[i].circle.setAttribute('visibility', 'hidden');
-		game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
-		game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
-	}
+    for (var i = 0; i < 19; i++) {
+        this.game.board.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
+        this.game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
+        this.game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
+    }
 };
 
 game.actions.selectRobber = function(i) {
-	for (var j = 0; j < 19; j++) {
-		this.hexes[j].robber = 0;
-		this.hexes[j].circle.setAttribute('onmouseover', '');
-		this.hexes[j].circle.setAttribute('onmouseout', '');
-		this.heses[j].circle.setAttribute('onclick', '');
-	}
-	this.hexes[i].robber = 1;
-	this.game.state.next_action = 'playerControl';
+    for (var j = 0; j < 19; j++) {
+        this.game.board.hexes[j].robber = 0;
+        this.game.board.hexes[j].circle.setAttribute('onmouseover', '');
+        this.game.board.hexes[j].circle.setAttribute('onmouseout', '');
+        this.game.board.hexes[j].circle.setAttribute('onclick', '');
+    }
+    this.game.board.hexes[i].robber = 1;
+    this.game.state.next_action = 'playerControl';
     gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
-	this.game.proceed();
+    this.game.proceed();
 };
 
 game.actions.buyDevCard = function() {
