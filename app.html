@@ -185,7 +185,6 @@ game.menu.init = function() {
         g = document.createElementNS(game.ns, 'g');
         g.setAttribute('transform', 'translate(' + positions[a][0] + ', ' + positions[a][1] + ')');
         g.setAttribute('data-action', a);
-        g.setAttribute('class', 'menu-item');
         g.appendChild(r);
         g.appendChild(text);
         
@@ -604,6 +603,7 @@ game.board.showAvailableEdges = function(player) {
                     
                     )
           ) {
+            this.edges[i].e.setAttribute('class', 'menu-item');
             this.edges[i].e.setAttribute('visibility', 'visible');
             this.edges[i].e.setAttribute('onmouseover', 'game.board.highlightEdge('+i+','+player+')');
             this.edges[i].e.setAttribute('onmouseout', 'game.board.unhighlightEdge('+i+')');
@@ -627,11 +627,13 @@ game.board.showAvailableVertices = function(type, player) {
                 if(c === false) b = false;
             }
             if(b === true) { 
+                this.vertices[i].v.setAttribute('class', 'menu-item');
                 this.vertices[i].v.setAttribute('visibility', 'visible');
                 this.vertices[i].v.setAttribute('onmouseover', 'game.board.highlightVertex('+i+', ' + type + ', ' + player + ')');
                 this.vertices[i].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+i+',' + type + ')');
             }
         } else if(type == 2 && this.vertices[i].contents == 1 && this.vertices[i].owner == player) {
+            this.vertices[i].v.setAttribute('class', 'menu-item');
             this.vertices[i].v.setAttribute('onmouseover', 'game.board.highlightVertex('+i+', ' + type + ',' + player + ')');
             this.vertices[i].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+i+',' + type + ')');
 
@@ -647,6 +649,7 @@ game.board.hideEmptyVertices = function() {
         this.vertices[i].v.setAttribute('onmouseover', '');
         this.vertices[i].v.setAttribute('onmouseout', '');
         this.vertices[i].v.setAttribute('onclick', '');
+        this.vertices[i].v.setAttribute('class', '');
     }
 };
 
@@ -658,6 +661,7 @@ game.board.hideEmptyEdges = function() {
         this.edges[i].e.setAttribute('onmouseover', '');
         this.edges[i].e.setAttribute('onmouseout', '');
         this.edges[i].e.setAttribute('onclick', '');
+        this.edges[i].e.setAttribute('class', '');
     }
 };
 
@@ -1035,6 +1039,7 @@ game.actions.getRobbed = function() {
 game.actions.moveRobber = function() {
     // Move the robber
     for (var i = 0; i < 19; i++) {
+        this.game.board.hexes[i].circle.setAttribute('class', 'menu-item');
         this.game.board.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
         this.game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
         this.game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
@@ -1044,6 +1049,7 @@ game.actions.moveRobber = function() {
 game.actions.selectRobber = function(i) {
     for (var j = 0; j < 19; j++) {
         this.game.board.hexes[j].robber = 0;
+        this.game.board.hexes[j].circle.setAttribute('class', '');
         this.game.board.hexes[j].circle.setAttribute('onmouseover', '');
         this.game.board.hexes[j].circle.setAttribute('onmouseout', '');
         this.game.board.hexes[j].circle.setAttribute('onclick', '');
@@ -1164,9 +1170,11 @@ game.actions.playerControl = function() {
         if(obj[action] === true) {
             this.game.menu.buttons[i].children[0].setAttribute('fill', 'white');
             this.game.menu.buttons[i].setAttribute('onclick', 'game.actions.' + action+'()');
+            this.game.menu.buttons[i].setAttribute('class', 'menu-item');
         } else {
             this.game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
             this.game.menu.buttons[i].setAttribute('onclick', '');
+            this.game.menu.buttons[i].setAttribute('class', '');
 
         }
     }
