@@ -943,13 +943,21 @@ game.board.getPaths = function(player, edge, edge_path, vertex_path, paths) {
 };
 
 game.board.highlightRobber = function(i) {
-    this.hexes[i].circle.setAttribute('fill', 'rgba(1,1,1,0.6)');
-    this.hexes[i].circle.setAttribute('onclick', 'game.actions.selectRobber(' + i + ')');
+    if (this.hexes[i].robber == 0) {
+        this.hexes[i].circle.setAttribute('fill', 'rgba(1,1,1,0.6)');
+        this.hexes[i].circle.setAttribute('onclick', 'game.actions.selectRobber(' + i + ')');
+    } else {
+        this.hexes[i].circle.setAttribute('fill', 'rgba(255,0,0,0.6)');
+    }
 };
 
 game.board.unhighlightRobber = function(i) {
-    this.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
-    this.hexes[i].circle.setAttribute('onclick', '');
+    if (this.hexes[i].robber == 0) {
+        this.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
+        this.hexes[i].circle.setAttribute('onclick', '');
+    } else {
+        this.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
+    }
 };
 
 game.state = {
