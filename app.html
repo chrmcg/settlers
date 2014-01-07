@@ -1370,6 +1370,7 @@ game.actions.selectEdge = function(i) {
             this.game.state.phase = 1;
         } else {
             this.game.state.turn++;
+            this.game.statusbox.viewPlayer(this.game.state.turn);
         }
         
     } else if(this.game.state.phase == 1) {
@@ -1379,6 +1380,7 @@ game.actions.selectEdge = function(i) {
             this.game.state.next_action = 'rollDice';
         } else {
             this.game.state.turn--;
+            this.game.statusbox.viewPlayer(this.game.state.turn);
             this.game.state.next_action = 'buildSettlement';
         }
 
