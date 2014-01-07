@@ -66,15 +66,23 @@ game.statusbox.init = function() {
     for(var p = 0; p < this.game.state.player_count; p++) {
         this.fields[p] = {};
         var obj = {
-            r1: [0, 'wood'],
-            r2: [0, 'sheep'],
-            r3: [0, 'wheat'],
-            r4: [0, 'brick'],
-            r5: [0, 'ore'],
+            r1: [0, 'wood', 1],
+            r2: [0, 'sheep', 2],
+            r3: [0, 'wheat', 3],
+            r4: [0, 'brick', 4],
+            r5: [0, 'ore', 5],
         };
-        var text, button;
+        var text, button, rect;
         var g, i = 0;
         for(var a in obj) {
+			rect = document.createElementNS(game.ns, 'rect');
+			rect.setAttribute('x', '20');
+			rect.setAttribute('y', '10');
+			rect.setAttribute('width', '80');
+            rect.setAttribute('height', '20');
+			rect.setAttribute('float', 'left');
+			rect.setAttribute('fill', this.game.board.colors[obj[a][2]]);
+		
             text = document.createElementNS(game.ns, 'text');
             text.setAttribute('x', '22');
             text.setAttribute('y', '25');
@@ -84,7 +92,7 @@ game.statusbox.init = function() {
             text.setAttribute('font-size', '16px');
             text.setAttribute('fill', this.game.board.pcolors[p]);
             text.textContent = obj[a][0] + ' ' + obj[a][1];
-
+			
             button = document.createElementNS(game.ns, 'text');
             button.textContent = '4:1';
             button.setAttribute('x', '80');
@@ -96,7 +104,8 @@ game.statusbox.init = function() {
             if(this.game.state.turn != p+1) {
                 g.setAttribute('display', 'none');
             }
-            g.appendChild(text);
+            g.appendChild(rect);
+			g.appendChild(text);
             g.appendChild(button);
             game.svg.appendChild(g);
             this.fields[p][a] = text;
