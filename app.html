@@ -360,10 +360,7 @@ game.board.checkNums = function(nums) {
             for(var k = 0; k < this.vertices[v].hexes.length; k++) {
                 if(this.vertices[v].hexes[k] != i ) {
                     n = nums[this.vertices[v].hexes[k]];
-                    if(nums[i] == 6 && n == 6
-                    || nums[i] == 6 && n == 8
-                    || nums[i] == 8 && n == 6
-                    || nums[i] == 8 && n == 8) {
+                    if((nums[i] == 6 || nums[i] == 8) && (n == 6 || n == 8)) {
                         return false;
                     }
                 }
