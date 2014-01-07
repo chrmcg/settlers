@@ -15,6 +15,9 @@ body {
 svg {
     margin: auto;
 }
+.menu-item {
+    cursor: pointer;
+}
 -->
 </style>
 <body>
@@ -182,6 +185,7 @@ game.menu.init = function() {
         g = document.createElementNS(game.ns, 'g');
         g.setAttribute('transform', 'translate(' + positions[a][0] + ', ' + positions[a][1] + ')');
         g.setAttribute('data-action', a);
+        g.setAttribute('class', 'menu-item');
         g.appendChild(r);
         g.appendChild(text);
         
