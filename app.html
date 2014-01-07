@@ -14,6 +14,7 @@ body {
 }
 svg {
     margin: auto;
+    border: 1px solid black;
 }
 .menu-item {
     cursor: pointer;
@@ -59,30 +60,53 @@ game.statusbox = {
     game: game,
     wrapper_outer: null,
     fields: {},
+    player_fields: {},
 };
 
 game.statusbox.init = function() {
 
+    var rect, text, button, obj, g;
     for(var p = 0; p < this.game.state.player_count; p++) {
+
+        // TODO: align these with the Google+ Hangout filmstrip; for now just center them
+        var margin = 10;
+        var width = this.game.state.player_count <= 5 ? 120 : 100;
+        var offset = (700 - this.game.state.player_count*(margin+width) ) / 2;
+
+        this.player_fields[p] = {};
+        g = document.createElementNS(game.ns, 'g');
+        g.setAttribute('transform', 'translate(' + ((margin+width) * p + offset) + ', 410)');
+
+        rect = document.createElementNS(game.ns, 'rect');
+        rect.setAttribute('fill', this.game.board.pcolors[p]);
+        rect.setAttribute('x', '0');
+        rect.setAttribute('y', '0');
+        rect.setAttribute('width', width);
+        rect.setAttribute('height', '25');
+
+        g.appendChild(rect);
+        game.svg.appendChild(g);
+        this.player_fields[p].rect = rect;
+
         this.fields[p] = {};
-        var obj = {
+        obj = {
             r1: [0, 'wood', 1],
             r2: [0, 'sheep', 2],
             r3: [0, 'wheat', 3],
             r4: [0, 'brick', 4],
             r5: [0, 'ore', 5],
         };
-        var text, button, rect;
-        var g, i = 0;
+
+        var i = 0;
         for(var a in obj) {
-			rect = document.createElementNS(game.ns, 'rect');
-			rect.setAttribute('x', '20');
-			rect.setAttribute('y', '10');
-			rect.setAttribute('width', '80');
+            rect = document.createElementNS(game.ns, 'rect');
+            rect.setAttribute('x', '20');
+            rect.setAttribute('y', '10');
+            rect.setAttribute('width', '80');
             rect.setAttribute('height', '20');
-			rect.setAttribute('float', 'left');
-			rect.setAttribute('fill', this.game.board.colors[obj[a][2]]);
-		
+            rect.setAttribute('float', 'left');
+            rect.setAttribute('fill', this.game.board.colors[obj[a][2]]);
+
             text = document.createElementNS(game.ns, 'text');
             text.setAttribute('x', '22');
             text.setAttribute('y', '25');
@@ -90,7 +114,7 @@ game.statusbox.init = function() {
             text.setAttribute('width','80');
             text.setAttribute('height', '40');
             text.setAttribute('font-size', '16px');
-            text.setAttribute('fill', this.game.board.pcolors[p]);
+            text.setAttribute('fill', 'black');
             text.textContent = obj[a][0] + ' ' + obj[a][1];
 			
             button = document.createElementNS(game.ns, 'text');
@@ -105,13 +129,15 @@ game.statusbox.init = function() {
                 g.setAttribute('display', 'none');
             }
             g.appendChild(rect);
-			g.appendChild(text);
+            g.appendChild(text);
             g.appendChild(button);
             game.svg.appendChild(g);
             this.fields[p][a] = text;
             i++;
         }
     }
+
+    this.viewPlayer(1);
 };
 
 game.statusbox.viewPlayer = function(player) {
@@ -123,12 +149,16 @@ game.statusbox.viewPlayer = function(player) {
             this.fields[i].r3.parentElement.setAttribute('display', 'inline');
             this.fields[i].r4.parentElement.setAttribute('display', 'inline');
             this.fields[i].r5.parentElement.setAttribute('display', 'inline');
+            this.player_fields[i].rect.setAttribute('height', '30px');
+            this.player_fields[i].rect.setAttribute('transform', 'translate(0, -10)');
         } else {
             this.fields[i].r1.parentElement.setAttribute('display', 'none');
             this.fields[i].r2.parentElement.setAttribute('display', 'none');
             this.fields[i].r3.parentElement.setAttribute('display', 'none');
             this.fields[i].r4.parentElement.setAttribute('display', 'none');
             this.fields[i].r5.parentElement.setAttribute('display', 'none');
+            this.player_fields[i].rect.setAttribute('height', '20px');
+            this.player_fields[i].rect.setAttribute('transform', '');
         }
     }
 };
@@ -162,14 +192,14 @@ game.menu.init = function() {
     var positions = {
         'trade':            [540,  50, 70],
 
-        'playDevCard':      [475, 210, 100],
-        'buyDevCard':       [475, 320, 100],
+        'playDevCard':      [475, 200, 100],
+        'buyDevCard':       [475, 310, 100],
 
-        'buildRoad':        [615, 210, 80],
-        'buildSettlement':  [615, 265, 80],
-        'buildCity':        [615, 320, 80],
+        'buildRoad':        [615, 200, 80],
+        'buildSettlement':  [615, 255, 80],
+        'buildCity':        [615, 310, 80],
 
-        'endTurn':          [550, 370, 150],
+        'endTurn':          [550, 360, 150],
     };
     var r, text, g, i = 0;
     for(var a in actions) {
@@ -1435,7 +1465,7 @@ game.state.uploadInitialState = function() {
 window.init = function () {
     game.svg = document.createElementNS(game.ns, 'svg');
     game.svg.setAttribute('width', '700');
-    game.svg.setAttribute('height', '400');
+    game.svg.setAttribute('height', '430');
     document.getElementById("board").appendChild(game.svg);
     
 
@@ -1451,7 +1481,7 @@ window.init = function () {
             };
 
             game.board.init();
-            game.board.draw(700, 400);
+            game.board.draw(700, 390);
             game.menu.init();
             game.state.init(3);
             game.statusbox.init();
