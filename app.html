@@ -193,6 +193,7 @@ game.board = {
 
 game.board.init = function() {
 	var nums = [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12];
+	// Randomize numbers
 	for(var i = 0; i < nums.length - 1; i++) {
 		var swap = Math.floor(Math.random() * (nums.length - 1 - i)) + i + 1;
 		temp = nums[i];
@@ -203,13 +204,14 @@ game.board.init = function() {
 	
     // 1 = WOOD, 2 = SHEEP, 3 = WHEAT, 4 = BRICK, 5 = ORE, 0 = DESERT
 	var types = [0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5];
+	// Randomize types
 	for(var i = 0; i < types.length - 1; i++) {
 		var swap = Math.floor(Math.random() * (types.length - 1 - i)) + i + 1;
 		temp = types[i];
 		types[i] = types[swap];
 		types[swap] = temp;
 	}
-	
+	// TODO: pass to shared state
     var vhex = [
         [ 1,  2, 10,  9,  8,  0], // hex 0
         [ 3,  4, 12, 11, 10,  2],
@@ -263,6 +265,13 @@ game.board.init = function() {
         [48, 6], [47, 6], [38, 3], [28, 3],
         [17, 5], [ 7, 5]
     ];
+	// Randomize ports
+	for(var i = 0; i < ports.length - 1; i++) {
+		var swap = Math.floor(Math.random() * (ports.length - 1 - i)) + i + 1;
+		temp = ports[i][1];
+		ports[i][1] = ports[swap][1];
+		ports[swap][1] = temp;
+	}
 
     // Initialize game.board.vertices
     for(var i = 0; i < 54; i++) {
