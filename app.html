@@ -24,6 +24,9 @@ svg {
 text {
     cursor: default;
 }
+.menu-item text {
+    cursor: pointer;
+}
 -->
 </style>
 <body>
@@ -70,7 +73,7 @@ game.statusbox = {
 
 game.statusbox.init = function() {
 
-    var rect, text, button, obj, g;
+    var rect, text, button, obj, g, label;
     for(var p = 0; p < this.game.state.player_count; p++) {
 
         // TODO: align these with the Google+ Hangout filmstrip; for now just center them
@@ -105,39 +108,67 @@ game.statusbox.init = function() {
         var i = 0;
         for(var a in obj) {
             rect = document.createElementNS(game.ns, 'rect');
-            rect.setAttribute('x', '20');
-            rect.setAttribute('y', '10');
-            rect.setAttribute('width', '80');
-            rect.setAttribute('height', '20');
+            rect.setAttribute('x', '0');
+            rect.setAttribute('y', '0');
+            rect.setAttribute('width', '44');
+            rect.setAttribute('height', '80');
             rect.setAttribute('float', 'left');
             rect.setAttribute('fill', this.game.board.colors[obj[a][2]]);
 
+            label = document.createElementNS(game.ns, 'text');
+            label.setAttribute('x', '22');
+            label.setAttribute('y', '15');
+            label.setAttribute('font-size', '14px');
+            label.setAttribute('fill', 'black');
+            label.setAttribute('text-anchor', 'middle');
+            label.style.fontFamily = 'sans-serif';
+            label.textContent = obj[a][1];
+
+            // the actual resource count
             text = document.createElementNS(game.ns, 'text');
             text.setAttribute('x', '22');
-            text.setAttribute('y', '25');
-
-            text.setAttribute('width','80');
+            text.setAttribute('y', '45');
+            text.setAttribute('width','44');
             text.setAttribute('height', '40');
-            text.setAttribute('font-size', '16px');
+            text.setAttribute('font-size', '28px');
             text.setAttribute('fill', 'black');
-            text.textContent = obj[a][0] + ' ' + obj[a][1];
+            text.setAttribute('text-anchor', 'middle');
+            text.style.fontFamily = 'sans-serif';
+            text.textContent = obj[a][0];
 			
-            button = document.createElementNS(game.ns, 'text');
-            button.textContent = '4:1';
-            button.setAttribute('x', '80');
-            button.setAttribute('y', '25');
-            button.setAttribute('font-size', '16px');
+            button = document.createElementNS(game.ns, 'g');
+            button.setAttribute('transform', 'translate(22, 70)');
+            button.setAttribute('text-anchor', 'middle');
 
             g = document.createElementNS(game.ns, 'g');
-            g.setAttribute('transform', 'translate(' + (425) + ', ' + (20*i) + ')');
+            g.setAttribute('transform', 'translate(' + (445 + 50*i) + ', ' + (10) + ')');
             if(this.game.state.turn != p+1) {
                 g.setAttribute('display', 'none');
             }
             g.appendChild(rect);
+            g.appendChild(label);
             g.appendChild(text);
             g.appendChild(button);
             game.svg.appendChild(g);
-            this.fields[p][a] = text;
+            this.fields[p][a] = {num: text, button: button, wrapper: g};
+
+            rect = document.createElementNS(game.ns, 'rect');
+            rect.setAttribute('width', '35');
+            rect.setAttribute('height', '18');
+            rect.setAttribute('x', '-17.5'); // half-integer values render better
+            rect.setAttribute('y', '-14.5');
+            rect.setAttribute('fill', 'gray');
+            rect.setAttribute('stroke', 'black');
+            button.appendChild(rect);
+
+            text = document.createElementNS(game.ns, 'text');
+            text.setAttribute('font-size', '16px');
+            text.style.fontFamily = 'sans-serif';
+            text.style.fontWeight = 'bold';
+            text.textContent = '4:1';
+            button.appendChild(text);
+
+          
             i++;
         }
     }
@@ -149,19 +180,19 @@ game.statusbox.viewPlayer = function(player) {
 
     for(var i = 0; i < this.game.state.player_count; i++) {
         if(i == player-1) {
-            this.fields[i].r1.parentElement.setAttribute('display', 'inline');
-            this.fields[i].r2.parentElement.setAttribute('display', 'inline');
-            this.fields[i].r3.parentElement.setAttribute('display', 'inline');
-            this.fields[i].r4.parentElement.setAttribute('display', 'inline');
-            this.fields[i].r5.parentElement.setAttribute('display', 'inline');
+            this.fields[i].r1.wrapper.setAttribute('display', 'inline');
+            this.fields[i].r2.wrapper.setAttribute('display', 'inline');
+            this.fields[i].r3.wrapper.setAttribute('display', 'inline');
+            this.fields[i].r4.wrapper.setAttribute('display', 'inline');
+            this.fields[i].r5.wrapper.setAttribute('display', 'inline');
             this.player_fields[i].rect.setAttribute('height', '30px');
             this.player_fields[i].rect.setAttribute('transform', 'translate(0, -10)');
         } else {
-            this.fields[i].r1.parentElement.setAttribute('display', 'none');
-            this.fields[i].r2.parentElement.setAttribute('display', 'none');
-            this.fields[i].r3.parentElement.setAttribute('display', 'none');
-            this.fields[i].r4.parentElement.setAttribute('display', 'none');
-            this.fields[i].r5.parentElement.setAttribute('display', 'none');
+            this.fields[i].r1.wrapper.setAttribute('display', 'none');
+            this.fields[i].r2.wrapper.setAttribute('display', 'none');
+            this.fields[i].r3.wrapper.setAttribute('display', 'none');
+            this.fields[i].r4.wrapper.setAttribute('display', 'none');
+            this.fields[i].r5.wrapper.setAttribute('display', 'none');
             this.player_fields[i].rect.setAttribute('height', '20px');
             this.player_fields[i].rect.setAttribute('transform', '');
         }
@@ -171,7 +202,7 @@ game.statusbox.viewPlayer = function(player) {
 game.statusbox.updateFields = function(player, fields_obj) {
 
     for(var a in fields_obj) {
-        this.fields[player-1]['r'+a].textContent = fields_obj[a] + this.fields[player-1]['r'+a].textContent.substring(this.fields[player-1]['r'+a].textContent.indexOf(' '));
+        this.fields[player-1]['r'+a].num.textContent = fields_obj[a];
     }
 };
 
@@ -195,7 +226,7 @@ game.menu.init = function() {
 
     };
     var positions = {
-        'trade':            [540,  50, 70],
+        'trade':            [540, 145, 70],
 
         'buyDevCard':       [475, 310, 100],
 
@@ -645,14 +676,7 @@ game.board.draw = function(w, h) {
             }
 
             group.appendChild(hex);
-            if (this.hexes[i].type != 0) {
-                circle = document.createElementNS(game.ns, 'circle');
-                circle.setAttribute('cx', this.hexes[i].cx);
-                circle.setAttribute('cy', this.hexes[i].cy);
-                circle.setAttribute('fill', '#faf0e6');
-                circle.setAttribute('r', '27');
-                group.appendChild(circle);
-            }
+            
             // Create a placeholder robber
             circle = document.createElementNS(game.ns, 'circle');
             circle.setAttribute('cx', this.hexes[i].cx);
@@ -1048,6 +1072,26 @@ game.state.collect = function(player, resources) {
     this.updateCards(player);
 };
 
+game.state.playerTradingFactors = function(player) {
+    var obj = {1:4, 2:4, 3:4, 4:4, 5:4};
+
+    for(var i = 0; i < 54; i++) {
+        if(game.board.vertices[i].port > 0 && game.board.vertices[i].owner == player) {
+            if(game.board.vertices[i].port == 6) {
+                obj[1] = (obj[1] == 2 ? 2 : 3);
+                obj[2] = (obj[2] == 2 ? 2 : 3);
+                obj[3] = (obj[3] == 2 ? 2 : 3);
+                obj[4] = (obj[4] == 2 ? 2 : 3);
+                obj[5] = (obj[5] == 2 ? 2 : 3);
+            } else {
+                obj[game.board.vertices[i].port] = 2;
+            }
+        }
+    }
+
+    return obj;
+}
+
 game.state.updateVictoryPoints = function() {
 
     var s, c, lr, la, vpc, player, p2, r;
@@ -1317,23 +1361,65 @@ game.actions.playDevCard = function(type) {
     }
 };
 
-game.actions.selectCards = function(reason) {
-	switch(reason) {
-		case 'Y':
-		// Year of plenty
-		// TODO: Choose any two resources and add them to your resources
-		break;
-		case 'M':
-		// Monopoly
-		// TODO: Choose one resource and get it from everyone
-		break;
-		case 'R':
-		// Robbed
-		// Choose half of your own resources to discard if you are coming from getRobbed()
-		break;
-		default: break;
-	}
-}
+game.actions.selectCards = function(reason, params) {
+    switch(reason) {
+        case 'Y':
+        // Year of plenty
+        // TODO: Choose any two resources and add them to your resources
+        break;
+
+        case 'M':
+        // Monopoly
+        // TODO: Choose one resource and get it from everyone
+        break;
+
+        case 'R':
+        // Robbed
+        // Choose half of your own resources to discard if you are coming from getRobbed()
+        break;
+
+        case 'A':
+        // Ask
+        // Choose what resources you're asking for in trade
+        console.log('Select a card and call game.actions.proposeTrade('+params.to+','+params.from+','+JSON.stringify(params.offer)+', {YOUR_SELECTION})' );
+ 
+        // TODO: setup a GUI such that pressing confirm, IF selection meets params.max and params.min requirements, calls:
+
+        //game.actions.proposeTrade(params.to, params.from, params.offer, selection);
+        break;
+
+        case 'O':
+        // Offer
+        // Choose what resources you're offering in trade
+        default: break;
+    }
+};
+
+game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
+
+    // Bank accepts or denies trade immediately based on 4:1, 3:1, 2:1 rules
+    if(p_to == 0) {
+        // TODO: check rules
+        game.actions.completeTrade(p_from, p_to, offer, ask);
+    } else {
+        // TODO: send this offer to the other player, get mutual confirmation
+    }
+};
+
+game.actions.setupTrade = function(p_from, p_to, offer) {
+    
+    if(p_to == 0 && game.state.playerHas(p_from, offer) === true) {
+        // Assuming valid 4:1, 3:1 or 2:1 bank trade
+        game.actions.selectCards('A', {
+            max: 1,
+            min: 1,
+            offer: offer,
+            from: p_from,
+            to: p_to,
+        });
+    } else console.log('bad setupTrade call');
+
+};
 
 game.actions.trade = function() {
     // TODO
@@ -1377,6 +1463,23 @@ game.actions.playerControl = function() {
             game.menu.devcards[i].button.children[0].setAttribute('fill', 'white');
         } else {
             game.menu.devcards[i].button.children[0].setAttribute('fill', 'gray');
+        }
+    }
+
+    var obj, factor;
+    var f_obj = game.state.playerTradingFactors(game.state.turn);
+    for(var i = 1; i <= 5; i++) {
+        factor = f_obj[i];
+        obj = {}; obj[i] = factor;
+        game.statusbox.fields[game.state.turn-1]['r'+i].button.children[1].textContent = factor + ':1';
+        if(game.state.playerHas(game.state.turn, obj) === true) {
+        game.statusbox.fields[game.state.turn-1]['r'+i].button.setAttribute('onclick', 
+            'game.actions.setupTrade('+game.state.turn+', 0, {'+i+':'+factor+'})'
+            );
+        game.statusbox.fields[game.state.turn-1]['r'+i].button.children[0].setAttribute('fill', 'white');
+        } else {
+        game.statusbox.fields[game.state.turn-1]['r'+i].button.setAttribute('onclick', '');
+        game.statusbox.fields[game.state.turn-1]['r'+i].button.children[0].setAttribute('fill', 'gray');
         }
     }
 
@@ -1601,6 +1704,28 @@ game.state.uploadInitialState = function() {
     gapi.hangout.data.submitDelta(s);
 };
 
+// For debugging
+game.autosettle = function() {
+    game.actions.selectVertex(10, 1);
+    game.actions.selectEdge(7);
+    game.actions.selectVertex(4, 1);
+    game.actions.selectEdge(8);
+    game.actions.selectVertex(21, 1);
+    game.actions.selectEdge(27);
+    game.actions.selectVertex(30, 1);
+    game.actions.selectEdge(42);
+    game.actions.selectVertex(42, 1);
+    game.actions.selectEdge(58);
+    game.actions.selectVertex(44, 1);
+    game.actions.selectEdge(59);
+    if(game.state.player_count > 3) {
+        game.actions.selectVertex(24, 1);
+        game.actions.selectEdge(31);
+        game.actions.selectVertex(39, 1);
+        game.actions.selectEdge(55);
+    }
+}
+
 window.init = function () {
     game.svg = document.createElementNS(game.ns, 'svg');
     game.svg.setAttribute('width', '700');
@@ -1626,6 +1751,7 @@ window.init = function () {
             game.statusbox.init();
 
             game.proceed();
+            game.autosettle();
         }
     });
 }
