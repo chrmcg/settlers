@@ -674,6 +674,9 @@ game.board.draw = function(w, h) {
                     prob.setAttribute('fill', '#ff0000');
                     text.setAttribute('fill', '#ff0000');
                 }            
+            } else {
+                text = null;
+                prob = null;
             }
 
             group.appendChild(hex);
