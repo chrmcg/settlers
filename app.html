@@ -674,9 +674,6 @@ game.board.draw = function(w, h) {
                     prob.setAttribute('fill', '#ff0000');
                     text.setAttribute('fill', '#ff0000');
                 }            
-            } else {
-                text = null;
-                prob = null;
             }
 
             group.appendChild(hex);
@@ -695,10 +692,8 @@ game.board.draw = function(w, h) {
             this.hexes[i].circle = circle;
 
             // The order of appendChild calls determines the z-index in SVG
-            if(text != null) {
+            if(this.hexes[i].type != 0) {
                 group.appendChild(text);
-            }
-            if (prob != null) {
                 group.appendChild(prob);
             }
             group.appendChild(circle);
