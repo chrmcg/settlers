@@ -30,7 +30,8 @@
             cursor: pointer;
         }
         .hex-content {
-            text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+            font-family: sans-serif;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
         }
         -->
         </style>
@@ -665,10 +666,12 @@ game.board.draw = function(w, h) {
                 text.setAttribute('font-size', '32px');
                 text.setAttribute('class', 'hex-content');
                 text.textContent = this.hexes[i].num;
+                text.setAttribute('fill', 'white');
                 prob = document.createElementNS(game.ns, 'text');
                 prob.setAttribute('x', this.hexes[i].cx);
                 prob.setAttribute('y', this.hexes[i].cy + 25);
                 prob.setAttribute('class', 'hex-content');
+                prob.setAttribute('fill', 'white');
                 if (this.hexes[i].num == 2 || this.hexes[i].num == 12) {
                     prob.textContent = "\u2022";
                 } else if (this.hexes[i].num == 3 || this.hexes[i].num == 11) {
