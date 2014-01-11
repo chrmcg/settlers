@@ -1260,6 +1260,19 @@ game.actions.getRobbed = function() {
 };
 
 game.actions.moveRobber = function() {
+    // Don't let the user do anything until the robber is moved
+    for(var i = 0; i < this.game.menu.buttons.length; i++) {
+        this.game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
+        this.game.menu.buttons[i].setAttribute('onclick', '');
+        this.game.menu.buttons[i].setAttribute('class', '');
+    }
+    for(var i = 0; i < game.state.player_count; i++) {
+        for(var j = 1; j <= 5; j++) {
+            game.statusbox.fields[i]['r'+j].button.children[0].setAttribute('fill', 'gray');
+            game.statusbox.fields[i]['r'+j].button.setAttribute('onclick', '');
+        }
+    }
+
     // Move the robber
     for (var i = 0; i < 19; i++) {
         this.game.board.hexes[i].circle.setAttribute('class', 'menu-item');
