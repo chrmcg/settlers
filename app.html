@@ -230,10 +230,12 @@ game.menu.init = function() {
         'buyDevCard': 'Buy Dev Card',
         'trade': 'Trade',
         'endTurn': 'DONE',
+        'confirmSelect': 'Confirm',
+        'cancelSelect': 'Cancel',
 
     };
     var positions = {
-        'trade':            [540, 145, 70],
+        'trade':            [530, 115, 70],
 
         'buyDevCard':       [475, 310, 100],
 
@@ -242,6 +244,9 @@ game.menu.init = function() {
         'buildCity':        [615, 310, 80],
 
         'endTurn':          [550, 360, 150],
+
+        'confirmSelect':    [500, 200, 80],
+        'cancelSelect':     [590, 200, 80],
     };
     var r, text, g, i = 0;
     for(var a in actions) {
@@ -268,6 +273,8 @@ game.menu.init = function() {
         g.setAttribute('data-action', a);
         g.appendChild(r);
         g.appendChild(text);
+
+        if(['confirmSelect', 'cancelSelect'].indexOf(a) > -1) g.setAttribute('visibility', 'hidden');
         
         game.svg.appendChild(g);
         this.buttons.push(g);
@@ -1446,6 +1453,17 @@ game.selectbox.init = function() {
 };
 
 game.actions.selectCards = function(reason, params) {
+
+    game.menu.buttons.forEach(function(a){
+        //if(a.getAttribute('data-action')=='trade'){a.setAttribute('visibility','hidden');}
+        //if(a.getAttribute('data-action')=='confirmSelect'){a.setAttribute('visibility','visible');}
+        if(['trade','buildRoad','buildSettlement','buildCity','buyDevCard'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','hidden');}
+        if(['confirmSelect', 'cancelSelect'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','visible');}
+    });
+    game.selectbox.wrapper_outer.setAttribute('visibility', 'visible');
+
+    this.params = params;
+
     switch(reason) {
         case 'Y':
         // Year of plenty
@@ -1465,11 +1483,60 @@ game.actions.selectCards = function(reason, params) {
         case 'A':
         // Ask
         // Choose what resources you're asking for in trade
-        console.log('Select a card and call game.actions.proposeTrade('+params.from+','+params.to+','+JSON.stringify(params.offer)+', {YOUR_SELECTION})' );
- 
-        // TODO: setup a GUI such that pressing confirm, IF selection meets params.max and params.min requirements, calls:
 
-        //game.actions.proposeTrade(params.from, params.to, params.offer, selection);
+        var self = this;
+        this.cb = function(i) {
+            var c =  1+parseInt(game.selectbox.fields['r'+i].num.textContent);
+            if(c <= 1) {
+                game.selectbox.fields['r'+i].num.textContent = c;
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
+          
+                for(var j = 1; j <= 5; j++) {
+                    if(i != j) {
+                        game.selectbox.fields['r'+j].num.textContent = '0';
+
+                        game.selectbox.fields['r'+j].dec_button.children[0].setAttribute('fill', 'gray');
+                        game.selectbox.fields['r'+j].inc_button.children[0].setAttribute('fill', 'white');
+                        game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', 'game.actions.cb('+j+')');
+                        game.selectbox.fields['r'+j].num.setAttribute('fill', 'black');
+                    }
+                    for(var k in params.offer) {
+                        game.selectbox.fields['r'+k].inc_button.children[0].setAttribute('fill', 'gray');
+                        game.selectbox.fields['r'+k].inc_button.setAttribute('onclick', '');
+                        game.selectbox.fields['r'+k].num.setAttribute('fill', 'gray');
+                    }
+                }
+            }
+
+            game.menu.buttons.forEach(function(a){
+                if(a.getAttribute('data-action')=='confirmSelect'){
+                    a.children[0].setAttribute('fill', 'white');
+                    a.setAttribute('onclick', 'game.actions.confirmSelect('+JSON.stringify(params)+')');
+                    a.setAttribute('class', 'menu-item');
+                }
+                if(a.getAttribute('data-action')=='cancelSelect'){
+                    a.children[0].setAttribute('fill', 'white');
+                    a.setAttribute('onclick', 'game.actions.cancelSelect()');
+                    a.setAttribute('class', 'menu-item');
+                }
+            });
+        };
+
+        for(var i = 1; i <= 5; i++) {
+            game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
+            game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
+            game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.cb('+i+')');
+            game.selectbox.fields['r'+i].num.textContent = '0';
+            game.selectbox.fields['r'+i].num.setAttribute('fill', 'black');
+        }
+
+        for(var i in params.offer) {
+            game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
+            game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
+            game.selectbox.fields['r'+i].num.setAttribute('fill', 'gray');
+        }
+
         break;
 
         case 'O':
@@ -1477,6 +1544,33 @@ game.actions.selectCards = function(reason, params) {
         // Choose what resources you're offering in trade
         default: break;
     }
+};
+
+game.actions.confirmSelect = function(params) {
+
+    var ask = {}, a;
+    for(var j = 1; j <= 5; j++) {
+        a = parseInt(game.selectbox.fields['r'+j].num.textContent);
+        if(a > 0) ask[j] = a;
+    }
+    
+    game.actions.cancelSelect();
+    game.actions.proposeTrade(params.from, params.to, params.offer, ask);
+    
+};
+
+game.actions.cancelSelect = function() {
+    game.menu.buttons.forEach(function(a){
+        if(['trade','buildRoad','buildSettlement','buildCity','buyDevCard'].indexOf(a.getAttribute('data-action')) > -1){
+            a.setAttribute('visibility','visible');
+        }
+        if(['confirmSelect', 'cancelSelect'].indexOf(a.getAttribute('data-action')) > -1){
+            a.setAttribute('visibility','hidden');
+            a.children[0].setAttribute('fill','gray');
+            a.setAttribute('onclick','');
+        }
+    });
+    game.selectbox.wrapper_outer.setAttribute('visibility', 'hidden');
 };
 
 game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
@@ -1605,6 +1699,7 @@ game.actions.endTurn = function() {
     }
 
     this.game.actions.cancelPlacement();
+    this.game.actions.cancelSelect();
 
     this.game.state.next_action = 'rollDice';
     this.game.state.turn = this.game.state.turn == this.game.state.player_count ? 1 : this.game.state.turn+1;
