@@ -1253,10 +1253,28 @@ game.actions.getRobbed = function() {
     this.game.state.next_action = 'moveRobber';
     gapi.hangout.data.submitDelta({'next_action': 'moveRobber'});
 
-    // TODO: select cards (game.actions.selectCards ?)
     console.log('Each player with >7 cards has to select cards now...');
-	
-    this.game.proceed();
+    var cards = 0; 
+    for(var i = 1; i <= 5; i++) {
+        cards += game.state['p'+(game.state.turn-1)]['r'+i]   
+    }
+
+    if(cards > 7) {
+        game.menu.buttons.forEach(function(a){
+            if(['endTurn'].indexOf(a.getAttribute('data-action')) > -1){
+                a.setAttribute('visibility','hidden');
+            }
+        });
+        for(var i = 1; i <= 5; i++) {
+            game.statusbox.fields[(game.state.turn-1)]['r'+i].button.setAttribute('onclick','');
+            game.statusbox.fields[(game.state.turn-1)]['r'+i].button.children[0].setAttribute('fill','gray');
+            
+        }
+        game.actions.selectCards('R', {card_count: cards});
+        
+    } else {
+        game.proceed();
+    }
 };
 
 game.actions.moveRobber = function() {
@@ -1555,7 +1573,88 @@ game.actions.selectCards = function(reason, params) {
 
         case 'R':
         // Robbed
-        // Choose half of your own resources to discard if you are coming from getRobbed()
+        var cards_robbed = Math.floor(params.card_count / 2);
+        console.log('Player '+game.state.turn+' has '+params.card_count+' cards and must discard '+cards_robbed);
+        this.incdec = function(i, amt) {
+            var c = amt+parseInt(game.selectbox.fields['r'+i].num.textContent);
+            game.selectbox.fields['r'+i].num.textContent = c;
+
+            var sum = 0;
+            var obj = {};
+            for(var j = 1; j <= 5; j++) { 
+                obj[j] = parseInt(game.selectbox.fields['r'+j].num.textContent); 
+                sum += obj[j];
+            }
+
+            var limit = game.state['p'+(game.state.turn-1)]['r'+i];
+
+            if(c >= limit) {
+                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', 'game.actions.incdec('+i+',-1)');
+                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'white');
+            } else if(c < limit && c > 0) {
+                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'white');
+                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', 'game.actions.incdec('+i+',-1)');
+      
+            } else if(c == 0) {
+                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
+                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', '');
+            }
+
+            if(sum == cards_robbed && game.state.playerHas(game.state.turn, obj) === true) {
+                for(var j = 1; j <= 5; j++) {
+                    game.selectbox.fields['r'+j].inc_button.children[0].setAttribute('fill', 'gray');
+                    game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', '');
+                }
+                game.menu.buttons.forEach(function(a){
+                    if(a.getAttribute('data-action')=='confirmSelect'){
+                        a.children[0].setAttribute('fill', 'white');
+                        a.setAttribute('onclick', 'game.actions.confirmSelect("'+reason+'",'+JSON.stringify(params)+')');
+                        a.setAttribute('class', 'menu-item');
+                    }
+                });
+            } else if(sum < cards_robbed) {
+                for(var j = 1; j <= 5; j++) {
+                    if(obj[j] < game.state['p'+(game.state.turn-1)]['r'+j]) {
+                        game.selectbox.fields['r'+j].inc_button.children[0].setAttribute('fill', 'white');
+                        game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', 'game.actions.incdec('+j+',1)');
+                    } else {
+                        game.selectbox.fields['r'+j].inc_button.children[0].setAttribute('fill', 'gray');
+                        game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', '');
+                    }
+
+                }
+                game.menu.buttons.forEach(function(a){
+                    if(a.getAttribute('data-action')=='confirmSelect'){
+                        a.children[0].setAttribute('fill', 'gray');
+                        a.setAttribute('onclick', '');
+                        a.setAttribute('class', '');
+                    }
+                });
+            }
+        };
+
+        for(var i = 1; i <= 5; i++) {
+            game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
+            if(game.state['p'+(game.state.turn-1)]['r'+i] > 0) {
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
+            } else {
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
+
+            }
+            game.selectbox.fields['r'+i].num.textContent = '0';
+            game.selectbox.fields['r'+i].num.setAttribute('fill', 'black');
+        }
+
+        game.menu.buttons.forEach(function(a){
+            if(a.getAttribute('data-action')=='cancelSelect'){
+                a.children[0].setAttribute('fill', 'gray');
+                a.setAttribute('onclick', '');
+                a.setAttribute('class', '');
+            }
+        });
+
         break;
 
         case 'A':
@@ -1563,6 +1662,7 @@ game.actions.selectCards = function(reason, params) {
         // Choose what resources you're asking for in trade
 
         this.inc = function(i) {
+            this.incdec = null;
             var c =  1+parseInt(game.selectbox.fields['r'+i].num.textContent);
             if(c <= 1) {
                 game.selectbox.fields['r'+i].num.textContent = c;
@@ -1573,6 +1673,7 @@ game.actions.selectCards = function(reason, params) {
                     if(i != j) {
                         game.selectbox.fields['r'+j].num.textContent = '0';
 
+                        game.selectbox.fields['r'+j].dec_button.setAttribute('onclick', '');
                         game.selectbox.fields['r'+j].dec_button.children[0].setAttribute('fill', 'gray');
                         game.selectbox.fields['r'+j].inc_button.children[0].setAttribute('fill', 'white');
                         game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', 'game.actions.inc('+j+')');
@@ -1581,6 +1682,7 @@ game.actions.selectCards = function(reason, params) {
                     for(var k in params.offer) {
                         game.selectbox.fields['r'+k].inc_button.children[0].setAttribute('fill', 'gray');
                         game.selectbox.fields['r'+k].inc_button.setAttribute('onclick', '');
+                        game.selectbox.fields['r'+k].dec_button.setAttribute('onclick', '');
                         game.selectbox.fields['r'+k].num.setAttribute('fill', 'gray');
                     }
                 }
@@ -1656,6 +1758,17 @@ game.actions.confirmSelect = function(reason, params) {
     game.actions.cancelSelect();
     break;
 
+
+    case 'R':
+    var robbed = {}, a;
+    for(var j = 1; j <= 5; j++) {
+        a = parseInt(game.selectbox.fields['r'+j].num.textContent);
+        if(a > 0) robbed[j] = a;
+    }
+    game.state.deduct(game.state.turn, robbed);
+    game.actions.cancelSelect();
+    break;
+
     case 'A':
     var ask = {}, a;
     for(var j = 1; j <= 5; j++) {
@@ -1673,7 +1786,7 @@ game.actions.confirmSelect = function(reason, params) {
 
 game.actions.cancelSelect = function() {
     game.menu.buttons.forEach(function(a){
-        if(['trade','buildRoad','buildSettlement','buildCity','buyDevCard'].indexOf(a.getAttribute('data-action')) > -1){
+        if(['trade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn'].indexOf(a.getAttribute('data-action')) > -1){
             a.setAttribute('visibility','visible');
         }
         if(['confirmSelect', 'cancelSelect'].indexOf(a.getAttribute('data-action')) > -1){
