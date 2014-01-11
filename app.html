@@ -2354,6 +2354,17 @@ game.actions.selectVertex = function(i, type) {
         this.game.board.vertices[i].contents = type;
         this.game.board.vertices[i].owner = this.game.state.turn;
         this.game.board.vertices[i].v.setAttribute('fill', game.board.pcolors[this.game.state.turn-1]);
+        if (type == 1) {
+            this.game.board.vertices[i].v.setAttribute('width', '10');
+            this.game.board.vertices[i].v.setAttribute('height', '10');
+            this.game.board.vertices[i].v.setAttribute('x', game.board.vertices[i].x - 5);
+            this.game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 5);
+        } else if (type == 2) {
+            this.game.board.vertices[i].v.setAttribute('width', '20');
+            this.game.board.vertices[i].v.setAttribute('height', '20');
+            this.game.board.vertices[i].v.setAttribute('x', game.board.vertices[i].x - 10);
+            this.game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 10);
+        }
         this.game.board.vertices[i].v.setAttribute('onclick', '');
     }
     this.game.board.hideEmptyVertices();
@@ -2371,6 +2382,7 @@ game.actions.selectEdge = function(i, player, params) {
     this.game.board.edges[i].road = 1;
     this.game.board.edges[i].owner = this.game.state.turn;
     this.game.board.edges[i].e.setAttribute('stroke', game.board.pcolors[this.game.state.turn-1]);
+    this.game.board.edges[i].e.setAttribute('stroke-width', '5');
     this.game.board.edges[i].e.setAttribute('onclick', '');
 
     ee[i].road = 1;

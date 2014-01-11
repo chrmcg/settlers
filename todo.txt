@@ -19,4 +19,3 @@ turn it is (gapi.hangout.layout)
 BUGS:
 
 Cannot cancel building road/settlement/city
-Settlements, roads too big after drafting
