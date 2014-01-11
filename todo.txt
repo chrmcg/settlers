@@ -17,3 +17,8 @@ turn it is (gapi.hangout.layout)
 
 - Push and pull game.state from gapi.hangout.data
 
+
+BUGS:
+
+Cannot cancel building road/settlement/city
+Settlements, roads too big after drafting
