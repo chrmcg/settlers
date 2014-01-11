@@ -319,6 +319,7 @@ game.menu.init = function() {
     }
 
     g.setAttribute('transform', 'translate(455, 210)');
+    game.devcardbox = g;
     game.svg.appendChild(g);
 };
 
@@ -1383,7 +1384,7 @@ game.selectbox.init = function() {
 
     this.wrapper_outer = document.createElementNS(game.ns, 'g');
     this.wrapper_outer.setAttribute('transform', 'translate(445, 95)');
-    this.wrapper_outer.setAttribute('visibility', 'hidden');
+    this.wrapper_outer.setAttribute('display', 'none');
     game.svg.appendChild(this.wrapper_outer);
 
     var gInc, gDec, n, w, text, rect;
@@ -1460,7 +1461,8 @@ game.actions.selectCards = function(reason, params) {
         if(['trade','buildRoad','buildSettlement','buildCity','buyDevCard'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','hidden');}
         if(['confirmSelect', 'cancelSelect'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','visible');}
     });
-    game.selectbox.wrapper_outer.setAttribute('visibility', 'visible');
+    game.devcardbox.setAttribute('display', 'none');
+    game.selectbox.wrapper_outer.setAttribute('display', 'inline');
 
     this.params = params;
 
@@ -1570,7 +1572,8 @@ game.actions.cancelSelect = function() {
             a.setAttribute('onclick','');
         }
     });
-    game.selectbox.wrapper_outer.setAttribute('visibility', 'hidden');
+    game.devcardbox.setAttribute('display', 'inline');
+    game.selectbox.wrapper_outer.setAttribute('display', 'none');
 };
 
 game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
