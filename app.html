@@ -1391,6 +1391,7 @@ game.actions.playDevCard = function(type) {
         var obj = {next_action: 'playerControl'};
         obj['p'+(this.game.state.turn-1)] = JSON.stringify(p);
         gapi.hangout.data.submitDelta(obj);
+        game.state.updateVictoryPoints();
 
         this.game.actions.moveRobber();
     break;
