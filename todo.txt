@@ -5,8 +5,6 @@ IMPLEMENT:
 - GUI:
    Current Offer / Current Ask
    other players' offers & asks, w/ Accept button if matching
-- Playing Road Building Cards
-
 
 - Move the VideoCanvas onto the app and show the VideoFeed of whoever's 
 turn it is (gapi.hangout.layout)
