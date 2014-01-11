@@ -219,6 +219,7 @@ game.menu = {
     wrapper_outer: null,
     buttons: [],
     devcards: [],
+    offers: [],
 
 };
 
@@ -323,6 +324,43 @@ game.menu.init = function() {
 
     g.setAttribute('transform', 'translate(455, 210)');
     game.devcardbox = g;
+    game.svg.appendChild(g);
+
+
+    // Add a box for trading offers
+    g = document.createElementNS(game.ns, 'g');
+    for(var j = 0; j < game.state.player_count; j++) {
+
+        text = document.createElementNS(game.ns, 'text');
+        text.setAttribute('x', 90);
+        text.setAttribute('y', 17);
+        text.setAttribute('text-anchor', 'middle');
+        text.textContent = 'Offer '+j;
+
+        g2 = document.createElementNS(game.ns, 'g');
+        g2.setAttribute('transform', 'translate(0, '+(36*j)+')');
+
+        rect = document.createElementNS(game.ns, 'rect');
+        rect.setAttribute('width', '180');
+        rect.setAttribute('height', '24');
+        rect.setAttribute('fill', 'white');
+        rect.setAttribute('stroke',' black');
+        rect.setAttribute('x','0');
+        rect.setAttribute('y','0');
+        g2.appendChild(rect);
+        g2.appendChild(text);
+
+        g.appendChild(g2);
+
+        this.offers.push({ 
+            text: text,
+            button: g2,
+        });
+    }
+
+    g.setAttribute('transform', 'translate(455, 247)');
+    g.setAttribute('display', 'none');
+    game.tradebox = g;
     game.svg.appendChild(g);
 };
 
@@ -1514,7 +1552,7 @@ game.actions.selectCards = function(reason, params) {
     switch(reason) {
         case 'Y':
         // Year of plenty
-        // TODO: Choose any two resources and add them to your resources
+        // Choose any two resources and add them to your resources
 
         this.incdec = function(i, amt) {
             var c = amt+parseInt(game.selectbox.fields['r'+i].num.textContent);
@@ -1985,8 +2023,9 @@ game.actions.confirmSelect = function(reason, params) {
         a = parseInt(game.selectbox.fields['r'+j].num.textContent);
         if(a > 0) offer[j] = a;
     }
-    game.actions.cancelSelect();
     game.actions.announceOffer(game.state.turn, offer);
+    game.menu.displayOffers();
+
     break;
 
     case 'A':
@@ -2002,6 +2041,51 @@ game.actions.confirmSelect = function(reason, params) {
     default: break;
     }
 };
+
+game.menu.displayOffers = function() {
+
+    var obj, str;
+    for(var i = 0; i < game.state.player_count; i++) {
+
+        obj = game.state['p'+i].offer;
+        sum = 0;
+        str = '';
+        for(var j in obj) { 
+            sum += obj[j]; 
+            str += obj[j] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][j] + ' ';
+        }
+
+        if(sum > 0) {
+            game.menu.offers[i].text.textContent = str;
+            if((i+1) != game.state.turn) {
+                game.menu.offers[i].button.setAttribute('visibility','visible');
+                game.menu.offers[i].button.setAttribute('class', 'menu-item');
+                game.menu.offers[i].button.setAttribute('onclick','game.actions.acceptOffer('+(i+1)+','+JSON.stringify(obj)+')');
+                game.menu.offers[i].text.style.fontStyle = 'normal';
+            } else {
+                game.menu.offers[i].button.setAttribute('visibility','hidden');
+
+            }
+
+        } else {
+            game.menu.offers[i].button.setAttribute('visibility','hidden');
+            game.menu.offers[i].button.setAttribute('onclick', '');
+
+        }
+    }
+    
+
+    game.tradebox.setAttribute('display', 'inline');
+    
+}
+
+game.actions.acceptOffer = function(from, offer) {
+    game.state['p'+(game.state.turn-1)].ask = offer;
+
+    console.log('accepted offer from player ' + from);
+
+    game.menu.displayOffers();
+}
 
 game.actions.cancelSelect = function() {
     game.menu.buttons.forEach(function(a){
@@ -2020,6 +2104,7 @@ game.actions.cancelSelect = function() {
         game.selectbox.fields['r'+i].dec_button.setAttribute('display', 'inline');
     }
     game.selectbox.wrapper_outer.setAttribute('display', 'none');
+    game.tradebox.setAttribute('display', 'none');
     game.menu.refreshDevCards();
     game.proceed();
 };
@@ -2034,6 +2119,8 @@ game.actions.announceOffer = function(player, offer) {
     var str = '';
     for(var i in offer) { str += offer[i] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][i] + ' '};
     console.log('Player ' + player + ' is offering ' + str);
+    game.state['p'+(player-1)].offer = offer;
+    game.menu.displayOffers();
 };
 
 game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
@@ -2061,10 +2148,12 @@ game.actions.setupTrade = function(p_from, p_to, offer) {
 };
 
 game.actions.offerTrade = function() {
+    game.menu.displayOffers();
     game.actions.selectCards('O');
 };
 
 game.actions.askTrade = function() {
+    game.menu.displayOffers();
     game.actions.selectCards('A');
 };
 
@@ -2394,10 +2483,10 @@ window.init = function () {
 
             game.board.init();
             game.board.draw(700, 390);
-            game.menu.init();
             game.state.init(3);
             game.statusbox.init();
             game.selectbox.init();
+            game.menu.init();
 
             game.proceed();
             game.autosettle();
