@@ -228,14 +228,16 @@ game.menu.init = function() {
         'buildSettlement': 'Settlement',
         'buildCity': 'City',
         'buyDevCard': 'Buy Dev Card',
-        'trade': 'Trade',
+        'offerTrade': 'Offer',
+        'askTrade': 'Ask',
         'endTurn': 'DONE',
         'confirmSelect': 'Confirm',
         'cancelSelect': 'Cancel',
 
     };
     var positions = {
-        'trade':            [530, 115, 70],
+        'offerTrade':       [490, 115, 70],
+        'askTrade':         [575, 115, 70],
 
         'buyDevCard':       [475, 310, 100],
 
@@ -1057,6 +1059,14 @@ game.state.playerHas = function(player, resources) {
     return bool;
 };
 
+game.state.playerCardCount = function(player) {
+    var sum = 0;
+    for(var i = 1; i <= 5; i++) {
+        sum += parseInt(this['p'+(player-1)]['r'+i]);
+    }
+    return sum;
+};
+
 game.state.deduct = function(player, resources) {
 
     var str = '';
@@ -1382,7 +1392,7 @@ game.actions.playDevCard = function(type) {
     //Knight, Year of Plenty, Road Building, Monopoly
 
     switch(type) {
-        case 'K':
+    case 'K':
         var p = JSON.parse(gapi.hangout.data.getValue('p'+(this.game.state.turn-1)));
         p.army++;
         this.game.state['p'+(this.game.state.turn-1)].army++;
@@ -1489,7 +1499,7 @@ game.selectbox.init = function() {
 game.actions.selectCards = function(reason, params) {
 
     game.menu.buttons.forEach(function(a){
-        if(['trade','buildRoad','buildSettlement','buildCity','buyDevCard'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','hidden');}
+        if(['offerTrade','askTrade','buildRoad','buildSettlement','buildCity','buyDevCard'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','hidden');}
         if(['confirmSelect', 'cancelSelect'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','visible');}
     });
     game.devcardbox.setAttribute('display', 'none');
@@ -1567,11 +1577,7 @@ game.actions.selectCards = function(reason, params) {
 
         break;
 
-        case 'M':
-        // Monopoly
-        // TODO: Choose one resource and get it from everyone
-        break;
-
+       
         case 'R':
         // Robbed
         var cards_robbed = Math.floor(params.card_count / 2);
@@ -1658,9 +1664,15 @@ game.actions.selectCards = function(reason, params) {
 
         break;
 
-        case 'A':
-        // Ask
-        // Choose what resources you're asking for in trade
+        case 'M':
+        // Monopoly
+        // TODO: Choose one resource and get it from everyone
+        
+        // break; // Fall through into case 1
+
+        case '1':
+        // Choose 1
+        // Choose what ONE resource you're asking for in a 4:1 trade or Monopoly card
 
         this.inc = function(i) {
             this.incdec = null;
@@ -1728,9 +1740,31 @@ game.actions.selectCards = function(reason, params) {
         break;
 
         case 'O':
-        // Offer
         // Choose what resources you're offering in trade
+        case 'A':
+        // Choose what resources you're asking for in trade
+
+
+        game.actions.incdec = null;
+
+        for(var i = 1; i <= 5; i++) {
+            game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
+            game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
+            game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
+            game.selectbox.fields['r'+i].num.textContent = '0';
+            game.selectbox.fields['r'+i].num.setAttribute('fill', 'black');
+        }
+
+        game.menu.buttons.forEach(function(a){
+            if(a.getAttribute('data-action')=='cancelSelect'){
+                a.children[0].setAttribute('fill', 'white');
+                a.setAttribute('onclick', 'game.actions.cancelSelect()');
+                a.setAttribute('class', 'menu-item');
+            }
+        });
         break;
+        
+        
 
         default: break;
     }
@@ -1770,7 +1804,7 @@ game.actions.confirmSelect = function(reason, params) {
     game.actions.cancelSelect();
     break;
 
-    case 'A':
+    case '1':
     var ask = {}, a;
     for(var j = 1; j <= 5; j++) {
         a = parseInt(game.selectbox.fields['r'+j].num.textContent);
@@ -1787,7 +1821,7 @@ game.actions.confirmSelect = function(reason, params) {
 
 game.actions.cancelSelect = function() {
     game.menu.buttons.forEach(function(a){
-        if(['trade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn'].indexOf(a.getAttribute('data-action')) > -1){
+        if(['offerTrade','askTrade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn'].indexOf(a.getAttribute('data-action')) > -1){
             a.setAttribute('visibility','visible');
         }
         if(['confirmSelect', 'cancelSelect'].indexOf(a.getAttribute('data-action')) > -1){
@@ -1817,9 +1851,7 @@ game.actions.setupTrade = function(p_from, p_to, offer) {
     
     if(p_to == 0 && game.state.playerHas(p_from, offer) === true) {
         // Assuming valid 4:1, 3:1 or 2:1 bank trade
-        game.actions.selectCards('A', {
-            max: 1,
-            min: 1,
+        game.actions.selectCards('1', {
             offer: offer,
             from: p_from,
             to: p_to,
@@ -1828,18 +1860,22 @@ game.actions.setupTrade = function(p_from, p_to, offer) {
 
 };
 
-game.actions.trade = function() {
-    // TODO
-
-    // Separate into "offers" and "asks"?
-    // Use game.actions.selectCards
+game.actions.offerTrade = function() {
+    game.actions.selectCards('O');
 };
+
+game.actions.askTrade = function() {
+    game.actions.selectCards('A');
+};
+
 
 game.actions.playerControl = function() {
 
     // TODO: activate controls only if game.state.turn == local player
     
     var obj = {
+        'offerTrade': game.state.playerCardCount(game.state.turn) > 0,
+        'askTrade': game.state.playerCardCount(game.state.turn) > 0,
         'buildRoad': game.state.playerHas(game.state.turn, {1:1, 4:1}),
         'buildSettlement': game.state.playerHas(game.state.turn, {1:1, 2:1, 3:1, 4:1}),
         'buildCity': game.state.playerHas(game.state.turn, {3:2, 5:3}),
