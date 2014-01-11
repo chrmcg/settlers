@@ -1355,6 +1355,7 @@ game.actions.playDevCard = function(type) {
         var p = JSON.parse(gapi.hangout.data.getValue('p'+(this.game.state.turn-1)));
         p.army++;
         this.game.state['p'+(this.game.state.turn-1)].army++;
+        this.game.state['p'+(this.game.state.turn-1)].cK--;
         this.game.state.next_action = 'playerControl';
         var obj = {next_action: 'playerControl'};
         obj['p'+(this.game.state.turn-1)] = JSON.stringify(p);
@@ -1362,8 +1363,8 @@ game.actions.playDevCard = function(type) {
 
         this.game.actions.moveRobber();
     break;
-    case 'Y':
-        // TODO: Choose 2 cards (game.actions.selectCards) to receive
+    case 'Y': 
+        game.actions.selectCards('Y');
     break;
     case 'R':
         // TODO: Build 2 roads free of charge
@@ -1456,20 +1457,82 @@ game.selectbox.init = function() {
 game.actions.selectCards = function(reason, params) {
 
     game.menu.buttons.forEach(function(a){
-        //if(a.getAttribute('data-action')=='trade'){a.setAttribute('visibility','hidden');}
-        //if(a.getAttribute('data-action')=='confirmSelect'){a.setAttribute('visibility','visible');}
         if(['trade','buildRoad','buildSettlement','buildCity','buyDevCard'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','hidden');}
         if(['confirmSelect', 'cancelSelect'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','visible');}
     });
     game.devcardbox.setAttribute('display', 'none');
     game.selectbox.wrapper_outer.setAttribute('display', 'inline');
 
-    this.params = params;
-
     switch(reason) {
         case 'Y':
         // Year of plenty
         // TODO: Choose any two resources and add them to your resources
+
+        this.incdec = function(i, amt) {
+            var c = amt+parseInt(game.selectbox.fields['r'+i].num.textContent);
+            if(c == 2) {
+                game.selectbox.fields['r'+i].num.textContent = c;
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
+                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', 'game.actions.incdec('+i+',-1)');
+                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'white');
+            } else if(c == 1) {
+                game.selectbox.fields['r'+i].num.textContent = c;
+                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'white');
+                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', 'game.actions.incdec('+i+',-1)');
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
+      
+            } else if(c == 0) {
+                game.selectbox.fields['r'+i].num.textContent = c;
+                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
+                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', '');
+            }
+
+            var sum = 0; for(var j = 1; j <= 5; j++) { sum += parseInt(game.selectbox.fields['r'+j].num.textContent); }
+            if(sum < 2) {
+                for(var j = 1; j <= 5; j++) {
+                    game.selectbox.fields['r'+j].inc_button.children[0].setAttribute('fill', 'white');
+                    game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', 'game.actions.incdec('+j+',1)');
+                }
+                game.menu.buttons.forEach(function(a){
+                    if(a.getAttribute('data-action')=='confirmSelect'){
+                        a.children[0].setAttribute('fill', 'gray');
+                        a.setAttribute('onclick', '');
+                        a.setAttribute('class', '');
+                    }
+                });
+            } else {
+                for(var j = 1; j <= 5; j++) {
+                    game.selectbox.fields['r'+j].inc_button.children[0].setAttribute('fill', 'gray');
+                    game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', '');
+                }
+                game.menu.buttons.forEach(function(a){
+                    if(a.getAttribute('data-action')=='confirmSelect'){
+                        a.children[0].setAttribute('fill', 'white');
+                        a.setAttribute('onclick', 'game.actions.confirmSelect("'+reason+'",'+JSON.stringify(params)+')');
+                        a.setAttribute('class', 'menu-item');
+                    }
+                });
+            }
+        };
+
+        for(var i = 1; i <= 5; i++) {
+            game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
+            game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
+            game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
+            game.selectbox.fields['r'+i].num.textContent = '0';
+            game.selectbox.fields['r'+i].num.setAttribute('fill', 'black');
+        }
+
+        game.menu.buttons.forEach(function(a){
+            if(a.getAttribute('data-action')=='cancelSelect'){
+                a.children[0].setAttribute('fill', 'white');
+                a.setAttribute('onclick', 'game.actions.cancelSelect()');
+                a.setAttribute('class', 'menu-item');
+            }
+        });
+
         break;
 
         case 'M':
@@ -1486,8 +1549,7 @@ game.actions.selectCards = function(reason, params) {
         // Ask
         // Choose what resources you're asking for in trade
 
-        var self = this;
-        this.cb = function(i) {
+        this.inc = function(i) {
             var c =  1+parseInt(game.selectbox.fields['r'+i].num.textContent);
             if(c <= 1) {
                 game.selectbox.fields['r'+i].num.textContent = c;
@@ -1500,7 +1562,7 @@ game.actions.selectCards = function(reason, params) {
 
                         game.selectbox.fields['r'+j].dec_button.children[0].setAttribute('fill', 'gray');
                         game.selectbox.fields['r'+j].inc_button.children[0].setAttribute('fill', 'white');
-                        game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', 'game.actions.cb('+j+')');
+                        game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', 'game.actions.inc('+j+')');
                         game.selectbox.fields['r'+j].num.setAttribute('fill', 'black');
                     }
                     for(var k in params.offer) {
@@ -1514,7 +1576,7 @@ game.actions.selectCards = function(reason, params) {
             game.menu.buttons.forEach(function(a){
                 if(a.getAttribute('data-action')=='confirmSelect'){
                     a.children[0].setAttribute('fill', 'white');
-                    a.setAttribute('onclick', 'game.actions.confirmSelect('+JSON.stringify(params)+')');
+                    a.setAttribute('onclick', 'game.actions.confirmSelect("'+reason+'",'+JSON.stringify(params)+')');
                     a.setAttribute('class', 'menu-item');
                 }
                 if(a.getAttribute('data-action')=='cancelSelect'){
@@ -1528,7 +1590,7 @@ game.actions.selectCards = function(reason, params) {
         for(var i = 1; i <= 5; i++) {
             game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
             game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
-            game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.cb('+i+')');
+            game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.inc('+i+')');
             game.selectbox.fields['r'+i].num.textContent = '0';
             game.selectbox.fields['r'+i].num.setAttribute('fill', 'black');
         }
@@ -1552,12 +1614,36 @@ game.actions.selectCards = function(reason, params) {
         case 'O':
         // Offer
         // Choose what resources you're offering in trade
+        break;
+
         default: break;
     }
 };
 
-game.actions.confirmSelect = function(params) {
+game.actions.confirmSelect = function(reason, params) {
 
+    switch(reason) {
+
+    case 'Y':
+    var ask = {}, a;
+    for(var j = 1; j <= 5; j++) {
+        a = parseInt(game.selectbox.fields['r'+j].num.textContent);
+        if(a > 0) ask[j] = a;
+    }
+    game.state.collect(game.state.turn, ask);
+
+    var p = JSON.parse(gapi.hangout.data.getValue('p'+(this.game.state.turn-1)));
+    p.cY--;
+    this.game.state['p'+(this.game.state.turn-1)].cY--;
+    this.game.state.next_action = 'playerControl';
+    var obj = {next_action: 'playerControl'};
+    obj['p'+(this.game.state.turn-1)] = JSON.stringify(p);
+    gapi.hangout.data.submitDelta(obj);
+
+    game.actions.cancelSelect();
+    break;
+
+    case 'A':
     var ask = {}, a;
     for(var j = 1; j <= 5; j++) {
         a = parseInt(game.selectbox.fields['r'+j].num.textContent);
@@ -1566,7 +1652,10 @@ game.actions.confirmSelect = function(params) {
     
     game.actions.cancelSelect();
     game.actions.proposeTrade(params.from, params.to, params.offer, ask);
-    
+    break;
+
+    default: break;
+    }
 };
 
 game.actions.cancelSelect = function() {
@@ -1582,6 +1671,8 @@ game.actions.cancelSelect = function() {
     });
     game.devcardbox.setAttribute('display', 'inline');
     game.selectbox.wrapper_outer.setAttribute('display', 'none');
+    game.menu.refreshDevCards();
+    game.proceed();
 };
 
 game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
