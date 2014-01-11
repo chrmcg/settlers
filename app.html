@@ -1412,7 +1412,7 @@ game.actions.playDevCard = function(type) {
         // TODO: Build 2 roads free of charge
     break;
     case 'M':
-        // TODO: Choose 1 card (game.actions.selectCards) and receive all cards of that type
+        game.actions.selectCards('M');
     break;
     default: break;
     }
@@ -1504,6 +1504,11 @@ game.actions.selectCards = function(reason, params) {
     });
     game.devcardbox.setAttribute('display', 'none');
     game.selectbox.wrapper_outer.setAttribute('display', 'inline');
+    
+    for(var i = 1; i <= 5; i++) {
+        game.selectbox.fields['r'+i].num.setAttribute('visibility', 'visible');
+        game.selectbox.fields['r'+i].dec_button.setAttribute('display', 'inline');
+    }
 
     switch(reason) {
         case 'Y':
@@ -1666,10 +1671,7 @@ game.actions.selectCards = function(reason, params) {
 
         case 'M':
         // Monopoly
-        // TODO: Choose one resource and get it from everyone
-        
-        // break; // Fall through into case 1
-
+        // Choose one resource and get it from everyone
         case '1':
         // Choose 1
         // Choose what ONE resource you're asking for in a 4:1 trade or Monopoly card
@@ -1678,13 +1680,19 @@ game.actions.selectCards = function(reason, params) {
             this.incdec = null;
             var c =  1+parseInt(game.selectbox.fields['r'+i].num.textContent);
             if(c <= 1) {
-                game.selectbox.fields['r'+i].num.textContent = c;
+                if(reason == 'M') {
+                    game.selectbox.fields['r'+i].num.textContent = 'M';
+                    game.selectbox.fields['r'+i].num.setAttribute('visibility', 'visible');
+                } else {
+                    game.selectbox.fields['r'+i].num.textContent = c;
+                }
                 game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
                 game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
           
                 for(var j = 1; j <= 5; j++) {
                     if(i != j) {
                         game.selectbox.fields['r'+j].num.textContent = '0';
+                        if(reason == 'M') game.selectbox.fields['r'+j].num.setAttribute('visibility', 'hidden');
 
                         game.selectbox.fields['r'+j].dec_button.setAttribute('onclick', '');
                         game.selectbox.fields['r'+j].dec_button.children[0].setAttribute('fill', 'gray');
@@ -1692,12 +1700,14 @@ game.actions.selectCards = function(reason, params) {
                         game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', 'game.actions.inc('+j+')');
                         game.selectbox.fields['r'+j].num.setAttribute('fill', 'black');
                     }
+                    if(reason == '1') {
                     for(var k in params.offer) {
                         game.selectbox.fields['r'+k].inc_button.children[0].setAttribute('fill', 'gray');
                         game.selectbox.fields['r'+k].inc_button.setAttribute('onclick', '');
                         game.selectbox.fields['r'+k].dec_button.setAttribute('onclick', '');
                         game.selectbox.fields['r'+k].num.setAttribute('fill', 'gray');
                     }
+                }
                 }
             }
 
@@ -1716,17 +1726,21 @@ game.actions.selectCards = function(reason, params) {
         };
 
         for(var i = 1; i <= 5; i++) {
-            game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
+            game.selectbox.fields['r'+i].dec_button.setAttribute('display', 'none');;
             game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
             game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.inc('+i+')');
+
             game.selectbox.fields['r'+i].num.textContent = '0';
+            if(reason == 'M') game.selectbox.fields['r'+i].num.setAttribute('visibility', 'hidden');
             game.selectbox.fields['r'+i].num.setAttribute('fill', 'black');
         }
 
-        for(var i in params.offer) {
-            game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
-            game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
-            game.selectbox.fields['r'+i].num.setAttribute('fill', 'gray');
+        if(reason == '1') {
+            for(var i in params.offer) {
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
+                game.selectbox.fields['r'+i].num.setAttribute('fill', 'gray');
+            }
         }
 
         game.menu.buttons.forEach(function(a){
@@ -1910,6 +1924,38 @@ game.actions.confirmSelect = function(reason, params) {
     game.actions.cancelSelect();
     break;
 
+    case 'M':
+    var obj = {}, a;
+    for(var j = 1; j <= 5; j++) {
+        if(game.selectbox.fields['r'+j].num.textContent == 'M') {
+            obj = {};
+            obj[j] = 1;
+        }
+    }
+
+    var ask;
+    for(var p = 1; p <= game.state.player_count; p++) {
+        if(p != game.state.turn) {
+            ask = {};
+            for(var i in obj) {
+                ask[i] = obj[i] * game.state['p'+(p-1)]['r'+i];
+                if(ask[i] > 0) {
+                    game.actions.completeTrade(game.state.turn, p, {}, ask); 
+                }
+            }
+        }
+    }
+
+    var p = JSON.parse(gapi.hangout.data.getValue('p'+(this.game.state.turn-1)));
+    p.cM--;
+    this.game.state['p'+(this.game.state.turn-1)].cM--;
+    this.game.state.next_action = 'playerControl';
+    var obj = {next_action: 'playerControl'};
+    obj['p'+(this.game.state.turn-1)] = JSON.stringify(p);
+    gapi.hangout.data.submitDelta(obj);
+
+    game.actions.cancelSelect();
+    break;
 
     case 'R':
     var robbed = {}, a;
@@ -1968,6 +2014,10 @@ game.actions.cancelSelect = function() {
         }
     });
     game.devcardbox.setAttribute('display', 'inline');
+    for(var i = 1; i <= 5; i++) {
+        game.selectbox.fields['r'+i].num.setAttribute('visibility', 'visible');
+        game.selectbox.fields['r'+i].dec_button.setAttribute('display', 'inline');
+    }
     game.selectbox.wrapper_outer.setAttribute('display', 'none');
     game.menu.refreshDevCards();
     game.proceed();
