@@ -2146,10 +2146,14 @@ game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
     } else {
         //TODO: check that both parties actually have the cards to be traded
 
-        game.state.deduct(p_A, r_A);
-        game.state.collect(p_B, r_A);
-        game.state.deduct(p_B, r_B);
-        game.state.collect(p_A, r_B);
+        if(Object.keys(r_A).length > 0) {
+            game.state.deduct(p_A, r_A);
+            game.state.collect(p_B, r_A);
+        }
+        if(Object.keys(r_B).length > 0) {
+            game.state.deduct(p_B, r_B);
+            game.state.collect(p_A, r_B);
+        }
     }
 
     game.proceed();

@@ -3,13 +3,9 @@ todo:
 IMPLEMENT:
 
 - GUI:
-   auto 4:1/3:1/2:1 button next to each resource
    Current Offer / Current Ask
    other players' offers & asks, w/ Accept button if matching
-- game.actions.selectCards
-
-- Methods:
-game.actions.cancelPlacement (already written, just add to GUI when appro)
+- Playing Road Building Cards
 
 
 - Move the VideoCanvas onto the app and show the VideoFeed of whoever's 
