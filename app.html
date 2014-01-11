@@ -1539,6 +1539,14 @@ game.actions.selectCards = function(reason, params) {
             game.selectbox.fields['r'+i].num.setAttribute('fill', 'gray');
         }
 
+        game.menu.buttons.forEach(function(a){
+            if(a.getAttribute('data-action')=='cancelSelect'){
+                a.children[0].setAttribute('fill', 'white');
+                a.setAttribute('onclick', 'game.actions.cancelSelect()');
+                a.setAttribute('class', 'menu-item');
+            }
+        });
+
         break;
 
         case 'O':
