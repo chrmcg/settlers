@@ -2439,7 +2439,7 @@ game.actions.selectEdge = function(i, player, params) {
 
     if(this.game.state.phase == 0) {
         this.game.state.next_action = 'buildSettlement';
-        gapi.hangout.data.submitDelta({'next_action', 'buildSettlement'});
+        gapi.hangout.data.submitDelta({'next_action': 'buildSettlement'});
         if(this.game.state.turn == this.game.state.player_count) {
             this.game.state.phase = 1;
         } else {
@@ -2452,12 +2452,12 @@ game.actions.selectEdge = function(i, player, params) {
         if(this.game.state.turn == 1) {
             this.game.state.phase = 2;
             this.game.state.next_action = 'rollDice';
-            gapi.hangout.data.submitDelta({'next_action', 'rollDice'});
+            gapi.hangout.data.submitDelta({'next_action': 'rollDice'});
         } else {
             this.game.state.turn--;
             this.game.statusbox.viewPlayer(this.game.state.turn);
             this.game.state.next_action = 'buildSettlement';
-            gapi.hangout.data.submitDelta({'next_action', 'buildSettlement'});
+            gapi.hangout.data.submitDelta({'next_action': 'buildSettlement'});
         }
 
     } else if(this.game.state.phase == 2) {
@@ -2465,13 +2465,13 @@ game.actions.selectEdge = function(i, player, params) {
         console.log(params);
         if (params == 'undefined') { 
             this.game.state.next_action = 'playerControl';
-            gapi.hangout.data.submitDelta({'next_action', 'playerControl'});
+            gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
             this.game.state.deduct(this.game.state.turn, {1: 1, 4: 1});
         } else if (params == 'R') {
             this.game.board.showAvailableEdges(player, 'R1'); 
         } else {
             this.game.state.next_action = 'playerControl';
-            gapi.hangout.data.submitDelta({'next_action', 'playerControl'});
+            gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
         }
     } 
 
