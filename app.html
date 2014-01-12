@@ -2560,7 +2560,6 @@ window.init = function () {
                 console.log(state_event);
                 console.log(state_event.metadata);
                 //Apply state_event changes
-                /*
                 for(var key in state_event.metadata) {
                     var value = state_event.metadata[key];
                     switch(key) {
@@ -2583,13 +2582,21 @@ window.init = function () {
                             for(var i = 0; i < nums.length; i++) {
                                 this.game.board.nums[i] = nums[i];
                             }
-                        break;
+                            break;
+                        case 'types':
+                            var types = JSON.parse(value.value);
+                            for(Var i = 0; i < types.length; i++) {
+                                this.game.board.types[i] = types[i];
+                            }
                         default:
-                            this.game.state[key] = JSON.parse(value.value);
+                            try {
+                                this.game.state[key] = JSON.parse(value.value);
+                            } catch {
+                                this.game.state[key] = value.value;
+                            }
                         break;
                     }
                 }
-                */
             });
 
             game.board.init();
