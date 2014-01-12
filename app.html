@@ -732,13 +732,21 @@ game.board.redraw = function() {
         v = this.vertices[i].v;
 
         if(this.vertices[i].contents == 1) {
+            v.setAttribute('fill', this.pcolors[this.vertices[i].owner-1]);
+            v.setAttribute('visibility', 'visible');
             v.setAttribute('width', '10');
             v.setAttribute('height', '10');
-            v.setAttribute('visibility', 'visible');
-            v.setAttribute('fill', this.pcolors[this.vertices[i].owner-1]);
+            v.setAttribute('x', this.vertices[i].x - 5);
+            v.setAttribute('y', this.vertices[i].y - 5);
+            v.setAttribute('onclick', '');
         } else if(this.vertices[i].contents == 2) {
-        // TODO: render city
-
+            v.setAttribute('fill', this.pcolors[this.vertices[i].owner-1]);
+            v.setAttribute('visibility', 'visible');
+            v.setAttribute('width', '20');
+            v.setAttribute('height', '20');
+            v.setAttribute('x', this.vertices[i].x - 10);
+            v.setAttribute('y', this.vertices[i].y - 10);
+            v.setAttribute('onclick', '');
         }
 
         if(this.vertices[i].port > 0) {
@@ -2665,8 +2673,6 @@ window.init = function () {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
             gapi.hangout.data.onStateChanged.add(function(state_event) {
-                console.log(state_event);
-                console.log(state_event.metadata);
                 //Apply state_event changes
                 for(var i in state_event.state) {
                     var key = i;
@@ -2684,20 +2690,6 @@ window.init = function () {
                             for(var j = 0; j < vertices.length; j++) {
                                 game.board.vertices[j].contents = vertices[j].contents;
                                 game.board.vertices[j].owner = vertices[j].owner;
-
-                                if (vertices[j].contents == 1) {
-                                    game.board.vertices[j].v.setAttribute('fill', game.board.pcolors[vertices[j].owner-1]);
-                                    game.board.vertices[j].v.setAttribute('width', '10');
-                                    game.board.vertices[j].v.setAttribute('height', '10');
-                                    game.board.vertices[j].v.setAttribute('x', game.board.vertices[j].x - 5);
-                                    game.board.vertices[j].v.setAttribute('y', game.board.vertices[j].y - 5);
-                                } else if (vertices[j].contents == 2) {
-                                    game.board.vertices[j].v.setAttribute('fill', game.board.pcolors[vertices[j].owner-1]);
-                                    game.board.vertices[j].v.setAttribute('width', '20');
-                                    game.board.vertices[j].v.setAttribute('height', '20');
-                                    game.board.vertices[j].v.setAttribute('x', game.board.vertices[j].x - 10);
-                                    game.board.vertices[j].v.setAttribute('y', game.board.vertices[j].y - 10);
-                                }
                                 game.board.vertices[j].v.setAttribute('onclick', '');
                             }
                         break;
