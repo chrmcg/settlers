@@ -693,13 +693,10 @@ game.board.redraw = function() {
                 text.setAttribute('fill', '#ff0000');
             }            
         } else {
-
-        text = this.hexes[i].circle.parentElement.children[1];
-        text.textContent = '';
-        prob = this.hexes[i].circle.parentElement.children[2];
-        prob.textContent = '';
-
-        
+            text = this.hexes[i].circle.parentElement.children[1];
+            text.textContent = '';
+            prob = this.hexes[i].circle.parentElement.children[2];
+            prob.textContent = '';
         }
 
         circle = this.hexes[i].circle;
@@ -2661,6 +2658,14 @@ window.init = function () {
                 console.log(state_event);
                 console.log(state_event.metadata);
                 //Apply state_event changes
+
+                if(state_event.state.types) {
+                    var types = JSON.parse(state_event.state.types);
+                    for(var j = 0; j < types.length; j++) {
+                        game.board.hexes[j].type = types[j];
+                    }
+                }
+
                 for(var i in state_event.state) {
                     var key = i;
                     var value = state_event.state[i];
@@ -2701,10 +2706,7 @@ window.init = function () {
                             }
                         break;
                         case 'types':
-                            var types = JSON.parse(value);
-                            for(var j = 0; j < types.length; j++) {
-                                game.board.hexes[j].type = types[j];
-                            }
+                            // do nothing on purpose
                         break;
                         default:
                             try {
