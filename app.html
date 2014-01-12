@@ -2413,7 +2413,7 @@ game.actions.selectVertex = function(i, type) {
 
     this.game.state.updateVictoryPoints();
     var vertices = (function(vertices){ 
-        var obj = [];
+        var obj = {};
         for (var i = 0; i < vertices.length; i++) {
             if (vertices[i].owner == this.game.state.turn) {
                 obj[i] = {contents : vertices[i].contents, owner : vertices[i].owner};
@@ -2583,7 +2583,7 @@ window.init = function () {
                         break;
                         case 'vertices':
                             var vertices = JSON.parse(value.value);
-                            for(var i = 0; i < vertices.length; i++) {
+                            for(var i in vertices) {
                                 this.game.board.vertices[i].contents = vertices[i].contents;
                                 this.game.board.vertices[i].owner = vertices[i].owner;
                             }
