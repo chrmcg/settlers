@@ -15,6 +15,6 @@ var server = http.createServer(function(req, res) {
         res.end();
     }
     console.log('Request for ' + req.url);
-}).listen(8080, function() {
-    console.log('Listening at: http://localhost:8080');
+}).listen(80, function() {
+    console.log('Listening at: http://localhost');
 });
