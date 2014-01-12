@@ -2593,7 +2593,8 @@ window.init = function () {
                             try {
                                 this.game.state[key] = JSON.parse(value);
                             } catch(e) {
-                                this.game.state[key] = value;
+                                console.log(e.message);
+//                                this.game.state[key] = value;
                             }
                         break;
                     }
