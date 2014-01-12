@@ -1210,7 +1210,7 @@ game.state.init = function(player_count) {
         game.state.uploadInitialState();
     } else {
         game.board.init();
-        gapi.hangout.data.submitDelta({});
+        gapi.hangout.data.submitDelta({'donotreply' : '@gmail.com'}); // Fake data to trigger an event
     }
 };
 
