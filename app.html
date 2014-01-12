@@ -2560,31 +2560,32 @@ window.init = function () {
                 console.log(state_event);
                 console.log(state_event.metadata);
                 //Apply state_event changes
-                for(var key in state_event.metadata) {
-                    var value = state_event.metadata[key];
+                for(var i = 0; i < state_event.addedKeys.length; i++) {
+                    var key = state_event.addedKeys[i].key;
+                    var value = state_event.addedKeys[i].value;
                     switch(key) {
                         case 'edges':
-                            var edges = JSON.parse(value.value);
+                            var edges = JSON.parse(value);
                             for(var i = 0; i < edges.length; i++) {
                                 this.game.board.edges[i].owner = edges[i].owner;
                                 this.game.board.edges[i].road = edges[i].road;
                             }
                         break;
                         case 'vertices':
-                            var vertices = JSON.parse(value.value);
+                            var vertices = JSON.parse(value);
                             for(var i = 0; i < vertices.length; i++) {
                                 this.game.board.vertices[i].contents = vertices[i].contents;
                                 this.game.board.vertices[i].owner = vertices[i].owner;
                             }
                         break;
                         case 'nums':
-                            var nums = JSON.parse(value.value);
+                            var nums = JSON.parse(value);
                             for(var i = 0; i < nums.length; i++) {
                                 this.game.board.nums[i] = nums[i];
                             }
                             break;
                         case 'types':
-                            var types = JSON.parse(value.value);
+                            var types = JSON.parse(value);
                             for(var i = 0; i < types.length; i++) {
                                 this.game.board.types[i] = types[i];
                             }
