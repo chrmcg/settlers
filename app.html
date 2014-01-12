@@ -658,6 +658,89 @@ game.board.pcolors = [
     'green'
 ];
 
+game.board.redraw = function() {
+
+    var hex, text, circle, group, bbox, points, prob;
+    for(var i = 0; i < 19; i++) {
+
+        if(this.hexes[i].type != 0) {
+            text = this.hexes[i].circle.parentElement.children[1];
+            text.textContent = this.hexes[i].num;
+
+            // TODO: cehck
+            prob = this.hexes[i].circle.parentElement.children[2];
+
+            if (this.hexes[i].num == 2 || this.hexes[i].num == 12) {
+                prob.textContent = "\u2022";
+                } else if (this.hexes[i].num == 3 || this.hexes[i].num == 11) {
+                prob.textContent = "\u2022\u2022";
+                } else if (this.hexes[i].num == 4 || this.hexes[i].num == 10) {
+                prob.textContent = "\u2022\u2022\u2022";
+                } else if (this.hexes[i].num == 5 || this.hexes[i].num == 9) {
+                prob.textContent = "\u2022\u2022\u2022\u2022";
+                } else if (this.hexes[i].num == 6 || this.hexes[i].num == 8) {
+                prob.textContent = "\u2022\u2022\u2022\u2022\u2022";
+                prob.setAttribute('fill', '#ff0000');
+                text.setAttribute('fill', '#ff0000');
+            }            
+        }
+
+        circle = this.hexes[i].circle;
+        if (this.hexes[i].robber == 0) {
+            circle.setAttribute('fill', 'rgba(0,0,0,0)');
+            } else {
+            circle.setAttribute('fill', 'rgba(1,1,1,0.6)');
+        }
+        /*
+        // Fix centering of nums
+        if(this.hexes[i].type != 0) {
+            bbox = text.getBBox();
+            text.setAttribute('x', this.hexes[i].cx - bbox.width/2);
+            text.setAttribute('y', this.hexes[i].cy + bbox.height/4);
+            bbox = prob.getBBox();
+            prob.setAttribute('x', this.hexes[i].cx - bbox.width/2);
+        }
+        */
+    }
+
+    var e;
+    for(var i = 0; i < 72; i++) {
+        e = this.edges[i].e;
+
+        if(this.edges[i].owner != null) {
+            e.setAttribute('stroke', this.pcolors[this.edges[i].owner]);
+            e.setAttribute('stroke-width', '5');
+        }
+
+    }
+
+    // Create placeholder object at each vertex
+    var v;
+    for(var i = 0; i < 54; i++) {
+        v = this.vertices[i].v;
+
+        if(this.vertices[i].contents == 1) {
+            v.setAttribute('width', '10');
+            v.setAttribute('height', '10');
+            v.setAttribute('fill', this.pcolors[this.edges[i].owner]);
+        } else if(this.vertices[i].contents == 2) {
+        // TODO: render city
+
+        }
+
+        if(this.vertices[i].port > 0) {
+            if(this.vertices[i].port == 6) {
+                v.setAttribute('stroke', 'blue');
+            } else {
+                v.setAttribute('stroke', game.board.colors[this.vertices[i].port]);
+            }
+        } else {
+            v.setAttribute('stroke', 'black');
+        }
+    }
+
+};
+
 game.board.draw = function(w, h) {
 
     w = w*2/3;
@@ -2617,7 +2700,7 @@ window.init = function () {
                     }
                 }
 
-                game.board.draw(700, 390);
+                game.board.redraw();
             });
 
             game.board.init();
