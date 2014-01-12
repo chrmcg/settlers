@@ -663,6 +663,8 @@ game.board.redraw = function() {
     var hex, text, circle, group, bbox, points, prob;
     for(var i = 0; i < 19; i++) {
 
+        this.hexes[i].circle.parentElement.children[0].setAttribute('fill', game.board.colors[this.hexes[i].type]);
+
         if(this.hexes[i].type != 0) {
             text = this.hexes[i].circle.parentElement.children[1];
             text.textContent = this.hexes[i].num;
@@ -690,6 +692,14 @@ game.board.redraw = function() {
                 prob.setAttribute('fill', '#ff0000');
                 text.setAttribute('fill', '#ff0000');
             }            
+        } else {
+
+        text = this.hexes[i].circle.parentElement.children[1];
+        text.textContent = '';
+        prob = this.hexes[i].circle.parentElement.children[2];
+        prob.textContent = '';
+
+        
         }
 
         circle = this.hexes[i].circle;
