@@ -667,18 +667,25 @@ game.board.redraw = function() {
             text = this.hexes[i].circle.parentElement.children[1];
             text.textContent = this.hexes[i].num;
 
-            // TODO: cehck
             prob = this.hexes[i].circle.parentElement.children[2];
 
             if (this.hexes[i].num == 2 || this.hexes[i].num == 12) {
                 prob.textContent = "\u2022";
-                } else if (this.hexes[i].num == 3 || this.hexes[i].num == 11) {
+                prob.setAttribute('fill', 'white');
+                text.setAttribute('fill', 'white');
+            } else if (this.hexes[i].num == 3 || this.hexes[i].num == 11) {
                 prob.textContent = "\u2022\u2022";
-                } else if (this.hexes[i].num == 4 || this.hexes[i].num == 10) {
+                prob.setAttribute('fill', 'white');
+                text.setAttribute('fill', 'white');
+            } else if (this.hexes[i].num == 4 || this.hexes[i].num == 10) {
                 prob.textContent = "\u2022\u2022\u2022";
-                } else if (this.hexes[i].num == 5 || this.hexes[i].num == 9) {
+                prob.setAttribute('fill', 'white');
+                text.setAttribute('fill', 'white');
+            } else if (this.hexes[i].num == 5 || this.hexes[i].num == 9) {
                 prob.textContent = "\u2022\u2022\u2022\u2022";
-                } else if (this.hexes[i].num == 6 || this.hexes[i].num == 8) {
+                prob.setAttribute('fill', 'white');
+                text.setAttribute('fill', 'white');
+            } else if (this.hexes[i].num == 6 || this.hexes[i].num == 8) {
                 prob.textContent = "\u2022\u2022\u2022\u2022\u2022";
                 prob.setAttribute('fill', '#ff0000');
                 text.setAttribute('fill', '#ff0000');
@@ -688,10 +695,10 @@ game.board.redraw = function() {
         circle = this.hexes[i].circle;
         if (this.hexes[i].robber == 0) {
             circle.setAttribute('fill', 'rgba(0,0,0,0)');
-            } else {
+        } else {
             circle.setAttribute('fill', 'rgba(1,1,1,0.6)');
         }
-        /*
+        
         // Fix centering of nums
         if(this.hexes[i].type != 0) {
             bbox = text.getBBox();
@@ -700,7 +707,6 @@ game.board.redraw = function() {
             bbox = prob.getBBox();
             prob.setAttribute('x', this.hexes[i].cx - bbox.width/2);
         }
-        */
     }
 
     var e;
