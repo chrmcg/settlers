@@ -1210,7 +1210,7 @@ game.state.init = function(player_count) {
         game.state.uploadInitialState();
     } else {
         game.board.init();
-//        game.state.downloadState();
+        gapi.hangout.data.submitDelta({});
     }
 };
 
@@ -2605,26 +2605,6 @@ game.actions.selectEdge = function(i, player, params) {
 
 game.actions.winGame = function() {
     console.log('Player ' + game.state.turn + ' wins the game!');
-};
-
-game.state.downloadState = function() {
-    var s = gapi.hangout.data.getState();
-    game.state.largest_army = parseInt(s.largest_army);
-    game.state.longest_road = parseInt(s.longest_road);
-    game.state.next_action = s.next_action;
-    game.state.devcards = JSON.parse(s.devcards);
-    if(s.edges != null) game.state.edges = JSON.parse(s.edges);
-    if(s.vertices != null) game.state.vertices = JSON.parse(s.vertices);
-    if(s.hexes != null) game.state.hexes = JSON.parse(s.hexes);
-    if(s.p0.length > 0) game.state.p0 = JSON.parse(s.p0);
-    if(s.p1.length > 0) game.state.p1 = JSON.parse(s.p1);
-    if(s.p2.length > 0) game.state.p2 = JSON.parse(s.p2);
-
-    if(typeof s.p3 != 'undefined' && s.p3.length > 0) game.state.p3 = JSON.parse(s.p3);
-
-    game.state.phase = parseInt(s.phase);
-    game.state.player_count = parseInt(s.player_count);
-    game.state.turn = parseInt(s.turn);
 };
 
 game.state.uploadInitialState = function() {
