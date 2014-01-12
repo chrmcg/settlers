@@ -714,7 +714,7 @@ game.board.redraw = function() {
         e = this.edges[i].e;
 
         if(this.edges[i].owner != null) {
-            e.setAttribute('stroke', this.pcolors[this.edges[i].owner]);
+            e.setAttribute('stroke', this.pcolors[this.edges[i].owner-1]);
             e.setAttribute('stroke-width', '5');
         }
 
@@ -728,7 +728,7 @@ game.board.redraw = function() {
         if(this.vertices[i].contents == 1) {
             v.setAttribute('width', '10');
             v.setAttribute('height', '10');
-            v.setAttribute('fill', this.pcolors[this.edges[i].owner]);
+            v.setAttribute('fill', this.pcolors[this.edges[i].owner-1]);
         } else if(this.vertices[i].contents == 2) {
         // TODO: render city
 
