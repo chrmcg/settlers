@@ -2566,27 +2566,27 @@ window.init = function () {
                     switch(key) {
                         case 'edges':
                             var edges = JSON.parse(value);
-                            for(var i = 0; i < edges.length; i++) {
+                            for(var j = 0; j < edges.length; j++) {
                                 game.board.edges[i].owner = edges[i].owner;
                                 game.board.edges[i].road = edges[i].road;
                             }
                         break;
                         case 'vertices':
                             var vertices = JSON.parse(value);
-                            for(var i = 0; i < vertices.length; i++) {
+                            for(var j = 0; j < vertices.length; j++) {
                                 game.board.vertices[i].contents = vertices[i].contents;
                                 game.board.vertices[i].owner = vertices[i].owner;
                             }
                         break;
                         case 'nums':
                             var nums = JSON.parse(value);
-                            for(var i = 0; i < nums.length; i++) {
+                            for(var j = 0; j < nums.length; j++) {
                                 game.board.nums[i] = nums[i];
                             }
                         break;
                         case 'types':
                             var types = JSON.parse(value);
-                            for(var i = 0; i < types.length; i++) {
+                            for(var j = 0; j < types.length; j++) {
                                 game.board.types[i] = types[i];
                             }
                         break;
