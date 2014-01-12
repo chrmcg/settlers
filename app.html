@@ -2598,13 +2598,13 @@ window.init = function () {
                         case 'nums':
                             var nums = JSON.parse(value);
                             for(var j = 0; j < nums.length; j++) {
-                                game.board.nums[i] = nums[i];
+                                game.board.hexes[i].num = nums[i];
                             }
                         break;
                         case 'types':
                             var types = JSON.parse(value);
                             for(var j = 0; j < types.length; j++) {
-                                game.board.types[i] = types[i];
+                                game.board.hexes[i].type = types[i];
                             }
                         break;
                         default:
@@ -2616,6 +2616,8 @@ window.init = function () {
                         break;
                     }
                 }
+
+                game.board.draw(700, 390);
             });
 
             game.board.init();
