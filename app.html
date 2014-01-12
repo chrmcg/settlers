@@ -39,9 +39,9 @@
     </head>
 <body>
 
-<!--
+
 <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
--->
+<!--
 <script>
     // Fake API to use if coding offline
     gapi = {
@@ -65,6 +65,8 @@
 
     };
 </script>
+-->
+
 
 <div id="board"></div>
 
@@ -2416,6 +2418,7 @@ game.actions.selectEdge = function(i, player, params) {
 
     } else if(this.game.state.phase == 2) {
         this.game.state['p'+(this.game.state.turn-1)].roads--;
+        console.log(params);
         if (params == 'undefined') { 
             this.game.state.next_action = 'playerControl';
             this.game.state.deduct(this.game.state.turn, {1: 1, 4: 1});
@@ -2517,13 +2520,13 @@ window.init = function () {
             game.menu.init();
 
             game.proceed();
-            game.autosettle();
+            //game.autosettle();
         }
     });
 }
 
 // Wait for gadget to load.                                                       
-//gadgets.util.registerOnLoadHandler(window.init);
-init();
+gadgets.util.registerOnLoadHandler(window.init);
+//init();
 </script>
 </body>
