@@ -2575,21 +2575,21 @@ window.init = function () {
                     var value = state_event.metadata[key];
                     switch(key) {
                         case 'edges':
-                            var edges = JSON.parse(value);
+                            var edges = JSON.parse(value.value);
                             for(var i = 0; i < edges.length; i++) {
                                 this.game.board.edges[i].owner = edges[i].owner;
                                 this.game.board.edges[i].road = edges[i].road;
                             }
                         break;
                         case 'vertices':
-                            var vertices = JSON.parse(value);
+                            var vertices = JSON.parse(value.value);
                             for(var i = 0; i < vertices.length; i++) {
                                 this.game.board.vertices[i].contents = vertices[i].contents;
                                 this.game.board.vertices[i].owner = vertices[i].owner;
                             }
                         break;
                         default:
-                            this.game.state[key] = JSON.parse(value);
+                            this.game.state[key] = JSON.parse(value.value);
                         break;
                     }
                 }
