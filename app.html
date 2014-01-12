@@ -559,7 +559,7 @@ game.board.init = function() {
     }
 
     // Pass (nums) and (types) to shared state
-    gapi.hangout.data.submitDelta({'nums' : JSON.stringify(nums), 'types' : JSON.stringify(types)});
+    gapi.hangout.data.submitDelta({'types' : JSON.stringify(types), 'nums' : JSON.stringify(nums)});
     
     // Assign randomized numbers
     for(var i = 0; i < 19; i++) {
