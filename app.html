@@ -2614,6 +2614,7 @@ game.state.downloadState = function() {
     game.state.next_action = s.next_action;
     game.state.devcards = JSON.parse(s.devcards);
     if(s.edges != null) game.state.edges = JSON.parse(s.edges);
+    if(s.vertices != null) game.state.vertices = JSON.parse(s.vertices);
     if(s.p0.length > 0) game.state.p0 = JSON.parse(s.p0);
     if(s.p1.length > 0) game.state.p1 = JSON.parse(s.p1);
     if(s.p2.length > 0) game.state.p2 = JSON.parse(s.p2);
@@ -2630,6 +2631,7 @@ game.state.uploadInitialState = function() {
     var s = {
         'devcards' : JSON.stringify(game.state.devcards) ,
         'edges' : JSON.stringify((function(edges){var arr = []; for(var i = 0; i < edges.length; i++) { arr.push({ owner: edges[i].owner, road: edges[i].road }); } return arr; })(game.board.edges)) ,
+        'vertices' : JSON.stringify((function(vertices){var arr = []; for(var i = 0; i < vertices.length; i++) { arr.push({ owner: vertices[i].owner, contents: vertices[i].contents }); } return arr; })(game.board.vertices),
         'largest_army' : ''+game.state.largest_army ,
         'longest_road' : ''+game.state.longest_road ,
         'next_action' : game.state.next_action ,
