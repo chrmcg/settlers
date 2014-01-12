@@ -547,12 +547,7 @@ game.board.init = function() {
             nums[swap] = temp;
         }
     } while(this.checkNums(nums) === false);
-
-    // Assign randomized numbers
-    for(var i = 0; i < 19; i++) {
-        this.hexes[i].num = nums.shift();
-    }
-
+    
     // 1 = WOOD, 2 = SHEEP, 3 = WHEAT, 4 = BRICK, 5 = ORE, 0 = DESERT
     var types = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5];
     // Randomize types
@@ -563,14 +558,20 @@ game.board.init = function() {
         types[swap] = temp;
     }
 
+    // Pass (nums) and (types) to shared state
+    gapi.hangout.data.submitDelta({'nums' : JSON.stringify(nums), 'types' : JSON.stringify(types)});
+    
+    // Assign randomized numbers
+    for(var i = 0; i < 19; i++) {
+        this.hexes[i].num = nums.shift();
+    }
+    
     // Assign randomized types
     for(var i = 0; i < 19; i++) {
         this.hexes[i].type = this.hexes[i].num == 0 ? 0 : types.shift();
         this.hexes[i].robber = this.hexes[i].num == 0 ? 1 : 0;
     }
 
-    // Pass (nums) and (types) to shared state
-    gapi.hangout.data.submitDelta({'nums' : JSON.stringify(nums), 'types' : JSON.stringify(types)});
 };
 
 // Checks to see if 6 or 8 adjacent
