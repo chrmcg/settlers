@@ -1208,6 +1208,7 @@ game.state.init = function(player_count) {
         game.menu.init();
         game.state.uploadInitialState();
     } else {
+        game.board.init();
         game.state.downloadState();
     }
 };
