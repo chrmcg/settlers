@@ -2631,9 +2631,30 @@ game.state.uploadInitialState = function() {
 
     var s = {
         'devcards' : JSON.stringify(game.state.devcards) ,
-        'edges' : JSON.stringify((function(edges){var arr = []; for(var i = 0; i < edges.length; i++) { arr.push({ owner: edges[i].owner, road: edges[i].road }); } return arr; })(game.board.edges)) ,
-        'vertices' : JSON.stringify((function(vertices){var arr = []; for(var i = 0; i < vertices.length; i++) { arr.push({ owner: vertices[i].owner, contents: vertices[i].contents }); } return arr; })(game.board.vertices),
-        'hexes' : JSON.stringify((function(hexes){var arr = []; for(var i = 0; i < hexes.length; i++) { arr.push({ num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber }); } return arr; })(game.board.hexes),
+        'edges' : JSON.stringify(
+        (function(edges){
+            var arr = [];
+            for(var i = 0; i < edges.length; i++) {
+                arr.push({ owner: edges[i].owner, road: edges[i].road});
+            }
+            return arr;
+        })(game.board.edges)) ,
+        'vertices' : JSON.stringify(
+        (function(vertices){
+            var arr = [];
+            for(var i = 0; i < vertices.length; i++) { 
+                arr.push({ owner: vertices[i].owner, contents: vertices[i].contents }); 
+            } 
+            return arr; 
+        })(game.board.vertices)),
+        'hexes' : JSON.stringify(
+        (function(hexes){
+            var arr = [];
+            for(var i = 0; i < hexes.length; i++) {
+                arr.push({ num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
+            }
+            return arr;
+        })(game.board.hexes)),
         'largest_army' : ''+game.state.largest_army ,
         'longest_road' : ''+game.state.longest_road ,
         'next_action' : game.state.next_action ,
