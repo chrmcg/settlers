@@ -39,9 +39,9 @@
     </head>
 <body>
 
-<!--
+
 <script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
--->
+<!--
 <script>
     // Fake API to use if coding offline
     gapi = {
@@ -65,6 +65,8 @@
 
     };
 </script>
+-->
+
 
 <div id="board"></div>
 
@@ -82,19 +84,19 @@ game.statusbox = {
 game.statusbox.init = function() {
 
     var rect, text, button, obj, g, label;
-    for(var p = 0; p < this.game.state.player_count; p++) {
+    for(var p = 0; p < game.state.player_count; p++) {
 
         // TODO: align these with the Google+ Hangout filmstrip; for now just center them
         var margin = 10;
-        var width = this.game.state.player_count <= 5 ? 120 : 100;
-        var offset = (700 - this.game.state.player_count*(margin+width) ) / 2;
+        var width = game.state.player_count <= 5 ? 120 : 100;
+        var offset = (700 - game.state.player_count*(margin+width) ) / 2;
 
         this.player_fields[p] = {};
         g = document.createElementNS(game.ns, 'g');
         g.setAttribute('transform', 'translate(' + ((margin+width) * p + offset) + ', 410)');
 
         rect = document.createElementNS(game.ns, 'rect');
-        rect.setAttribute('fill', this.game.board.pcolors[p]);
+        rect.setAttribute('fill', game.board.pcolors[p]);
         rect.setAttribute('x', '0');
         rect.setAttribute('y', '0');
         rect.setAttribute('width', width);
@@ -121,7 +123,7 @@ game.statusbox.init = function() {
             rect.setAttribute('width', '44');
             rect.setAttribute('height', '80');
             rect.setAttribute('float', 'left');
-            rect.setAttribute('fill', this.game.board.colors[obj[a][2]]);
+            rect.setAttribute('fill', game.board.colors[obj[a][2]]);
 
             label = document.createElementNS(game.ns, 'text');
             label.setAttribute('x', '22');
@@ -150,7 +152,7 @@ game.statusbox.init = function() {
 
             g = document.createElementNS(game.ns, 'g');
             g.setAttribute('transform', 'translate(' + (445 + 50*i) + ', ' + (10) + ')');
-            if(this.game.state.turn != p+1) {
+            if(game.state.turn != p+1) {
                 g.setAttribute('display', 'none');
             }
             g.appendChild(rect);
@@ -186,7 +188,7 @@ game.statusbox.init = function() {
 
 game.statusbox.viewPlayer = function(player) {
 
-    for(var i = 0; i < this.game.state.player_count; i++) {
+    for(var i = 0; i < game.state.player_count; i++) {
         if(i == player-1) {
             this.fields[i].r1.wrapper.setAttribute('display', 'inline');
             this.fields[i].r2.wrapper.setAttribute('display', 'inline');
@@ -536,7 +538,7 @@ game.board.init = function() {
 
     var nums = [0, 2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12];
 
-    // Randomize numbers & check to see if 6 or 8 adjacent
+    // Randomize numbers until 6 or 8 not adjacent
     do {
         for(var i = 0; i < nums.length - 1; i++) {
             var swap = Math.floor(Math.random() * (nums.length - 1 - i)) + i + 1;
@@ -567,9 +569,11 @@ game.board.init = function() {
         this.hexes[i].robber = this.hexes[i].num == 0 ? 1 : 0;
     }
 
-    // TODO: pass (nums) and (types) to shared state
+    // Pass (nums) and (types) to shared state
+    gapi.hangout.data.submitDelta({'nums' : JSON.stringify(nums), 'types' : JSON.stringify(types)});
 };
 
+// Checks to see if 6 or 8 adjacent
 game.board.checkNums = function(nums) {
 
     var v, n;
@@ -814,13 +818,13 @@ game.board.draw = function(w, h) {
 
 game.board.showAvailableEdges = function(player, params) {
     var cont;
-    var a = this.game.state['p'+(this.game.state.turn-1)].firstSettlement; 
-    var b = this.game.state['p'+(this.game.state.turn-1)].secondSettlement; 
+    var a = game.state['p'+(game.state.turn-1)].firstSettlement; 
+    var b = game.state['p'+(game.state.turn-1)].secondSettlement; 
     for(var i = 0; i < 72; i++) {
 
         cont = true;
 
-        if(this.game.state.phase == 1) {
+        if(game.state.phase == 1) {
             cont = false;
             if(this.edges[i].v1 == b || this.edges[i].v2 == b) {
                 cont = true;
@@ -853,7 +857,7 @@ game.board.showAvailableVertices = function(type, player) {
             a = this.getNeighborVertices(i);
             b = true;
             for(var j = 0; j < a.length; j++) { if(this.vertices[a[j]].contents > 0) { b = false; } }
-            if(this.game.state.phase == 2) {
+            if(game.state.phase == 2) {
                 c = false;
                 for(var k = 0; k < this.vertices[i].edges.length; k++) {
                     if(this.edges[this.vertices[i].edges[k]].owner == player) c = true;
@@ -900,7 +904,7 @@ game.board.hideEmptyEdges = function() {
 };
 
 game.board.highlightVertex = function(i, type, player) {
-    if(this.game.state.turn == player) {
+    if(game.state.turn == player) {
         if(type == 1) {
             this.vertices[i].v.setAttribute('width', '20');
             this.vertices[i].v.setAttribute('height', '20');
@@ -1114,11 +1118,14 @@ game.state.deduct = function(player, resources) {
     for(var type in resources) {
         if(type > 0) {
             this['p'+(player-1)]['r'+type] -= resources[type];
-// TODO:                gapi.hangout.data.submitDelta
             str += resources[type] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][type] + ' ';
         }
     }
     console.log('Player ' + player + ' is deducted: ' + str);
+    var obj = {};
+    obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
+    gapi.hangout.data.submitDelta(obj);
+    //gapi.hangout.data.submitDelta({'p'+(player-1): JSON.stringify(this['p'+(player-1)])});
     this.updateCards(player);
 };
 
@@ -1128,10 +1135,13 @@ game.state.collect = function(player, resources) {
     for(var type in resources) {
         if(type > 0) {
             this['p'+(player-1)]['r'+type] += resources[type];
-// TODO:                gapi.hangout.data.submitDelta
             str += resources[type] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][type] + ' ';
         }
     }
+    var obj = {};
+    obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
+    gapi.hangout.data.submitDelta(obj);
+    //gapi.hangout.data.submitDelta({'p'+(player-1): JSON.stringify(this['p'+(player-1)]});
     console.log('Player ' + player + ' collects: ' + str);
     this.updateCards(player);
 };
@@ -1173,7 +1183,7 @@ game.state.updateVictoryPoints = function() {
             console.log('Player '+player+' has taken the Largest Army');
         }
 
-        var r = this.game.board.roadLength(player);
+        var r = game.board.roadLength(player);
         lr_arr[player-1] = r;
     }
 
@@ -1204,11 +1214,11 @@ game.state.updateVictoryPoints = function() {
         s = (function(v){var a=0;
                 for(var i = 0; i < 54; i++) { if(v[i].owner == player && v[i].contents == 1) a++; }
             return a;
-            })(this.game.board.vertices);
+            })(game.board.vertices);
         c = (function(v){var a=0;
                 for(var i = 0; i < 54; i++) { if(v[i].owner == player && v[i].contents == 2) a++; }
             return a;
-            })(this.game.board.vertices);
+            })(game.board.vertices);
 
 
         la = (this['p'+(player-1)].la == 1) ? 2 : 0;
@@ -1221,7 +1231,11 @@ game.state.updateVictoryPoints = function() {
         }
     }
 
-    // TODO : submitDelta for all of this
+    var obj = {};
+    for(var i = 0; i < this.player_count; i++) {
+        obj['p'+i] = JSON.stringify(this['p'+i]);
+    }
+    gapi.hangout.data.submitDelta(obj);
     console.log('Victory points: p1 ' + this.p0.victoryPoints
                     + (this.p1?(', p2 ' + this.p1.victoryPoints):'')
                     + (this.p2?(', p3 ' + this.p2.victoryPoints):'')
@@ -1236,10 +1250,11 @@ game.state.updateCards = function(player) {
         str += this['p'+(player-1)]['r'+i] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][i] + ' ';
         resources[i] = this['p'+(player-1)]['r'+i];
     }
-    
-    // TODO : submitDelta
-    this.game.statusbox.updateFields(player, resources);
 
+    var obj = {};
+    obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
+    gapi.hangout.data.submitDelta(obj);
+    game.statusbox.updateFields(player, resources);
 };
 
 game.proceed = function() {
@@ -1256,7 +1271,7 @@ game.actions.rollDice = function() {
     game.statusbox.viewPlayer(game.state.turn);
     game.menu.refreshDevCards();
 
-    this.game.state.next_action = 'playerControl';
+    game.state.next_action = 'playerControl';
     gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
 
     var d1 = Math.floor(Math.random() * 6) + 1;
@@ -1266,25 +1281,25 @@ game.actions.rollDice = function() {
     console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
 
     if(d == 7) {
-        this.game.state.next_action = 'getRobbed';
+        game.state.next_action = 'getRobbed';
         gapi.hangout.data.submitDelta({'next_action': 'getRobbed'});
     } else {
         var h, v, obj;
         for(var i = 0; i < 19; i++) {
-            h = this.game.board.hexes[i]
+            h = game.board.hexes[i]
             if(h.num == d) {
-                for(var j = 0; j < this.game.board.hexes[i].vertices.length; j++) {
-                    if(this.game.board.hexes[i].robber == 0) {
-                        v = this.game.board.vertices[this.game.board.hexes[i].vertices[j]];
+                for(var j = 0; j < game.board.hexes[i].vertices.length; j++) {
+                    if(game.board.hexes[i].robber == 0) {
+                        v = game.board.vertices[game.board.hexes[i].vertices[j]];
                         obj = {};
                         switch(v.contents) {
                             case 1:
                             obj[h.type] = 1;
-                            this.game.state.collect(v.owner, obj);
+                            game.state.collect(v.owner, obj);
                             break;
                             case 2:
                             obj[h.type] = 2;
-                            this.game.state.collect(v.owner, obj);
+                            game.state.collect(v.owner, obj);
                             break;
                             case 0: default:
 
@@ -1296,12 +1311,12 @@ game.actions.rollDice = function() {
         }
     }
 
-    this.game.proceed();
+    game.proceed();
 };
 
 game.actions.getRobbed = function() {
     
-    this.game.state.next_action = 'moveRobber';
+    game.state.next_action = 'moveRobber';
     gapi.hangout.data.submitDelta({'next_action': 'moveRobber'});
 
     console.log('Each player with >7 cards has to select cards now...');
@@ -1330,10 +1345,10 @@ game.actions.getRobbed = function() {
 
 game.actions.moveRobber = function() {
     // Don't let the user do anything until the robber is moved
-    for(var i = 0; i < this.game.menu.buttons.length; i++) {
-        this.game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
-        this.game.menu.buttons[i].setAttribute('onclick', '');
-        this.game.menu.buttons[i].setAttribute('class', '');
+    for(var i = 0; i < game.menu.buttons.length; i++) {
+        game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
+        game.menu.buttons[i].setAttribute('onclick', '');
+        game.menu.buttons[i].setAttribute('class', '');
     }
     for(var i = 0; i < game.state.player_count; i++) {
         for(var j = 1; j <= 5; j++) {
@@ -1344,57 +1359,57 @@ game.actions.moveRobber = function() {
 
     // Move the robber
     for (var i = 0; i < 19; i++) {
-        this.game.board.hexes[i].circle.setAttribute('class', 'menu-item');
-        this.game.board.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
-        this.game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
-        this.game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
+        game.board.hexes[i].circle.setAttribute('class', 'menu-item');
+        game.board.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
+        game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
+        game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
     }
 };
 
 game.actions.selectRobber = function(i) {
     for (var j = 0; j < 19; j++) {
-        this.game.board.hexes[j].robber = 0;
-        this.game.board.hexes[j].circle.setAttribute('class', '');
-        this.game.board.hexes[j].circle.setAttribute('onmouseover', '');
-        this.game.board.hexes[j].circle.setAttribute('onmouseout', '');
-        this.game.board.hexes[j].circle.setAttribute('onclick', '');
+        game.board.hexes[j].robber = 0;
+        game.board.hexes[j].circle.setAttribute('class', '');
+        game.board.hexes[j].circle.setAttribute('onmouseover', '');
+        game.board.hexes[j].circle.setAttribute('onmouseout', '');
+        game.board.hexes[j].circle.setAttribute('onclick', '');
     }
-    this.game.board.hexes[i].robber = 1;
+    game.board.hexes[i].robber = 1;
 
-    this.game.state.next_action = 'stealFrom';
+    game.state.next_action = 'stealFrom';
     gapi.hangout.data.submitDelta({'next_action': 'stealFrom'});
-    this.game.proceed();
+    game.proceed();
 };
 
 game.actions.stealFrom = function() {
 
     var robberhex = null;
     for(var j = 0; j < 19; j++) {
-        if(this.game.board.hexes[j].robber == 1) robberhex = j;
+        if(game.board.hexes[j].robber == 1) robberhex = j;
     }
 
     var owners = [];
     var o;
     for(var i = 0; i < 6; i++) {
-        o = this.game.board.vertices[this.game.board.hexes[robberhex].vertices[i]].owner;
-        if(o != null && o != this.game.state.turn && owners.indexOf(o) == -1) owners.push(o);
+        o = game.board.vertices[game.board.hexes[robberhex].vertices[i]].owner;
+        if(o != null && o != game.state.turn && owners.indexOf(o) == -1) owners.push(o);
     }
 
-    this.game.state.next_action = 'playerControl';
+    game.state.next_action = 'playerControl';
     gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
 
     console.log('Choose one of (' + owners.join(', ') + ') to steal a card from');
     // TODO: user chooses from (owners) and randomly gets one of their cards
-    this.game.proceed();
+    game.proceed();
 };
 
 game.actions.buyDevCard = function() {
 
-    if(this.game.state.playerHas(this.game.state.turn, {2: 1, 3: 1, 5: 1})) {
+    if(game.state.playerHas(game.state.turn, {2: 1, 3: 1, 5: 1})) {
         var empty = true;
         var k;
         var i = 0;
-        for(var key in this.game.state.devcards) {
+        for(var key in game.state.devcards) {
             empty = false;
             if(Math.random() < 1/++i) {
                 k = key;
@@ -1405,55 +1420,70 @@ game.actions.buyDevCard = function() {
         if(empty === true) {
             console.log('There are no more dev cards in the stack');
         } else {
-            this.game.state.deduct(this.game.state.turn, {2: 1, 3: 1, 5: 1});
-            var card = this.game.state.devcards[k];
-            delete this.game.state.devcards[k];
+            game.state.deduct(game.state.turn, {2: 1, 3: 1, 5: 1});
+            var card = game.state.devcards[k];
+            delete game.state.devcards[k];
 
 
-            var p = JSON.parse(gapi.hangout.data.getValue('p'+(this.game.state.turn-1)));
-            p['c'+card]++;
-            this.game.state['p'+(this.game.state.turn-1)]['c'+card]++;
-            //gapi.hangout.data.submitDelta({('p'+(this.game.state.turn-1)): JSON.stringify(p)});
-            console.log('Player ' + this.game.state.turn + ' buys a ' + card + ' card');
+            //var p = JSON.parse(gapi.hangout.data.getValue('p'+(game.state.turn-1)));
+            //p['c'+card]++;
+            game.state['p'+(game.state.turn-1)]['c'+card]++;
+            var obj = {};
+            obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
+            gapi.hangout.data.submitDelta(obj);
+            //gapi.hangout.data.submitDelta({'p'+(game.state.turn-1): JSON.stringify(game.state['p'+(game.state.turn-1)]});
+            //gapi.hangout.data.submitDelta({('p'+(game.state.turn-1)): JSON.stringify(p)});
+            console.log('Player ' + game.state.turn + ' buys a ' + card + ' card');
             game.menu.refreshDevCards();
         }
     } else {
-        console.log('Player ' + this.game.state.turn + ' cannot afford a dev card');
+        console.log('Player ' + game.state.turn + ' cannot afford a dev card');
     }
 
-    this.game.state.updateVictoryPoints();
-    this.game.state.next_action = 'playerControl';
+    game.state.updateVictoryPoints();
+    game.state.next_action = 'playerControl';
     gapi.hangout.data.submitDelta({'next_action': 'moveRobber'});
-    this.game.proceed();
+    game.proceed();
 };
 
 game.actions.playDevCard = function(type) {
     console.log(type + ' card played');
-    //TODO
     //Knight, Year of Plenty, Road Building, Monopoly
 
     switch(type) {
     case 'K':
-        var p = JSON.parse(gapi.hangout.data.getValue('p'+(this.game.state.turn-1)));
-        p.army++;
-        this.game.state['p'+(this.game.state.turn-1)].army++;
-        this.game.state['p'+(this.game.state.turn-1)].cK--;
-        this.game.state.next_action = 'playerControl';
+        //var p = JSON.parse(gapi.hangout.data.getValue('p'+(game.state.turn-1)));
+        //p.army++;
+        game.state['p'+(game.state.turn-1)].army++;
+        game.state['p'+(game.state.turn-1)].cK--;
+        game.state.next_action = 'playerControl';
         var obj = {next_action: 'playerControl'};
-        obj['p'+(this.game.state.turn-1)] = JSON.stringify(p);
+        //obj['p'+(game.state.turn-1)] = JSON.stringify(p);
+        obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
         gapi.hangout.data.submitDelta(obj);
         game.state.updateVictoryPoints();
 
-        this.game.actions.moveRobber();
+        game.actions.moveRobber();
     break;
     case 'Y': 
         game.actions.selectCards('Y');
     break;
     case 'R':
-        // TODO: Build 2 roads free of charge
-        if (this.game.state['p'+(this.game.state.turn-1)].roads > 1) {
+        // Build 2 roads free of charge
+        if (game.state['p'+(game.state.turn-1)].roads > 1) {
             game.actions.buildRoad('R');
-            this.game.state['p'+(this.game.state.turn-1)].cR--;
+            game.state['p'+(game.state.turn-1)].cR--;
+            var edges = (function(edges){ 
+                var obj = [];
+                for (var i = 0; i < edges.length; i++) {
+                    obj[i] = {road : edges[i].road, owner : edges[i].owner};
+                }
+                return obj;
+            })(game.board.edges);
+            var obj = {};
+            obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
+            obj['edges'] = JSON.stringify(edges);
+            gapi.hangout.data.submitDelta(obj);
         }
     break;
     case 'M':
@@ -1913,12 +1943,13 @@ game.actions.confirmSelect = function(reason, params) {
     }
     game.state.collect(game.state.turn, ask);
 
-    var p = JSON.parse(gapi.hangout.data.getValue('p'+(this.game.state.turn-1)));
-    p.cY--;
-    this.game.state['p'+(this.game.state.turn-1)].cY--;
-    this.game.state.next_action = 'playerControl';
+    //var p = JSON.parse(gapi.hangout.data.getValue('p'+(game.state.turn-1)));
+    //p.cY--;
+    game.state['p'+(game.state.turn-1)].cY--;
+    game.state.next_action = 'playerControl';
     var obj = {next_action: 'playerControl'};
-    obj['p'+(this.game.state.turn-1)] = JSON.stringify(p);
+    //obj['p'+(game.state.turn-1)] = JSON.stringify(p);
+    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
     gapi.hangout.data.submitDelta(obj);
 
     game.actions.cancelSelect();
@@ -1946,12 +1977,13 @@ game.actions.confirmSelect = function(reason, params) {
         }
     }
 
-    var p = JSON.parse(gapi.hangout.data.getValue('p'+(this.game.state.turn-1)));
-    p.cM--;
-    this.game.state['p'+(this.game.state.turn-1)].cM--;
-    this.game.state.next_action = 'playerControl';
+    //var p = JSON.parse(gapi.hangout.data.getValue('p'+(game.state.turn-1)));
+    //p.cM--;
+    game.state['p'+(game.state.turn-1)].cM--;
+    game.state.next_action = 'playerControl';
     var obj = {next_action: 'playerControl'};
-    obj['p'+(this.game.state.turn-1)] = JSON.stringify(p);
+    //obj['p'+(game.state.turn-1)] = JSON.stringify(p);
+    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
     gapi.hangout.data.submitDelta(obj);
 
     game.actions.cancelSelect();
@@ -2161,9 +2193,9 @@ game.actions.playerControl = function() {
     
     var obj = {
         'offerTrade': game.state.playerCardCount(game.state.turn) > 0,
-        'buildRoad': game.state.playerHas(game.state.turn, {1:1, 4:1}) && game.state['p'+(this.game.state.turn-1)].roads > 0,
-        'buildSettlement': game.state.playerHas(game.state.turn, {1:1, 2:1, 3:1, 4:1}) && game.state['p'+(this.game.state.turn-1)].settlements > 0,
-        'buildCity': game.state.playerHas(game.state.turn, {3:2, 5:3}) && game.state['p'+(this.game.state.turn-1)].cities > 0,
+        'buildRoad': game.state.playerHas(game.state.turn, {1:1, 4:1}) && game.state['p'+(game.state.turn-1)].roads > 0,
+        'buildSettlement': game.state.playerHas(game.state.turn, {1:1, 2:1, 3:1, 4:1}) && game.state['p'+(game.state.turn-1)].settlements > 0,
+        'buildCity': game.state.playerHas(game.state.turn, {3:2, 5:3}) && game.state['p'+(game.state.turn-1)].cities > 0,
         'buyDevCard': game.state.playerHas(game.state.turn, {2:1, 3:1, 5:1}),
         'endTurn': true,
     }
@@ -2171,16 +2203,16 @@ game.actions.playerControl = function() {
     game.statusbox.viewPlayer(game.state.turn);
 
     var action;
-    for(var i = 0; i < this.game.menu.buttons.length; i++) {
-        action = this.game.menu.buttons[i].getAttribute('data-action');
+    for(var i = 0; i < game.menu.buttons.length; i++) {
+        action = game.menu.buttons[i].getAttribute('data-action');
         if(obj[action] === true) {
-            this.game.menu.buttons[i].children[0].setAttribute('fill', 'white');
-            this.game.menu.buttons[i].setAttribute('onclick', 'game.actions.' + action+'()');
-            this.game.menu.buttons[i].setAttribute('class', 'menu-item');
+            game.menu.buttons[i].children[0].setAttribute('fill', 'white');
+            game.menu.buttons[i].setAttribute('onclick', 'game.actions.' + action+'()');
+            game.menu.buttons[i].setAttribute('class', 'menu-item');
         } else {
-            this.game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
-            this.game.menu.buttons[i].setAttribute('onclick', '');
-            this.game.menu.buttons[i].setAttribute('class', '');
+            game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
+            game.menu.buttons[i].setAttribute('onclick', '');
+            game.menu.buttons[i].setAttribute('class', '');
 
         }
     }
@@ -2255,95 +2287,97 @@ game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
 };
 
 game.actions.endTurn = function() {
-    //TODO: gapi.hangout.data.submitDelta
-    for(var i = 0; i < this.game.menu.buttons.length; i++) {
-        this.game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
-        this.game.menu.buttons[i].setAttribute('onclick', '');
+    for(var i = 0; i < game.menu.buttons.length; i++) {
+        game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
+        game.menu.buttons[i].setAttribute('onclick', '');
     }
 
-    this.game.actions.cancelPlacement();
-    this.game.actions.cancelSelect();
+    game.actions.cancelPlacement();
+    game.actions.cancelSelect();
 
-    this.game.state.next_action = 'rollDice';
-    this.game.state.turn = this.game.state.turn == this.game.state.player_count ? 1 : this.game.state.turn+1;
+    game.state.next_action = 'rollDice';
+    game.state.turn = game.state.turn == game.state.player_count ? 1 : game.state.turn+1;
 
-    var obj = {next_action: 'rollDice'};
-    obj.turn = ''+this.game.state.turn;
+    var obj = {'next_action': 'rollDice'};
+    obj['turn'] = ''+game.state.turn;
     gapi.hangout.data.submitDelta(obj);
-    this.game.proceed();
+    game.proceed();
 }
 
 // 1 = WOOD, 2 = SHEEP, 3 = WHEAT, 4 = BRICK, 5 = ORE
 
 game.actions.buildSettlement = function() {
-    if(this.game.state.phase == 0 || this.game.state.phase == 1) {
-        this.game.state.next_action = 'buildRoad';
-        this.game.board.showAvailableVertices(1, this.game.state.turn);
-    } else if(this.game.state.phase == 2) {
-        if(this.game.state.playerHas(this.game.state.turn, {1: 1, 2: 1, 3: 1, 4: 1}))  {
-            this.game.state.next_action = 'playerControl'
-            this.game.board.showAvailableVertices(1, this.game.state.turn);
+    if(game.state.phase == 0 || game.state.phase == 1) {
+        game.state.next_action = 'buildRoad';
+        gapi.hangout.data.submitDelta({'next_action': 'buildRoad'});
+        game.board.showAvailableVertices(1, game.state.turn);
+    } else if(game.state.phase == 2) {
+        if(game.state.playerHas(game.state.turn, {1: 1, 2: 1, 3: 1, 4: 1}))  {
+            game.state.next_action = 'playerControl';
+            gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
+            game.board.showAvailableVertices(1, game.state.turn);
         } else {
-            console.log('Cannot build. Player ' + this.game.state.turn + ' has insufficient resources');
+            console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
         }
     }
 };
 
 game.actions.buildCity = function() {
-    this.game.board.showAvailableVertices(2, this.game.state.turn);
+    game.board.showAvailableVertices(2, game.state.turn);
 
-    if(this.game.state.phase == 2 && (this.game.state.playerHas(this.game.state.turn, {3: 2, 5: 3}))) {
-        this.game.state.next_action = 'playerControl';
-        this.game.board.showAvailableVertices(2, this.game.state.turn);
+    if(game.state.phase == 2 && (game.state.playerHas(game.state.turn, {3: 2, 5: 3}))) {
+        game.state.next_action = 'playerControl';
+        gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
+        game.board.showAvailableVertices(2, game.state.turn);
     } else {
-        console.log('Cannot build. Player ' + this.game.state.turn + ' has insufficient resources');
+        console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
     }
 
 };
 
 game.actions.buildRoad = function(params) {
     if (params == 'R') {
-        this.game.board.showAvailableEdges(this.game.state.turn, 'R');
-    } else if(this.game.state.phase == 0 || this.game.state.phase == 1) {
-        this.game.board.showAvailableEdges(this.game.state.turn);
-    } else if(this.game.state.phase == 2) {
-        if(this.game.state.playerHas(this.game.state.turn, {1: 1, 4: 1}))  {
-            this.game.state.next_action = 'playerControl';
-            this.game.board.showAvailableEdges(this.game.state.turn);
+        game.board.showAvailableEdges(game.state.turn, 'R');
+    } else if(game.state.phase == 0 || game.state.phase == 1) {
+        game.board.showAvailableEdges(game.state.turn);
+    } else if(game.state.phase == 2) {
+        if(game.state.playerHas(game.state.turn, {1: 1, 4: 1}))  {
+            game.state.next_action = 'playerControl';
+            gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
+            game.board.showAvailableEdges(game.state.turn);
         } else {
-            console.log('Cannot build. Player ' + this.game.state.turn + ' has insufficient resources');
+            console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
         }
     }
 };
 
 game.actions.cancelPlacement = function() {
-    this.game.board.hideEmptyVertices();
-    this.game.board.hideEmptyEdges();
+    game.board.hideEmptyVertices();
+    game.board.hideEmptyEdges();
 };
 
 game.actions.selectVertex = function(i, type) {
-    //TODO: gapi.hangout.data.submitDelta
     var stop = false;
 
-    if(this.game.state.phase == 0) {
-        this.game.state['p'+(this.game.state.turn-1)].firstSettlement = i;
-    } else if(this.game.state.phase == 1) {
-        this.game.state['p'+(this.game.state.turn-1)].secondSettlement = i;
+    if(game.state.phase == 0) {
+        game.state['p'+(game.state.turn-1)].firstSettlement = i;
+    } else if(game.state.phase == 1) {
+        game.state['p'+(game.state.turn-1)].secondSettlement = i;
         var obj = {}, b;
-        for(var j = 0; j < this.game.board.vertices[i].hexes.length; j++) {
-            b = this.game.board.hexes[this.game.board.vertices[i].hexes[j]].type;
+        for(var j = 0; j < game.board.vertices[i].hexes.length; j++) {
+            b = game.board.hexes[game.board.vertices[i].hexes[j]].type;
             if(obj[b] == null) obj[b] = 0;
             obj[b]++;
         }
-        this.game.state.collect(this.game.state.turn, obj);
-    } else if(this.game.state.phase == 2) {
+        game.state.collect(game.state.turn, obj);
+    } else if(game.state.phase == 2) {
         if(type == 1) {
-            this.game.state.deduct(this.game.state.turn, {1: 1, 2: 1, 3: 1, 4: 1});
-            this.game.state['p'+(this.game.state.turn-1)].settlements--;
+            game.state.deduct(game.state.turn, {1: 1, 2: 1, 3: 1, 4: 1});
+            game.state['p'+(game.state.turn-1)].settlements--;
         } else if(type == 2) {
-            if(this.game.board.vertices[i].owner == this.game.state.turn) {
-                this.game.state.deduct(this.game.state.turn, {3: 2, 5: 3});
-                this.game.state['p'+(this.game.state.turn-1)].cities--;
+            if(game.board.vertices[i].owner == game.state.turn) {
+                game.state.deduct(game.state.turn, {3: 2, 5: 3});
+                game.state['p'+(game.state.turn-1)].cities--;
             } else {
                 stop = true;
             }
@@ -2351,87 +2385,105 @@ game.actions.selectVertex = function(i, type) {
     }
 
     if(stop === false) {
-        this.game.board.vertices[i].contents = type;
-        this.game.board.vertices[i].owner = this.game.state.turn;
-        this.game.board.vertices[i].v.setAttribute('fill', game.board.pcolors[this.game.state.turn-1]);
+        game.board.vertices[i].contents = type;
+        game.board.vertices[i].owner = game.state.turn;
+        game.board.vertices[i].v.setAttribute('fill', game.board.pcolors[game.state.turn-1]);
         if (type == 1) {
-            this.game.board.vertices[i].v.setAttribute('width', '10');
-            this.game.board.vertices[i].v.setAttribute('height', '10');
-            this.game.board.vertices[i].v.setAttribute('x', game.board.vertices[i].x - 5);
-            this.game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 5);
+            game.board.vertices[i].v.setAttribute('width', '10');
+            game.board.vertices[i].v.setAttribute('height', '10');
+            game.board.vertices[i].v.setAttribute('x', game.board.vertices[i].x - 5);
+            game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 5);
         } else if (type == 2) {
-            this.game.board.vertices[i].v.setAttribute('width', '20');
-            this.game.board.vertices[i].v.setAttribute('height', '20');
-            this.game.board.vertices[i].v.setAttribute('x', game.board.vertices[i].x - 10);
-            this.game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 10);
+            game.board.vertices[i].v.setAttribute('width', '20');
+            game.board.vertices[i].v.setAttribute('height', '20');
+            game.board.vertices[i].v.setAttribute('x', game.board.vertices[i].x - 10);
+            game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 10);
         }
-        this.game.board.vertices[i].v.setAttribute('onclick', '');
+        game.board.vertices[i].v.setAttribute('onclick', '');
     }
-    this.game.board.hideEmptyVertices();
+    game.board.hideEmptyVertices();
 
-    this.game.state.updateVictoryPoints();
-    this.game.proceed();
+    game.state.updateVictoryPoints();
+    var vertices = (function(vertices){ 
+        var obj = {};
+        for (var i = 0; i < vertices.length; i++) {
+            obj[i] = {contents : vertices[i].contents, owner : vertices[i].owner};
+        }
+        return obj;
+    })(game.board.vertices);
+    var obj = {};
+    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
+    obj['vertices'] = JSON.stringify(vertices);
+    gapi.hangout.data.submitDelta(obj);
+
+    game.proceed();
 };
 
 game.actions.selectEdge = function(i, player, params) {
-    //TODO: gapi.hangout.data.submitDelta
+    game.board.edges[i].road = 1;
+    game.board.edges[i].owner = game.state.turn;
+    game.board.edges[i].e.setAttribute('stroke', game.board.pcolors[game.state.turn-1]);
+    game.board.edges[i].e.setAttribute('stroke-width', '5');
+    game.board.edges[i].e.setAttribute('onclick', '');
 
-    var ee = JSON.parse(gapi.hangout.data.getValue('edges'));
-    console.log(ee);
+    game.board.hideEmptyEdges();
 
-    this.game.board.edges[i].road = 1;
-    this.game.board.edges[i].owner = this.game.state.turn;
-    this.game.board.edges[i].e.setAttribute('stroke', game.board.pcolors[this.game.state.turn-1]);
-    this.game.board.edges[i].e.setAttribute('stroke-width', '5');
-    this.game.board.edges[i].e.setAttribute('onclick', '');
-
-    ee[i].road = 1;
-    ee[i].owner = this.game.state.turn;
-    gapi.hangout.data.submitDelta({edges: JSON.stringify(ee)});        
-    
-    this.game.board.hideEmptyEdges();
-
-
-
-    if(this.game.state.phase == 0) {
-        this.game.state.next_action = 'buildSettlement';
-
-        if(this.game.state.turn == this.game.state.player_count) {
-            this.game.state.phase = 1;
+    if(game.state.phase == 0) {
+        game.state.next_action = 'buildSettlement';
+        gapi.hangout.data.submitDelta({'next_action': 'buildSettlement'});
+        if(game.state.turn == game.state.player_count) {
+            game.state.phase = 1;
         } else {
-            this.game.state.turn++;
-            this.game.statusbox.viewPlayer(this.game.state.turn);
+            game.state.turn++;
+            game.statusbox.viewPlayer(game.state.turn);
         }
         
-    } else if(this.game.state.phase == 1) {
+    } else if(game.state.phase == 1) {
         
-        if(this.game.state.turn == 1) {
-            this.game.state.phase = 2;
-            this.game.state.next_action = 'rollDice';
+        if(game.state.turn == 1) {
+            game.state.phase = 2;
+            game.state.next_action = 'rollDice';
+            gapi.hangout.data.submitDelta({'next_action': 'rollDice'});
         } else {
-            this.game.state.turn--;
-            this.game.statusbox.viewPlayer(this.game.state.turn);
-            this.game.state.next_action = 'buildSettlement';
+            game.state.turn--;
+            game.statusbox.viewPlayer(game.state.turn);
+            game.state.next_action = 'buildSettlement';
+            gapi.hangout.data.submitDelta({'next_action': 'buildSettlement'});
         }
 
-    } else if(this.game.state.phase == 2) {
-        this.game.state['p'+(this.game.state.turn-1)].roads--;
+    } else if(game.state.phase == 2) {
+        game.state['p'+(game.state.turn-1)].roads--;
+        console.log(params);
         if (params == 'undefined') { 
-            this.game.state.next_action = 'playerControl';
-            this.game.state.deduct(this.game.state.turn, {1: 1, 4: 1});
+            game.state.next_action = 'playerControl';
+            gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
+            game.state.deduct(game.state.turn, {1: 1, 4: 1});
         } else if (params == 'R') {
-            this.game.board.showAvailableEdges(player, 'R1'); 
+            game.board.showAvailableEdges(player, 'R1'); 
         } else {
-            this.game.state.next_action = 'playerControl';
+            game.state.next_action = 'playerControl';
+            gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
         }
     } 
 
-    this.game.state.updateVictoryPoints();
-    this.game.proceed();
+    game.state.updateVictoryPoints();
+    var edges = (function(edges){ 
+        var obj = [];
+        for (var i = 0; i < edges.length; i++) {
+            obj[i] = {road : edges[i].road, owner : edges[i].owner};
+        }
+        return obj;
+    })(game.board.edges);
+    var obj = {};
+    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
+    obj['edges'] = JSON.stringify(edges);
+    gapi.hangout.data.submitDelta(obj);
+
+    game.proceed();
 };
 
 game.actions.winGame = function() {
-    console.log('Player ' + this.game.state.turn + ' wins the game!');
+    console.log('Player ' + game.state.turn + ' wins the game!');
 };
 
 game.state.downloadState = function() {
@@ -2444,7 +2496,9 @@ game.state.downloadState = function() {
     if(s.p0.length > 0) game.state.p0 = JSON.parse(s.p0);
     if(s.p1.length > 0) game.state.p1 = JSON.parse(s.p1);
     if(s.p2.length > 0) game.state.p2 = JSON.parse(s.p2);
+
     if(typeof s.p3 != 'undefined' && s.p3.length > 0) game.state.p3 = JSON.parse(s.p3);
+
     game.state.phase = parseInt(s.phase);
     game.state.player_count = parseInt(s.player_count);
     game.state.turn = parseInt(s.turn);
@@ -2503,11 +2557,50 @@ window.init = function () {
     gapi.hangout.onApiReady.add(function(eventObj) {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
-
-            gapi.hangout.data.onStateChanged = function(state_event) {
+            gapi.hangout.data.onStateChanged.add(function(state_event) {
                 console.log(state_event);
-                //TODO: apply state_event changes in game.state
-            };
+                console.log(state_event.metadata);
+                //Apply state_event changes
+                for(var i = 0; i < state_event.addedKeys.length; i++) {
+                    var key = state_event.addedKeys[i].key;
+                    var value = state_event.addedKeys[i].value;
+                    switch(key) {
+                        case 'edges':
+                            var edges = JSON.parse(value);
+                            for(var j = 0; j < edges.length; j++) {
+                                game.board.edges[i].owner = edges[i].owner;
+                                game.board.edges[i].road = edges[i].road;
+                            }
+                        break;
+                        case 'vertices':
+                            var vertices = JSON.parse(value);
+                            for(var j = 0; j < vertices.length; j++) {
+                                game.board.vertices[i].contents = vertices[i].contents;
+                                game.board.vertices[i].owner = vertices[i].owner;
+                            }
+                        break;
+                        case 'nums':
+                            var nums = JSON.parse(value);
+                            for(var j = 0; j < nums.length; j++) {
+                                game.board.nums[i] = nums[i];
+                            }
+                        break;
+                        case 'types':
+                            var types = JSON.parse(value);
+                            for(var j = 0; j < types.length; j++) {
+                                game.board.types[i] = types[i];
+                            }
+                        break;
+                        default:
+                            try {
+                                game.state[key] = JSON.parse(value);
+                            } catch(e) {
+                                game.state[key] = value;
+                            }
+                        break;
+                    }
+                }
+            });
 
             game.board.init();
             game.board.draw(700, 390);
@@ -2517,13 +2610,13 @@ window.init = function () {
             game.menu.init();
 
             game.proceed();
-            game.autosettle();
+            //game.autosettle();
         }
     });
 }
 
 // Wait for gadget to load.                                                       
-//gadgets.util.registerOnLoadHandler(window.init);
-init();
+gadgets.util.registerOnLoadHandler(window.init);
+//init();
 </script>
 </body>
