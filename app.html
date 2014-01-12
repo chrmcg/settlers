@@ -1202,6 +1202,10 @@ game.state.init = function(player_count) {
     };
 
     if(gapi.hangout.data.getValue("largest_army") == null) {
+        game.board.init();
+        game.statusbox.init();
+        game.selectbox.init();
+        game.menu.init();
         game.state.uploadInitialState();
     } else {
         game.state.downloadState();
@@ -2730,12 +2734,8 @@ window.init = function () {
                 game.board.redraw();
             });
 
-            game.board.init();
-            game.board.draw(700, 390);
             game.state.init(3);
-            game.statusbox.init();
-            game.selectbox.init();
-            game.menu.init();
+            game.board.draw(700, 390);
 
             game.proceed();
             //game.autosettle();
