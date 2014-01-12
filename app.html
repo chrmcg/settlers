@@ -2578,6 +2578,21 @@ window.init = function () {
                             for(var j = 0; j < vertices.length; j++) {
                                 game.board.vertices[i].contents = vertices[i].contents;
                                 game.board.vertices[i].owner = vertices[i].owner;
+
+                                if (vertices[i].contents == 1) {
+                                    game.board.vertices[i].v.setAttribute('fill', game.board.pcolors[vertices[i].owner-1]);
+                                    game.board.vertices[i].v.setAttribute('width', '10');
+                                    game.board.vertices[i].v.setAttribute('height', '10');
+                                    game.board.vertices[i].v.setAttribute('x', game.board.vertices[i].x - 5);
+                                    game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 5);
+                                } else if (vertices[i].contents == 2) {
+                                    game.board.vertices[i].v.setAttribute('fill', game.board.pcolors[vertices[i].owner-1]);
+                                    game.board.vertices[i].v.setAttribute('width', '20');
+                                    game.board.vertices[i].v.setAttribute('height', '20');
+                                    game.board.vertices[i].v.setAttribute('x', game.board.vertices[i].x - 10);
+                                    game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 10);
+                                }
+                                game.board.vertices[i].v.setAttribute('onclick', '');
                             }
                         break;
                         case 'nums':
