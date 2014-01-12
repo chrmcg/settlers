@@ -720,7 +720,6 @@ game.board.redraw = function() {
 
     }
 
-    // Create placeholder object at each vertex
     var v;
     for(var i = 0; i < 54; i++) {
         v = this.vertices[i].v;
@@ -728,7 +727,7 @@ game.board.redraw = function() {
         if(this.vertices[i].contents == 1) {
             v.setAttribute('width', '10');
             v.setAttribute('height', '10');
-            v.setAttribute('fill', this.pcolors[this.edges[i].owner-1]);
+            v.setAttribute('fill', this.pcolors[this.vertices[i].owner-1]);
         } else if(this.vertices[i].contents == 2) {
         // TODO: render city
 
@@ -738,7 +737,7 @@ game.board.redraw = function() {
             if(this.vertices[i].port == 6) {
                 v.setAttribute('stroke', 'blue');
             } else {
-                v.setAttribute('stroke', game.board.colors[this.vertices[i].port]);
+                v.setAttribute('stroke', this.colors[this.vertices[i].port]);
             }
         } else {
             v.setAttribute('stroke', 'black');
