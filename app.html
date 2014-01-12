@@ -2398,13 +2398,9 @@ game.actions.endTurn = function() {
 
 game.actions.buildSettlement = function() {
     if(game.state.phase == 0 || game.state.phase == 1) {
-        game.state.next_action = 'buildRoad';
-        gapi.hangout.data.submitDelta({'next_action': 'buildRoad'});
         game.board.showAvailableVertices(1, game.state.turn);
     } else if(game.state.phase == 2) {
         if(game.state.playerHas(game.state.turn, {1: 1, 2: 1, 3: 1, 4: 1}))  {
-            game.state.next_action = 'playerControl';
-            gapi.hangout.data.submitDelta({'next_action': 'playerControl'});
             game.board.showAvailableVertices(1, game.state.turn);
         } else {
             console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
@@ -2451,6 +2447,7 @@ game.actions.selectVertex = function(i, type) {
 
     if(game.state.phase == 0) {
         game.state['p'+(game.state.turn-1)].firstSettlement = i;
+        game.state.next_action = 'buildRoad';
     } else if(game.state.phase == 1) {
         game.state['p'+(game.state.turn-1)].secondSettlement = i;
         var obj = {}, b;
@@ -2504,6 +2501,9 @@ game.actions.selectVertex = function(i, type) {
     var obj = {};
     obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
     obj['vertices'] = JSON.stringify(vertices);
+    if (game.state.phase == 0) {
+        obj['next_action'] = 'buildRoad';
+    }
     gapi.hangout.data.submitDelta(obj);
 
     game.proceed();
