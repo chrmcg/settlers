@@ -2588,6 +2588,12 @@ window.init = function () {
                                 this.game.board.vertices[i].owner = vertices[i].owner;
                             }
                         break;
+                        case 'nums':
+                            var nums = JSON.parse(value.value);
+                            for(var i = 0; i < nums.length; i++) {
+                                this.game.board.nums[i] = nums[i];
+                            }
+                        break;
                         default:
                             this.game.state[key] = JSON.parse(value.value);
                         break;
