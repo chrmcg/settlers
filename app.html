@@ -460,21 +460,21 @@ game.board.randomize = function() {
     for(var i = 0; i < ports.length; i++) {
         this.vertices[ports[i][0]].port = ports[i][1];
     }
-   
+    
+    // Pass (nums) and (types) to shared state
+    gapi.hangout.data.submitDelta({'types' : JSON.stringify(types), 'nums' : JSON.stringify(nums)});
+    
     // Assign randomized numbers
     for(var i = 0; i < 19; i++) {
         this.hexes[i].num = nums.shift();
     }
-    
+
     // Assign randomized types
     for(var i = 0; i < 19; i++) {
         this.hexes[i].type = this.hexes[i].num == 0 ? 0 : types.shift();
         this.hexes[i].robber = this.hexes[i].num == 0 ? 1 : 0;
     }
 
-    // Pass (nums) and (types) to shared state
-    gapi.hangout.data.submitDelta({'types' : JSON.stringify(types), 'nums' : JSON.stringify(nums)});
-    return [nums, types, ports];
 };
 
 game.board.init = function() {
