@@ -1122,7 +1122,10 @@ game.state.deduct = function(player, resources) {
         }
     }
     console.log('Player ' + player + ' is deducted: ' + str);
-    gapi.hangout.data.submitDelta({'p'+(player-1): JSON.stringify(this['p'+(player-1)]});
+    var obj = {};
+    obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
+    gapi.hangout.data.submitDelta(obj);
+    //gapi.hangout.data.submitDelta({'p'+(player-1): JSON.stringify(this['p'+(player-1)])});
     this.updateCards(player);
 };
 
@@ -1135,7 +1138,10 @@ game.state.collect = function(player, resources) {
             str += resources[type] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][type] + ' ';
         }
     }
-    gapi.hangout.data.submitDelta({'p'+(player-1): JSON.stringify(this['p'+(player-1)]});
+    var obj = {};
+    obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
+    gapi.hangout.data.submitDelta(obj);
+    //gapi.hangout.data.submitDelta({'p'+(player-1): JSON.stringify(this['p'+(player-1)]});
     console.log('Player ' + player + ' collects: ' + str);
     this.updateCards(player);
 };
@@ -1240,8 +1246,10 @@ game.state.updateCards = function(player) {
         str += this['p'+(player-1)]['r'+i] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][i] + ' ';
         resources[i] = this['p'+(player-1)]['r'+i];
     }
-    
-    gapi.hangout.data.submitDelta({'p'+(player-1): JSON.stringify(this['p'+(player-1)]});
+    var obj = {};
+    obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
+    gapi.hangout.data.submitDelta(obj);
+    //gapi.hangout.data.submitDelta({'p'+(player-1): JSON.stringify(this['p'+(player-1)]});
     this.game.statusbox.updateFields(player, resources);
 };
 
@@ -1416,7 +1424,10 @@ game.actions.buyDevCard = function() {
             //var p = JSON.parse(gapi.hangout.data.getValue('p'+(this.game.state.turn-1)));
             //p['c'+card]++;
             this.game.state['p'+(this.game.state.turn-1)]['c'+card]++;
-            gapi.hangout.data.submitDelta({'p'+(this.game.state.turn-1): JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]});
+            var obj = {};
+            obj['p'+(this.game.state.turn-1)] = JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]);
+            gapi.hangout.data.submitDelta(obj);
+            //gapi.hangout.data.submitDelta({'p'+(this.game.state.turn-1): JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]});
             //gapi.hangout.data.submitDelta({('p'+(this.game.state.turn-1)): JSON.stringify(p)});
             console.log('Player ' + this.game.state.turn + ' buys a ' + card + ' card');
             game.menu.refreshDevCards();
@@ -1467,10 +1478,14 @@ game.actions.playDevCard = function(type) {
                 }
                 return obj;
             })(this.game.board.edges);
-            gapi.hangout.data.submitDelta({
-                    'p'+(this.game.state.turn-1) : JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]), 
-                    'edges' : JSON.stringify(edges)
-                });
+            var obj = {};
+            obj['p'+(this.game.state.turn-1)] = JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]);
+            obj['edges'] = JSON.stringify(edges);
+            gapi.hangout.data.submitDelta(obj);
+            //gapi.hangout.data.submitDelta({
+            //        'p'+(this.game.state.turn-1) : JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]), 
+            //        'edges' : JSON.stringify(edges)
+            //    });
         }
     break;
     case 'M':
@@ -2401,10 +2416,14 @@ game.actions.selectVertex = function(i, type) {
         }
         return obj;
     })(this.game.board.vertices);
-    gapi.hangout.data.submitDelta({
-        'p'+(this.game.state.turn-1) : JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]), 
-        'vertices' : JSON.stringify(vertices)
-    });
+    var obj = {};
+    obj['p'+(this.game.state.turn-1)] = JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]);
+    obj['vertices'] = JSON.stringify(vertices);
+    gapi.hangout.data.submitDelta(obj);
+    //gapi.hangout.data.submitDelta({
+    //    'p'+(this.game.state.turn-1) : JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]), 
+    //    'vertices' : JSON.stringify(vertices)
+    //});
 
     this.game.proceed();
 };
@@ -2466,10 +2485,14 @@ game.actions.selectEdge = function(i, player, params) {
         }
         return obj;
     })(this.game.board.edges);
-    gapi.hangout.data.submitDelta({
-        'p'+(this.game.state.turn-1) : JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]), 
-        'edges' : JSON.stringify(edges)
-    });
+    var obj = {};
+    obj['p'+(this.game.state.turn-1)] = JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]);
+    obj['edges'] = JSON.stringify(edges);
+    gapi.hangout.data.submitDelta(obj);
+    //gapi.hangout.data.submitDelta({
+    //    'p'+(this.game.state.turn-1) : JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]), 
+    //    'edges' : JSON.stringify(edges)
+    //});
 
     this.game.proceed();
 };
