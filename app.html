@@ -1210,6 +1210,9 @@ game.state.init = function(player_count) {
         game.state.uploadInitialState();
     } else {
         game.board.init();
+        game.statusbox.init();
+        game.selectbox.init();
+        game.menu.init();
         var rand = ''+Math.floor(1000 * Math.random());
         gapi.hangout.data.submitDelta({'rand' : rand}); // Fake data to trigger an event
     }
