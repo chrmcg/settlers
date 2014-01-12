@@ -2642,13 +2642,16 @@ game.autosettle = function() {
     }
 }
 
-var numsSaved, typesSaved = false;
+var numsSaved, typesSaved;
 
 window.init = function () {
     game.svg = document.createElementNS(game.ns, 'svg');
     game.svg.setAttribute('width', '700');
     game.svg.setAttribute('height', '430');
     document.getElementById("board").appendChild(game.svg);
+
+    numsSaved = false;
+    typesSaved = false;
 
     // When API is ready...                                                         
     gapi.hangout.onApiReady.add(function(eventObj) {
