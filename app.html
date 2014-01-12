@@ -2558,7 +2558,9 @@ window.init = function () {
             console.log('API is ready!');
             gapi.hangout.data.onStateChanged.add(function(state_event) {
                 console.log(state_event);
+                console.log(state_event.metadata);
                 //Apply state_event changes
+                /*
                 for(var key in state_event.metadata) {
                     var value = state_event.metadata[key];
                     switch(key) {
@@ -2587,6 +2589,7 @@ window.init = function () {
                         break;
                     }
                 }
+                */
             });
 
             game.board.init();
