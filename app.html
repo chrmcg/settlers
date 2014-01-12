@@ -2651,9 +2651,9 @@ window.init = function () {
                 console.log(state_event);
                 console.log(state_event.metadata);
                 //Apply state_event changes
-                for(var i = 0; i < state_event.addedKeys.length; i++) {
-                    var key = state_event.addedKeys[i].key;
-                    var value = state_event.addedKeys[i].value;
+                for(var i in state_event.state) {
+                    var key = i
+                    var value = state_event.state[i];
                     switch(key) {
                         case 'edges':
                             var edges = JSON.parse(value);
