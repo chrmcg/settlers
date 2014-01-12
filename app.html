@@ -2590,7 +2590,6 @@ window.init = function () {
                                 game.board.types[i] = types[i];
                             }
                         default:
-                            /*
                             try {
                                 game.state[key] = JSON.parse(value);
                             } catch(e) {
@@ -2598,8 +2597,6 @@ window.init = function () {
                                 console.log(value);
                                 game.state[key] = value;
                             }
-                            */
-                            game.state[key] = value;
                         break;
                     }
                 }
