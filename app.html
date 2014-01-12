@@ -1476,9 +1476,7 @@ game.actions.playDevCard = function(type) {
             var edges = (function(edges){ 
                 var obj = [];
                 for (var i = 0; i < edges.length; i++) {
-                    if (edges[i].owner == this.game.state.turn) {
-                        obj[i] = {road : edges[i].road, owner : edges[i].owner};
-                    }
+                    obj[i] = {road : edges[i].road, owner : edges[i].owner};
                 }
                 return obj;
             })(this.game.board.edges);
@@ -1486,10 +1484,6 @@ game.actions.playDevCard = function(type) {
             obj['p'+(this.game.state.turn-1)] = JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]);
             obj['edges'] = JSON.stringify(edges);
             gapi.hangout.data.submitDelta(obj);
-            //gapi.hangout.data.submitDelta({
-            //        'p'+(this.game.state.turn-1) : JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]), 
-            //        'edges' : JSON.stringify(edges)
-            //    });
         }
     break;
     case 'M':
@@ -2414,9 +2408,7 @@ game.actions.selectVertex = function(i, type) {
     var vertices = (function(vertices){ 
         var obj = {};
         for (var i = 0; i < vertices.length; i++) {
-            if (vertices[i].owner == this.game.state.turn) {
-                obj[i] = {contents : vertices[i].contents, owner : vertices[i].owner};
-            }
+            obj[i] = {contents : vertices[i].contents, owner : vertices[i].owner};
         }
         return obj;
     })(this.game.board.vertices);
@@ -2479,9 +2471,7 @@ game.actions.selectEdge = function(i, player, params) {
     var edges = (function(edges){ 
         var obj = [];
         for (var i = 0; i < edges.length; i++) {
-            if (edges[i].owner == this.game.state.turn) {
-                obj[i] = {road : edges[i].road, owner : edges[i].owner};
-            }
+            obj[i] = {road : edges[i].road, owner : edges[i].owner};
         }
         return obj;
     })(this.game.board.edges);
@@ -2566,10 +2556,9 @@ window.init = function () {
     gapi.hangout.onApiReady.add(function(eventObj) {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
-            /*
             gapi.hangout.data.onStateChanged.add(function(state_event) {
                 console.log(state_event);
-                //Apply state_event changese
+                //Apply state_event changes
                 for(var key in state_event.metadata) {
                     var value = state_event.metadata[key];
                     switch(key) {
@@ -2582,7 +2571,7 @@ window.init = function () {
                         break;
                         case 'vertices':
                             var vertices = JSON.parse(value.value);
-                            for(var i in vertices) {
+                            for(var i = 0; i < vertices.length; i++) {
                                 this.game.board.vertices[i].contents = vertices[i].contents;
                                 this.game.board.vertices[i].owner = vertices[i].owner;
                             }
@@ -2598,7 +2587,7 @@ window.init = function () {
                         break;
                     }
                 }
-            });*/
+            });
 
             game.board.init();
             game.board.draw(700, 390);
