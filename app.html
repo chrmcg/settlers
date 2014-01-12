@@ -2591,7 +2591,7 @@ window.init = function () {
                         default:
                             try {
                                 this.game.state[key] = JSON.parse(value.value);
-                            } catch {
+                            } catch(e) {
                                 this.game.state[key] = value.value;
                             }
                         break;
