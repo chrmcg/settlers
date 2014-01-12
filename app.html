@@ -1087,9 +1087,9 @@ game.state.init = function(player_count) {
     };
 
     if(gapi.hangout.data.getValue("largest_army") == null) {
-       // game.state.uploadInitialState();
+        game.state.uploadInitialState();
     } else {
-        //game.state.downloadState();
+        game.state.downloadState();
     }
 };
 
