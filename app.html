@@ -665,7 +665,7 @@ game.board.redraw = function() {
 
         this.hexes[i].circle.parentElement.children[0].setAttribute('fill', game.board.colors[this.hexes[i].type]);
 
-        if(this.hexes[i].type != 0) {
+        if(this.hexes[i].num != 0) {
             text = this.hexes[i].circle.parentElement.children[1];
             text.textContent = this.hexes[i].num;
 
@@ -707,7 +707,7 @@ game.board.redraw = function() {
         }
         
         // Fix centering of nums
-        if(this.hexes[i].type != 0) {
+        if(this.hexes[i].num != 0) {
             bbox = text.getBBox();
             text.setAttribute('x', this.hexes[i].cx - bbox.width/2);
             text.setAttribute('y', this.hexes[i].cy + bbox.height/4);
@@ -2642,13 +2642,13 @@ game.autosettle = function() {
     }
 }
 
+var numsSaved, typesSaved = false;
+
 window.init = function () {
     game.svg = document.createElementNS(game.ns, 'svg');
     game.svg.setAttribute('width', '700');
     game.svg.setAttribute('height', '430');
     document.getElementById("board").appendChild(game.svg);
-    
-
 
     // When API is ready...                                                         
     gapi.hangout.onApiReady.add(function(eventObj) {
@@ -2660,17 +2660,7 @@ window.init = function () {
                 //Apply state_event changes
 
                 if(state_event.state.types) {
-                    var types = JSON.parse(state_event.state.types);
-                    console.log(types);
-                    for(var j = 0; j < types.length; j++) {
-                        game.board.hexes[j].type = types[j];
-                        if(game.board.hexes[j].type == 0) {
-                            game.board.hexes[j].robber = 1;
-                        } else {
-                            game.board.hexes[j].robber = 0;
-                        }
-                    }
-                }
+                                    }
 
                 for(var i in state_event.state) {
                     var key = i;
@@ -2709,10 +2699,21 @@ window.init = function () {
                             var nums = JSON.parse(value);
                             for(var j = 0; j < nums.length; j++) {
                                 game.board.hexes[j].num = nums[j];
+                                numsSaved = true;
+                                if (game.board.hexes[j].num == 0) {
+                                    game.board.hexes[j].robber = 1;
+                                } else {
+                                    game.board.hexes[j].robber = 0;
+                                }
                             }
                         break;
                         case 'types':
-                            // do nothing on purpose
+                            var types = JSON.parse(state_event.state.types);
+                            console.log(types);
+                            for(var j = 0; j < types.length; j++) {
+                                game.board.hexes[j].type = types[j];
+                                typesSaved = true;
+                            }
                         break;
                         default:
                             try {
@@ -2723,8 +2724,9 @@ window.init = function () {
                         break;
                     }
                 }
-
-                game.board.redraw();
+                if (numsSaved && typesSaved) {
+                    game.board.redraw();
+                }
             });
 
             game.board.init();
