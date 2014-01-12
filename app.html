@@ -2503,7 +2503,7 @@ game.state.downloadState = function() {
     if(s.p0.length > 0) game.state.p0 = JSON.parse(s.p0);
     if(s.p1.length > 0) game.state.p1 = JSON.parse(s.p1);
     if(s.p2.length > 0) game.state.p2 = JSON.parse(s.p2);
-    if(s.p3.length > 0) game.state.p3 = JSON.parse(s.p3);
+    if(typeof s.p3.length != 'undefined' && s.p3.length > 0) game.state.p3 = JSON.parse(s.p3);
     game.state.phase = parseInt(s.phase);
     game.state.player_count = parseInt(s.player_count);
     game.state.turn = parseInt(s.turn);
