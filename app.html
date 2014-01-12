@@ -2567,7 +2567,7 @@ window.init = function () {
     gapi.hangout.onApiReady.add(function(eventObj) {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
-
+            try {
             gapi.hangout.data.onStateChanged.add(function(state_event) {
                 console.log(state_event);
                 //Apply state_event changese
@@ -2594,6 +2594,10 @@ window.init = function () {
                     }
                 }
             });
+            } catch (e) {
+                console.log(e.stack);
+                console.log(e.message);
+            }
 
             game.board.init();
             game.board.draw(700, 390);
