@@ -833,6 +833,18 @@ game.board.draw = function(w, h) {
                     prob.setAttribute('fill', '#ff0000');
                     text.setAttribute('fill', '#ff0000');
                 }            
+            } else {
+                text = document.createElementNS(game.ns, 'text');
+                text.setAttribute('x', this.hexes[i].cx);
+                text.setAttribute('y', this.hexes[i].cy);
+                text.setAttribute('font-size', '32px');
+                text.setAttribute('class', 'hex-content');
+                text.setAttribute('fill', 'white');
+                prob = document.createElementNS(game.ns, 'text');
+                prob.setAttribute('x', this.hexes[i].cx);
+                prob.setAttribute('y', this.hexes[i].cy + 25);
+                prob.setAttribute('class', 'hex-content');
+                prob.setAttribute('fill', 'white');
             }
 
             group.appendChild(hex);
@@ -851,10 +863,8 @@ game.board.draw = function(w, h) {
             this.hexes[i].circle = circle;
 
             // The order of appendChild calls determines the z-index in SVG
-            if(this.hexes[i].type != 0) {
-                group.appendChild(text);
-                group.appendChild(prob);
-            }
+            group.appendChild(text);
+            group.appendChild(prob);
             group.appendChild(circle);
             game.svg.appendChild(group);
 
@@ -2650,9 +2660,6 @@ window.init = function () {
     game.svg.setAttribute('height', '430');
     document.getElementById("board").appendChild(game.svg);
 
-    numsSaved = false;
-    typesSaved = false;
-
     // When API is ready...                                                         
     gapi.hangout.onApiReady.add(function(eventObj) {
         if (eventObj.isApiReady) {
@@ -2661,10 +2668,6 @@ window.init = function () {
                 console.log(state_event);
                 console.log(state_event.metadata);
                 //Apply state_event changes
-
-                if(state_event.state.types) {
-                                    }
-
                 for(var i in state_event.state) {
                     var key = i;
                     var value = state_event.state[i];
@@ -2702,7 +2705,6 @@ window.init = function () {
                             var nums = JSON.parse(value);
                             for(var j = 0; j < nums.length; j++) {
                                 game.board.hexes[j].num = nums[j];
-                                numsSaved = true;
                                 if (game.board.hexes[j].num == 0) {
                                     game.board.hexes[j].robber = 1;
                                 } else {
@@ -2715,7 +2717,6 @@ window.init = function () {
                             console.log(types);
                             for(var j = 0; j < types.length; j++) {
                                 game.board.hexes[j].type = types[j];
-                                typesSaved = true;
                             }
                         break;
                         default:
@@ -2727,9 +2728,7 @@ window.init = function () {
                         break;
                     }
                 }
-                if (numsSaved && typesSaved) {
-                    game.board.redraw();
-                }
+                game.board.redraw();
             });
 
             game.board.init();
