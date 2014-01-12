@@ -2001,7 +2001,7 @@ game.actions.confirmSelect = function(reason, params) {
     this.game.state.next_action = 'playerControl';
     var obj = {next_action: 'playerControl'};
     //obj['p'+(this.game.state.turn-1)] = JSON.stringify(p);
-    obj['p'+(this.game.state.turn-1)] = this.game.state['p'+(this.game.state.turn-1)];
+    obj['p'+(this.game.state.turn-1)] = JSON.stringify(this.game.state['p'+(this.game.state.turn-1)]);
     gapi.hangout.data.submitDelta(obj);
 
     game.actions.cancelSelect();
