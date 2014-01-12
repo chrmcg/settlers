@@ -2,20 +2,14 @@ todo:
 
 IMPLEMENT:
 
-- GUI:
-   Current Offer / Current Ask
-   other players' offers & asks, w/ Accept button if matching
-
 - Move the VideoCanvas onto the app and show the VideoFeed of whoever's 
 turn it is (gapi.hangout.layout)
+
 - Align the player_fields in game.statusbox with the Hangouts "filmstrip"
 
 - Add touchscreen support (mouseover not supported, so 
   call game.actions.confirmPlacement or cancelPlacement on touchend)
 
-- Push and pull game.state from gapi.hangout.data
-
-
 BUGS:
 
-Cannot cancel building road/settlement/city
+- Cannot cancel building road/settlement/city
