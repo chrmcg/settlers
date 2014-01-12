@@ -2585,7 +2585,7 @@ window.init = function () {
                             break;
                         case 'types':
                             var types = JSON.parse(value.value);
-                            for(Var i = 0; i < types.length; i++) {
+                            for(var i = 0; i < types.length; i++) {
                                 this.game.board.types[i] = types[i];
                             }
                         default:
