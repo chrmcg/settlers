@@ -1231,10 +1231,9 @@ game.state.updateVictoryPoints = function() {
         }
     }
 
-    var obj = [];
+    var obj = {};
     for(var i = 0; i < this.player_count; i++) {
-        obj[i] = {};
-        obj[i]['p'+i] = JSON.stringify(this['p'+i]);
+        obj['p'+i] = JSON.stringify(this['p'+i]);
     }
     gapi.hangout.data.submitDelta(obj);
     console.log('Victory points: p1 ' + this.p0.victoryPoints
