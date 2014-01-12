@@ -2707,6 +2707,7 @@ window.init = function () {
                                 game.board.hexes[j].num = nums[j];
                                 if (game.board.hexes[j].num == 0) {
                                     game.board.hexes[j].robber = 1;
+                                    game.board.hexes[j].type = 0;
                                 } else {
                                     game.board.hexes[j].robber = 0;
                                 }
@@ -2715,8 +2716,14 @@ window.init = function () {
                         case 'types':
                             var types = JSON.parse(state_event.state.types);
                             console.log(types);
+                            var t = 0;
                             for(var j = 0; j < types.length; j++) {
-                                game.board.hexes[j].type = types[j];
+                                if(game.board.hexes[j].num == 0) {
+                                    game.board.hexes[j].type = 0;
+                                } else {
+                                    game.board.hexes[j].type = types[t];
+                                    t++;
+                                }
                             }
                         break;
                         default:
