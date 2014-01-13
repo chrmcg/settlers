@@ -759,41 +759,41 @@ game.board.redraw = function() {
 };
 
 game.board.draw = function(w, h) {
+    if(w !== undefined && h !== undefined) {
+        w = w*2/3;
 
-    w = w*2/3;
+        var rx, ry;
+        if(w < h) {
+            rx = (w - 22) / 10;
+            ry = 2 * rx / math.sqrt(3);
+        } else {
+            ry = (h - 22) / 8;
+            rx = math.sqrt(3) * ry / 2;
+        }
 
-    var rx, ry;
-    if(w < h) {
-        rx = (w - 22) / 10;
-        ry = 2 * rx / math.sqrt(3);
-    } else {
-        ry = (h - 22) / 8;
-        rx = math.sqrt(3) * ry / 2;
+        var cx = w / 2;
+        var cy = h / 2;
+
+        this.hexes[0].cx = cx - 2*rx;   this.hexes[0].cy = cy - 3*ry;
+        this.hexes[1].cx = cx;          this.hexes[1].cy = cy - 3*ry;
+        this.hexes[2].cx = cx + 2*rx;   this.hexes[2].cy = cy - 3*ry;
+        this.hexes[3].cx = cx - 3*rx;   this.hexes[3].cy = cy - 1.5*ry;
+        this.hexes[4].cx = cx - rx;     this.hexes[4].cy = cy - 1.5*ry;
+        this.hexes[5].cx = cx + rx;     this.hexes[5].cy = cy - 1.5*ry;
+        this.hexes[6].cx = cx + 3*rx;   this.hexes[6].cy = cy - 1.5*ry;
+        this.hexes[7].cx = cx - 4*rx;   this.hexes[7].cy = cy;
+        this.hexes[8].cx = cx - 2*rx;   this.hexes[8].cy = cy;
+        this.hexes[9].cx = cx;          this.hexes[9].cy = cy;
+        this.hexes[10].cx = cx + 2*rx;  this.hexes[10].cy = cy;
+        this.hexes[11].cx = Cx + 4*rx;  this.hexes[11].cy = Cy;
+        this.hexes[12].cx = Cx - 3*rx;  this.hexes[12].cy = Cy + 1.5*ry;
+        this.hexes[13].cx = Cx - rx;    this.hexes[13].cy = Cy + 1.5*ry;
+        this.hexes[14].cx = Cx + rx;    this.hexes[14].cy = Cy + 1.5*ry;
+        this.hexes[15].cx = Cx + 3*rx;  this.hexes[15].cy = Cy + 1.5*ry;
+        this.hexes[16].cx = Cx - 2*rx;  this.hexes[16].cy = Cy + 3*ry;
+        this.hexes[17].cx = Cx;         this.hexes[17].cy = Cy + 3*ry;
+        this.hexes[18].cx = Cx + 2*rx;  this.hexes[18].cy = Cy + 3*ry;
     }
-
-    var cx = w / 2;
-    var cy = h / 2;
-
-    this.hexes[0].cx = cx - 2*rx;   this.hexes[0].cy = cy - 3*ry;
-    this.hexes[1].cx = cx;          this.hexes[1].cy = cy - 3*ry;
-    this.hexes[2].cx = cx + 2*rx;   this.hexes[2].cy = cy - 3*ry;
-    this.hexes[3].cx = cx - 3*rx;   this.hexes[3].cy = cy - 1.5*ry;
-    this.hexes[4].cx = cx - rx;     this.hexes[4].cy = cy - 1.5*ry;
-    this.hexes[5].cx = cx + rx;     this.hexes[5].cy = cy - 1.5*ry;
-    this.hexes[6].cx = cx + 3*rx;   this.hexes[6].cy = cy - 1.5*ry;
-    this.hexes[7].cx = cx - 4*rx;   this.hexes[7].cy = cy;
-    this.hexes[8].cx = cx - 2*rx;   this.hexes[8].cy = cy;
-    this.hexes[9].cx = cx;          this.hexes[9].cy = cy;
-    this.hexes[10].cx = cx + 2*rx;  this.hexes[10].cy = cy;
-    this.hexes[11].cx = Cx + 4*rx;  this.hexes[11].cy = Cy;
-    this.hexes[12].cx = Cx - 3*rx;  this.hexes[12].cy = Cy + 1.5*ry;
-    this.hexes[13].cx = Cx - rx;    this.hexes[13].cy = Cy + 1.5*ry;
-    this.hexes[14].cx = Cx + rx;    this.hexes[14].cy = Cy + 1.5*ry;
-    this.hexes[15].cx = Cx + 3*rx;  this.hexes[15].cy = Cy + 1.5*ry;
-    this.hexes[16].cx = Cx - 2*rx;  this.hexes[16].cy = Cy + 3*ry;
-    this.hexes[17].cx = Cx;         this.hexes[17].cy = Cy + 3*ry;
-    this.hexes[18].cx = Cx + 2*rx;  this.hexes[18].cy = Cy + 3*ry;
-
     var hex, text, circle, group, bbox, points, prob;
     for(var i = 0; i < 19; i++) {
         if(typeof this.hexes[i].cx != 'undefined') {
@@ -1193,16 +1193,18 @@ game.state.init = function(player_count) {
     };
 
     if(gapi.hangout.data.getValue("largest_army") === undefined) {
-        game.board.init();
         game.board.draw(700, 390);
+        game.board.init();
+        game.board.draw();
         game.statusbox.init();
         game.selectbox.init();
         game.menu.init();
         game.board.randomize();
         game.state.uploadInitialState();
     } else {
-        game.board.init();
         game.board.draw(700, 390);
+        game.board.init();
+        game.board.draw();
         game.statusbox.init();
         game.selectbox.init();
         game.menu.init();
