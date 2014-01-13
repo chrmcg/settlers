@@ -950,7 +950,7 @@ game.board.draw = function(w, h) {
         this.vertices[i].v = v;
         game.svg.appendChild(v);
     }
-
+    drawn = true;
 };
 
 game.board.showAvailableEdges = function(player, params) {
@@ -2683,14 +2683,20 @@ game.state.downloadState = function(state) {
             break;
         }
     }
-    game.board.redraw();
+    if (drawn) {
+        game.board.redraw();
+    }
 }
+
+var drawn;
 
 window.init = function () {
     game.svg = document.createElementNS(game.ns, 'svg');
     game.svg.setAttribute('width', '700');
     game.svg.setAttribute('height', '430');
     document.getElementById("board").appendChild(game.svg);
+
+    drawn = false;
 
     // When API is ready...                                                         
     gapi.hangout.onApiReady.add(function(eventObj) {
@@ -2700,11 +2706,7 @@ window.init = function () {
                 game.state.downloadState(state_event.state);
             });
 
-            try {
-                game.board.init();
-            } catch (e) {
-                console.log(e.message);
-            }
+            game.board.init();
             game.statusbox.init();
             game.selectbox.init();
             game.menu.init();
