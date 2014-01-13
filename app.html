@@ -414,7 +414,7 @@ game.board = {
     edges: []
 };
 
-game.board.randomize = function(callback) {
+game.board.randomize = function() {
      // 0 = no port, 1 = WOOD, 2 = SHEEP, 3 = WHEAT, 4 = BRICK, 5 = ORE, 6 = 3:1 port
     var porttypes = [1, 2, 3, 4, 5, 6, 6, 6, 6];
     var ports = [
@@ -462,12 +462,8 @@ game.board.randomize = function(callback) {
         this.vertices[ports[i][0]].port = ports[i][1];
     }
 
-    game.stateChangedCallback = callback;
     // Pass (nums) and (types) to shared state
     gapi.hangout.data.submitDelta({'types' : JSON.stringify(types), 'nums' : JSON.stringify(nums)});
-
-    var savenums = nums;
-    var savetypes = types;
 
     // Assign randomized numbers
     for(var i = 0; i < 19; i++) {
@@ -479,7 +475,6 @@ game.board.randomize = function(callback) {
         this.hexes[i].type = this.hexes[i].num == 0 ? 0 : types.shift();
         this.hexes[i].robber = this.hexes[i].num == 0 ? 1 : 0;
     }
-    return [savenums, savetypes]
 };
 
 game.board.init = function() {
@@ -1221,12 +1216,7 @@ game.state.init = function(player_count) {
         game.selectbox.init();
         game.menu.init();
 
-        // Randomize will set this as the callback to trigger on StateChangedEvent
-        var obj = game.board.randomize(function() { 
-            game.state.uploadInitialState();
-        });
-        game.state.nums = obj[0];
-        game.state.types = obj[1];
+        game.board.randomize();
     } else {
         game.board.init();
         game.statusbox.init();
@@ -2728,8 +2718,7 @@ window.init = function () {
                         break;
                         case 'nums':
                         case 'types':
-                            var nums = JSON.parse(value);
-                            game.state.nums = nums;
+                            var nums = JSON.parse(state_event.state.nums);
                             if(nums.length > 0) {
                                 for(var j = 0; j < 19; j++) {
                                     game.board.hexes[j].num = nums[j];
@@ -2742,8 +2731,6 @@ window.init = function () {
                                 }
                             }
                             var types = JSON.parse(state_event.state.types);
-                            game.state.types = types;
-                            console.log(types);
                             if(types.length > 0) {
                                 var t = 0;
                                 for(var j = 0; j < 19; j++) {
@@ -2764,10 +2751,6 @@ window.init = function () {
                             }
                         break;
                     }
-                }
-                if(game.stateChangedCallback != null) {
-                    game.stateChangedCallback();
-                    game.stateChangedCallback = null;
                 }
                 game.board.redraw();
             });
