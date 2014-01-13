@@ -1211,12 +1211,11 @@ game.state.init = function(player_count) {
 
     if(gapi.hangout.data.getValue("largest_army") === undefined) {
         game.board.init();
-
         game.statusbox.init();
         game.selectbox.init();
         game.menu.init();
-
         game.board.randomize();
+        game.state.uploadInitialState();
     } else {
         game.board.init();
         game.statusbox.init();
@@ -2680,8 +2679,6 @@ game.autosettle = function() {
         game.actions.selectEdge(55);
     }
 }
-
-var numsSaved, typesSaved;
 
 window.init = function () {
     game.svg = document.createElementNS(game.ns, 'svg');
