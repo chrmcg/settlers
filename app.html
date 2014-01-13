@@ -462,8 +462,26 @@ game.board.randomize = function() {
         this.vertices[ports[i][0]].port = ports[i][1];
     }
 
-    // Pass (nums) and (types) to shared state
-    gapi.hangout.data.submitDelta({'types' : JSON.stringify(types), 'nums' : JSON.stringify(nums)});
+
+    // Pass hexes, vertices to shared state
+    gapi.hangout.data.submitDelta({
+        'vertices' : JSON.stringify(
+        (function(vertices){
+            var arr = [];
+            for(var i = 0; i < vertices.length; i++) { 
+                arr.push({ port : vertices[i].port }); 
+            } 
+            return arr; 
+        })(game.board.vertices)),
+        'hexes' : JSON.stringify(
+        (function(hexes){
+            var arr = [];
+            for(var i = 0; i < hexes.length; i++) {
+                arr.push({ num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
+            }
+            return arr;
+        })(game.board.hexes))
+    )});
 
     // Assign randomized numbers
     for(var i = 0; i < 19; i++) {
@@ -572,6 +590,7 @@ game.board.init = function() {
             }
         }
     }
+
 };
 
 // Checks to see if 6 or 8 adjacent
@@ -667,11 +686,6 @@ game.board.redraw = function() {
         
         console.log(this.hexes[i].type);
         console.log(this.hexes[i].circle);
-        if(this.hexes[i].type === null || this.hexes[i].num === null) {
-            var rand = ''+Math.floor(1000 * Math.random());
-            gapi.hangout.data.submitDelta({'rand' : rand}); // Fake data to trigger an event
-            return;
-        }
 
         if(this.hexes[i].num != 0) {
             text = this.hexes[i].circle.parentElement.children[1];
@@ -1215,14 +1229,12 @@ game.state.init = function(player_count) {
         game.selectbox.init();
         game.menu.init();
         game.board.randomize();
-        game.state.uploadInitialState();
     } else {
         game.board.init();
         game.statusbox.init();
         game.selectbox.init();
         game.menu.init();
-        var rand = ''+Math.floor(1000 * Math.random());
-        gapi.hangout.data.submitDelta({'rand' : rand}); // Fake data to trigger an event
+        game.state.downloadState(gapi.hangout.data.getState());
     }
 };
 
@@ -2616,48 +2628,6 @@ game.actions.winGame = function() {
     console.log('Player ' + game.state.turn + ' wins the game!');
 };
 
-game.state.uploadInitialState = function() {
-
-    var s = {
-        'devcards' : JSON.stringify(game.state.devcards) ,
-        'edges' : JSON.stringify(
-        (function(edges){
-            var arr = [];
-            for(var i = 0; i < edges.length; i++) {
-                arr.push({ owner: edges[i].owner, road: edges[i].road});
-            }
-            return arr;
-        })(game.board.edges)) ,
-        'vertices' : JSON.stringify(
-        (function(vertices){
-            var arr = [];
-            for(var i = 0; i < vertices.length; i++) { 
-                arr.push({ owner: vertices[i].owner, contents: vertices[i].contents }); 
-            } 
-            return arr; 
-        })(game.board.vertices)),
-        'hexes' : JSON.stringify(
-        (function(hexes){
-            var arr = [];
-            for(var i = 0; i < hexes.length; i++) {
-                arr.push({ num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
-            }
-            return arr;
-        })(game.board.hexes)),
-        'largest_army' : ''+game.state.largest_army ,
-        'longest_road' : ''+game.state.longest_road ,
-        'next_action' : game.state.next_action ,
-        'p0' : (game.state.p0 == null ? '' : JSON.stringify(game.state.p0)) ,
-        'p1' : (game.state.p1 == null ? '' : JSON.stringify(game.state.p1)) ,
-        'p2' : (game.state.p2 == null ? '' : JSON.stringify(game.state.p2)) ,
-        'p3' : (game.state.p3 == null ? '' : JSON.stringify(game.state.p3)) ,
-        'phase' : ''+game.state.phase ,
-        'player_count' : ''+game.state.player_count , 
-        'turn' : ''+game.state.turn ,
-    }
-    gapi.hangout.data.submitDelta(s);
-};
-
 // For debugging
 game.autosettle = function() {
     game.actions.selectVertex(10, 1);
@@ -2680,6 +2650,50 @@ game.autosettle = function() {
     }
 }
 
+game.state.downloadState = function(state) {
+    //Apply state_event changes
+    console.log(Object.keys(state));
+
+    for(var i in state) {
+        var key = i;
+        var value = state[i];
+        switch(key) {
+            case 'edges':
+                var edges = JSON.parse(value);
+                for(var j = 0; j < edges.length; j++) {
+                    game.board.edges[j].owner = edges[j].owner;
+                    game.board.edges[j].road = edges[j].road;
+                }
+            break;
+            case 'vertices':
+                var vertices = JSON.parse(value);
+                for(var j = 0; j < vertices.length; j++) {
+                    game.board.vertices[j].contents = vertices[j].contents;
+                    game.board.vertices[j].owner = vertices[j].owner;
+                    game.board.vertices[j].port = vertices[j].port;
+                    game.board.vertices[j].v.setAttribute('onclick', '');
+                }
+            break;
+            case 'hexes':
+                var hexes = JSON.parse(value);
+                    for(var j = 0; j < 19; j++) {
+                        game.board.hexes[j].num = hexes[j];
+                        game.board.hexes[j].type = hexes[j];
+                    }
+                }
+            break;
+            default:
+                try {
+                    game.state[key] = JSON.parse(value);
+                } catch(e) {
+                    game.state[key] = value;
+                }
+            break;
+        }
+    }
+    game.board.redraw();
+}
+
 window.init = function () {
     game.svg = document.createElementNS(game.ns, 'svg');
     game.svg.setAttribute('width', '700');
@@ -2691,69 +2705,7 @@ window.init = function () {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
             gapi.hangout.data.onStateChanged.add(function(state_event) {
-                //Apply state_event changes
-                console.log(Object.keys(state_event.state));
-
-                for(var i in state_event.state) {
-                    var key = i;
-                    var value = state_event.state[i];
-                    switch(key) {
-                        case 'edges':
-                            var edges = JSON.parse(value);
-                            for(var j = 0; j < edges.length; j++) {
-                                game.board.edges[j].owner = edges[j].owner;
-                                game.board.edges[j].road = edges[j].road;
-                            }
-                        break;
-                        case 'vertices':
-                            var vertices = JSON.parse(value);
-                            for(var j = 0; j < vertices.length; j++) {
-                                game.board.vertices[j].contents = vertices[j].contents;
-                                game.board.vertices[j].owner = vertices[j].owner;
-                                game.board.vertices[j].v.setAttribute('onclick', '');
-                            }
-                        break;
-                        case 'nums':
-                        case 'types':
-                            var nums = JSON.parse(state_event.state.nums);
-                            if(nums.length > 0) {
-                                for(var j = 0; j < 19; j++) {
-                                    game.board.hexes[j].num = nums[j];
-                                    if (game.board.hexes[j].num == 0) {
-                                        game.board.hexes[j].robber = 1;
-                                        game.board.hexes[j].type = 0;
-                                    } else {
-                                        game.board.hexes[j].robber = 0;
-                                    }
-                                }
-                            }
-                            var types = JSON.parse(state_event.state.types);
-                            if(types.length > 0) {
-                                var t = 0;
-                                for(var j = 0; j < 19; j++) {
-                                    if(game.board.hexes[j].num == 0) {
-                                        game.board.hexes[j].type = 0;
-                                        } else {
-                                        game.board.hexes[j].type = types[t];
-                                        t++;
-                                    }
-                                }
-                            }
-                        break;
-                        default:
-                            try {
-                                game.state[key] = JSON.parse(value);
-                            } catch(e) {
-                                game.state[key] = value;
-                            }
-                        break;
-                    }
-                }
-                if (game.board.hexes[0].num === null || game.board.hexes[0].type === null) {
-                    var rand = ''+Math.floor(1000*Math.random());
-                    gapi.hangout.data.submitDelta('rand', rand);
-                }
-                game.board.redraw();
+                game.state.downloadState(state_event.state);
             });
 
             game.state.init(3);
