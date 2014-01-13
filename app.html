@@ -2703,7 +2703,7 @@ window.init = function () {
             console.log('API is ready!');
             gapi.hangout.data.onStateChanged.add(function(state_event) {
                 //Apply state_event changes
-                console.log(Object.keys(state_event));
+                console.log(Object.keys(state_event.state));
 
                 for(var i in state_event.state) {
                     var key = i;
