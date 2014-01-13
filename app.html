@@ -1227,7 +1227,7 @@ game.state.init = function(player_count) {
     if(gapi.hangout.data.getValue('hexes') === undefined) {
         game.board.randomize();
     } else {
-        game.state.downloadState(gapi.hangout.data.getState());
+        game.state.download(gapi.hangout.data.getState());
     }
 };
 
@@ -2643,7 +2643,7 @@ game.autosettle = function() {
     }
 }
 
-game.state.downloadState = function(state) {
+game.state.download = function(state) {
     //Apply state_event changes
     console.log(Object.keys(state));
 
@@ -2671,6 +2671,7 @@ game.state.downloadState = function(state) {
                 for(var j = 0; j < 19; j++) {
                     game.board.hexes[j].num = hexes[j].num;
                     game.board.hexes[j].type = hexes[j].type;
+                    game.board.hexes[j].robber = hexes[j].robber;
                 }
             break;
             default:
@@ -2702,7 +2703,7 @@ window.init = function () {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
             gapi.hangout.data.onStateChanged.add(function(state_event) {
-                game.state.downloadState(state_event.state);
+                game.state.download(state_event.state);
             });
 
             game.board.init();
