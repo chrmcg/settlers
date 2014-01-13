@@ -462,9 +462,6 @@ game.board.randomize = function() {
         this.vertices[ports[i][0]].port = ports[i][1];
     }
 
-    // Pass (nums) and (types) to shared state
-    gapi.hangout.data.submitDelta({'types' : JSON.stringify(types), 'nums' : JSON.stringify(nums)});
-
     // Assign randomized numbers
     for(var i = 0; i < 19; i++) {
         this.hexes[i].num = nums.shift();
@@ -662,16 +659,7 @@ game.board.redraw = function() {
 
     var hex, text, circle, group, bbox, points, prob;
     for(var i = 0; i < 19; i++) {
-
         this.hexes[i].circle.parentElement.children[0].setAttribute('fill', game.board.colors[this.hexes[i].type]);
-        
-        console.log(this.hexes[i].type);
-        console.log(this.hexes[i].circle);
-        if(this.hexes[i].type === null || this.hexes[i].num === null) {
-            var rand = ''+Math.floor(1000 * Math.random());
-            gapi.hangout.data.submitDelta({'rand' : rand}); // Fake data to trigger an event
-            return;
-        }
 
         if(this.hexes[i].num != 0) {
             text = this.hexes[i].circle.parentElement.children[1];
@@ -707,7 +695,7 @@ game.board.redraw = function() {
             prob.textContent = '';
         }
 
-        circle = this.hexes[i].circle;
+        circle = this.hexes[i].circle;        
         if (this.hexes[i].robber == 0) {
             circle.setAttribute('fill', 'rgba(0,0,0,0)');
         } else {
@@ -777,26 +765,26 @@ game.board.draw = function(w, h) {
     var rx, ry;
     if(w < h) {
         rx = (w - 22) / 10;
-        ry = 2 * rx / Math.sqrt(3);
+        ry = 2 * rx / math.sqrt(3);
     } else {
         ry = (h - 22) / 8;
-        rx = Math.sqrt(3) * ry / 2;
+        rx = math.sqrt(3) * ry / 2;
     }
 
-    var Cx = w / 2;
-    var Cy = h / 2;
+    var cx = w / 2;
+    var cy = h / 2;
 
-    this.hexes[0].cx = Cx - 2*rx;   this.hexes[0].cy = Cy - 3*ry;
-    this.hexes[1].cx = Cx;          this.hexes[1].cy = Cy - 3*ry;
-    this.hexes[2].cx = Cx + 2*rx;   this.hexes[2].cy = Cy - 3*ry;
-    this.hexes[3].cx = Cx - 3*rx;   this.hexes[3].cy = Cy - 1.5*ry;
-    this.hexes[4].cx = Cx - rx;     this.hexes[4].cy = Cy - 1.5*ry;
-    this.hexes[5].cx = Cx + rx;     this.hexes[5].cy = Cy - 1.5*ry;
-    this.hexes[6].cx = Cx + 3*rx;   this.hexes[6].cy = Cy - 1.5*ry;
-    this.hexes[7].cx = Cx - 4*rx;   this.hexes[7].cy = Cy;
-    this.hexes[8].cx = Cx - 2*rx;   this.hexes[8].cy = Cy;
-    this.hexes[9].cx = Cx;          this.hexes[9].cy = Cy;
-    this.hexes[10].cx = Cx + 2*rx;  this.hexes[10].cy = Cy;
+    this.hexes[0].cx = cx - 2*rx;   this.hexes[0].cy = cy - 3*ry;
+    this.hexes[1].cx = cx;          this.hexes[1].cy = cy - 3*ry;
+    this.hexes[2].cx = cx + 2*rx;   this.hexes[2].cy = cy - 3*ry;
+    this.hexes[3].cx = cx - 3*rx;   this.hexes[3].cy = cy - 1.5*ry;
+    this.hexes[4].cx = cx - rx;     this.hexes[4].cy = cy - 1.5*ry;
+    this.hexes[5].cx = cx + rx;     this.hexes[5].cy = cy - 1.5*ry;
+    this.hexes[6].cx = cx + 3*rx;   this.hexes[6].cy = cy - 1.5*ry;
+    this.hexes[7].cx = cx - 4*rx;   this.hexes[7].cy = cy;
+    this.hexes[8].cx = cx - 2*rx;   this.hexes[8].cy = cy;
+    this.hexes[9].cx = cx;          this.hexes[9].cy = cy;
+    this.hexes[10].cx = cx + 2*rx;  this.hexes[10].cy = cy;
     this.hexes[11].cx = Cx + 4*rx;  this.hexes[11].cy = Cy;
     this.hexes[12].cx = Cx - 3*rx;  this.hexes[12].cy = Cy + 1.5*ry;
     this.hexes[13].cx = Cx - rx;    this.hexes[13].cy = Cy + 1.5*ry;
@@ -866,11 +854,6 @@ game.board.draw = function(w, h) {
             group.appendChild(hex);
             
             // Create a placeholder robber
-            circle = document.createElementNS(game.ns, 'circle');
-            circle.setAttribute('cx', this.hexes[i].cx);
-            circle.setAttribute('cy', this.hexes[i].cy);
-            circle.setAttribute('fill', '#000000');
-            circle.setAttribute('r', '27');
             if (this.hexes[i].robber == 0) {
                 circle.setAttribute('fill', 'rgba(0,0,0,0)');
             } else {
@@ -2713,31 +2696,11 @@ window.init = function () {
                                 game.board.vertices[j].v.setAttribute('onclick', '');
                             }
                         break;
-                        case 'nums':
-                        case 'types':
-                            var nums = JSON.parse(state_event.state.nums);
-                            if(nums.length > 0) {
-                                for(var j = 0; j < 19; j++) {
-                                    game.board.hexes[j].num = nums[j];
-                                    if (game.board.hexes[j].num == 0) {
-                                        game.board.hexes[j].robber = 1;
-                                        game.board.hexes[j].type = 0;
-                                    } else {
-                                        game.board.hexes[j].robber = 0;
-                                    }
-                                }
-                            }
-                            var types = JSON.parse(state_event.state.types);
-                            if(types.length > 0) {
-                                var t = 0;
-                                for(var j = 0; j < 19; j++) {
-                                    if(game.board.hexes[j].num == 0) {
-                                        game.board.hexes[j].type = 0;
-                                        } else {
-                                        game.board.hexes[j].type = types[t];
-                                        t++;
-                                    }
-                                }
+                        case 'hexes':
+                            var hexes = JSON.parse(value);
+                            for(var j = 0; j < 19; j++) {
+                                game.board.hexes[j].num = hexes[j].num;
+                                game.board.hexes[j].type = hexes[j].type;
                             }
                         break;
                         default:
@@ -2748,10 +2711,6 @@ window.init = function () {
                             }
                         break;
                     }
-                }
-                if (game.board.hexes[0].num === null || game.board.hexes[0].type === null) {
-                    var rand = ''+Math.floor(1000*Math.random());
-                    gapi.hangout.data.submitDelta('rand', rand);
                 }
                 game.board.redraw();
             });
