@@ -73,6 +73,7 @@
 <script>
 window.game = {};
 game.ns = 'http://www.w3.org/2000/svg';
+game.stateChangedCallback = null;
 
 game.statusbox = {
     game: game,
@@ -413,7 +414,7 @@ game.board = {
     edges: []
 };
 
-game.board.randomize = function() {
+game.board.randomize = function(callback) {
      // 0 = no port, 1 = WOOD, 2 = SHEEP, 3 = WHEAT, 4 = BRICK, 5 = ORE, 6 = 3:1 port
     var porttypes = [1, 2, 3, 4, 5, 6, 6, 6, 6];
     var ports = [
@@ -460,7 +461,8 @@ game.board.randomize = function() {
     for(var i = 0; i < ports.length; i++) {
         this.vertices[ports[i][0]].port = ports[i][1];
     }
-    
+
+    game.stateChangedCallback = callback;
     // Pass (nums) and (types) to shared state
     gapi.hangout.data.submitDelta({'types' : JSON.stringify(types), 'nums' : JSON.stringify(nums)});
     
@@ -1211,11 +1213,15 @@ game.state.init = function(player_count) {
 
     if(gapi.hangout.data.getValue("largest_army") === undefined) {
         game.board.init();
-        game.board.randomize();
+
         game.statusbox.init();
         game.selectbox.init();
         game.menu.init();
-        game.state.uploadInitialState();
+
+        // Randomize will set this as the callback to trigger on StateChangedEvent
+        game.board.randomize(function() { 
+            game.state.uploadInitialState();
+        });
     } else {
         game.board.init();
         game.statusbox.init();
@@ -2718,26 +2724,30 @@ window.init = function () {
                         break;
                         case 'nums':
                             var nums = JSON.parse(value);
-                            for(var j = 0; j < 19; j++) {
-                                game.board.hexes[j].num = nums[j];
-                                if (game.board.hexes[j].num == 0) {
-                                    game.board.hexes[j].robber = 1;
-                                    game.board.hexes[j].type = 0;
-                                } else {
-                                    game.board.hexes[j].robber = 0;
+                            if(nums.length > 0) {
+                                for(var j = 0; j < 19; j++) {
+                                    game.board.hexes[j].num = nums[j];
+                                    if (game.board.hexes[j].num == 0) {
+                                        game.board.hexes[j].robber = 1;
+                                        game.board.hexes[j].type = 0;
+                                    } else {
+                                        game.board.hexes[j].robber = 0;
+                                    }
                                 }
                             }
                         break;
                         case 'types':
                             var types = JSON.parse(state_event.state.types);
                             console.log(types);
-                            var t = 0;
-                            for(var j = 0; j < 19; j++) {
-                                if(game.board.hexes[j].num == 0) {
-                                    game.board.hexes[j].type = 0;
-                                } else {
-                                    game.board.hexes[j].type = types[t];
-                                    t++;
+                            if(types.length > 0) {
+                                var t = 0;
+                                for(var j = 0; j < 19; j++) {
+                                    if(game.board.hexes[j].num == 0) {
+                                        game.board.hexes[j].type = 0;
+                                        } else {
+                                        game.board.hexes[j].type = types[t];
+                                        t++;
+                                    }
                                 }
                             }
                         break;
@@ -2749,6 +2759,10 @@ window.init = function () {
                             }
                         break;
                     }
+                }
+                if(game.stateChangedCallback != null) {
+                    game.stateChangedCallback();
+                    game.stateChangedCallback = null;
                 }
                 game.board.redraw();
             });
