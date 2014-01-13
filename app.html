@@ -1223,7 +1223,7 @@ game.state.init = function(player_count) {
         21: 'V', 22: 'V', 23: 'V', 24: 'V', 25: 'V', //Victory Point Card
     };
 
-    if(gapi.hangout.data.getValue("largest_army") === undefined) {
+    if(gapi.hangout.data.getValue('hexes') === undefined) {
         game.board.init();
         game.statusbox.init();
         game.selectbox.init();
