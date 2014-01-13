@@ -39,9 +39,9 @@
     </head>
 <body>
 
-
-<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
 <!--
+<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+-->
 <script>
     // Fake API to use if coding offline
     gapi = {
@@ -50,7 +50,12 @@
                 add: function(f) {f({isApiReady:true});},
             },
             data : {
-                onStateChanged: null,
+                osc: null,
+                onStateChanged: {
+                    add: function(a) {
+                        this.osc = a;
+                    },
+                },
                 values: {},
                 getValue: function(v) {
                     return this.values[v];
@@ -59,13 +64,14 @@
                     for(var i in obj) {
                         this.values[i] = obj[i];
                     }
+                    if(this.osc != null) this.osc();
                 },
             }
         },
 
     };
 </script>
--->
+
 
 
 <div id="board"></div>
@@ -2765,7 +2771,7 @@ window.init = function () {
 }
 
 // Wait for gadget to load.                                                       
-gadgets.util.registerOnLoadHandler(window.init);
-//init();
+//gadgets.util.registerOnLoadHandler(window.init);
+init();
 </script>
 </body>
