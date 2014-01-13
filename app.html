@@ -2727,6 +2727,7 @@ window.init = function () {
                             }
                         break;
                         case 'nums':
+                        case 'types':
                             var nums = JSON.parse(value);
                             game.state.nums = nums;
                             if(nums.length > 0) {
@@ -2740,7 +2741,6 @@ window.init = function () {
                                     }
                                 }
                             }
-                        case 'types':
                             var types = JSON.parse(state_event.state.types);
                             game.state.types = types;
                             console.log(types);
