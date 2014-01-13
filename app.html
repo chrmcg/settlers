@@ -2649,7 +2649,7 @@ game.state.uploadInitialState = function() {
         (function(hexes){
             var arr = [];
             for(var i = 0; i < hexes.length; i++) {
-                arr.push({ num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber, circle: hexes[i].circle});
+                arr.push({ num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
             }
             return arr;
         })(game.board.hexes)),
