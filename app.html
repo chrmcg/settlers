@@ -2579,17 +2579,17 @@ game.actions.selectEdge = function(i, player, params) {
             game.state.turn++;
             game.statusbox.viewPlayer(game.state.turn);
         }
-        gapi.hangout.data.submitDelta({'next_action': 'buildSettlement', 'phase', game.state.phase, 'turn', game.state.turn});
+        gapi.hangout.data.submitDelta({'next_action': 'buildSettlement', 'phase': game.state.phase, 'turn': game.state.turn});
         
     } else if(game.state.phase == 1) {
         
         if(game.state.turn == 1) {
             game.state.phase = 2;
-            gapi.hangout.data.submitDelta({'next_action': 'rollDice', 'phase', game.state.phase});
+            gapi.hangout.data.submitDelta({'next_action': 'rollDice', 'phase': game.state.phase});
         } else {
             game.state.turn--;
             game.statusbox.viewPlayer(game.state.turn);
-            gapi.hangout.data.submitDelta({'next_action': 'buildSettlement', 'turn', game.state.turn});
+            gapi.hangout.data.submitDelta({'next_action': 'buildSettlement', 'turn': game.state.turn});
         }
 
     } else if(game.state.phase == 2) {
