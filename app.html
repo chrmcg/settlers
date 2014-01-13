@@ -683,9 +683,6 @@ game.board.redraw = function() {
     for(var i = 0; i < 19; i++) {
 
         this.hexes[i].circle.parentElement.children[0].setAttribute('fill', game.board.colors[this.hexes[i].type]);
-        
-        console.log(this.hexes[i].type);
-        console.log(this.hexes[i].circle);
 
         if(this.hexes[i].num != 0) {
             text = this.hexes[i].circle.parentElement.children[1];
