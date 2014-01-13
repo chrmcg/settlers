@@ -2749,6 +2749,10 @@ window.init = function () {
                         break;
                     }
                 }
+                if (game.board.hexes[0].num === null || game.board.hexes[0].type === null) {
+                    var rand = ''+Math.floor(1000*Math.random());
+                    gapi.hangout.data.submitDelta('rand', rand);
+                }
                 game.board.redraw();
             });
 
