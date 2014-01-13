@@ -2669,10 +2669,9 @@ game.state.downloadState = function(state) {
             break;
             case 'hexes':
                 var hexes = JSON.parse(value);
-                    for(var j = 0; j < 19; j++) {
-                        game.board.hexes[j].num = hexes[j];
-                        game.board.hexes[j].type = hexes[j];
-                    }
+                for(var j = 0; j < 19; j++) {
+                    game.board.hexes[j].num = hexes[j];
+                    game.board.hexes[j].type = hexes[j];
                 }
             break;
             default:
