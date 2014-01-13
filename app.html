@@ -2700,7 +2700,11 @@ window.init = function () {
                 game.state.downloadState(state_event.state);
             });
 
-            game.board.init();
+            try {
+                game.board.init();
+            } catch (e) {
+                console.log(e.message);
+            }
             game.statusbox.init();
             game.selectbox.init();
             game.menu.init();
