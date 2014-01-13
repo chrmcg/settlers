@@ -2568,26 +2568,23 @@ game.actions.selectEdge = function(i, player, params) {
     game.board.hideEmptyEdges();
 
     if(game.state.phase == 0) {
-        game.state.next_action = 'buildSettlement';
-        gapi.hangout.data.submitDelta({'next_action': 'buildSettlement'});
         if(game.state.turn == game.state.player_count) {
             game.state.phase = 1;
         } else {
             game.state.turn++;
             game.statusbox.viewPlayer(game.state.turn);
         }
+        gapi.hangout.data.submitDelta({'next_action': 'buildSettlement', 'phase', game.state.phase, 'turn', game.state.turn});
         
     } else if(game.state.phase == 1) {
         
         if(game.state.turn == 1) {
             game.state.phase = 2;
-            game.state.next_action = 'rollDice';
-            gapi.hangout.data.submitDelta({'next_action': 'rollDice'});
+            gapi.hangout.data.submitDelta({'next_action': 'rollDice', 'phase', game.state.phase});
         } else {
             game.state.turn--;
             game.statusbox.viewPlayer(game.state.turn);
-            game.state.next_action = 'buildSettlement';
-            gapi.hangout.data.submitDelta({'next_action': 'buildSettlement'});
+            gapi.hangout.data.submitDelta({'next_action': 'buildSettlement', 'turn', game.state.turn});
         }
 
     } else if(game.state.phase == 2) {
