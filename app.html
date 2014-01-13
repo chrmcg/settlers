@@ -667,10 +667,10 @@ game.board.redraw = function() {
         
         console.log(this.hexes[i].type);
         console.log(this.hexes[i].circle);
-        if(this.hexes[i].type == null) {
+        if(this.hexes[i].type === null || this.hexes[i].num === null) {
             var rand = ''+Math.floor(1000 * Math.random());
             gapi.hangout.data.submitDelta({'rand' : rand}); // Fake data to trigger an event
-            return false;
+            return;
         }
 
         if(this.hexes[i].num != 0) {
