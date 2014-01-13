@@ -2669,6 +2669,9 @@ window.init = function () {
     game.svg.setAttribute('height', '430');
     document.getElementById("board").appendChild(game.svg);
 
+    game.board.draw(700, 390);
+    game.state.init(3);
+
     // When API is ready...                                                         
     gapi.hangout.onApiReady.add(function(eventObj) {
         if (eventObj.isApiReady) {
@@ -2701,6 +2704,7 @@ window.init = function () {
                             for(var j = 0; j < 19; j++) {
                                 game.board.hexes[j].num = hexes[j].num;
                                 game.board.hexes[j].type = hexes[j].type;
+                                game.board.hexes[j].robber = hexes[j].robber;
                             }
                         break;
                         default:
@@ -2714,9 +2718,6 @@ window.init = function () {
                 }
                 game.board.redraw();
             });
-
-            game.state.init(3);
-            game.board.draw(700, 390);
 
             game.proceed();
             //game.autosettle();
