@@ -479,7 +479,7 @@ game.board.randomize = function() {
         (function(vertices){
             var arr = [];
             for(var i = 0; i < vertices.length; i++) { 
-                arr.push({ contents: vertices[i].content, owner: vertices[i].owner, port : vertices[i].port }); 
+                arr.push({ contents: vertices[i].contents, owner: vertices[i].owner, port : vertices[i].port }); 
             } 
             return arr; 
         })(game.board.vertices)),
