@@ -465,7 +465,10 @@ game.board.randomize = function(callback) {
     game.stateChangedCallback = callback;
     // Pass (nums) and (types) to shared state
     gapi.hangout.data.submitDelta({'types' : JSON.stringify(types), 'nums' : JSON.stringify(nums)});
-    
+
+    var savenums = nums;
+    var savetypes = types;
+
     // Assign randomized numbers
     for(var i = 0; i < 19; i++) {
         this.hexes[i].num = nums.shift();
@@ -476,7 +479,7 @@ game.board.randomize = function(callback) {
         this.hexes[i].type = this.hexes[i].num == 0 ? 0 : types.shift();
         this.hexes[i].robber = this.hexes[i].num == 0 ? 1 : 0;
     }
-
+    return [savenums, savetypes]
 };
 
 game.board.init = function() {
@@ -1219,9 +1222,11 @@ game.state.init = function(player_count) {
         game.menu.init();
 
         // Randomize will set this as the callback to trigger on StateChangedEvent
-        game.board.randomize(function() { 
+        var obj = game.board.randomize(function() { 
             game.state.uploadInitialState();
         });
+        game.state.nums = obj[0];
+        game.state.types = obj[1];
     } else {
         game.board.init();
         game.statusbox.init();
@@ -2723,6 +2728,7 @@ window.init = function () {
                         break;
                         case 'nums':
                             var nums = JSON.parse(value);
+                            game.state.nums = nums;
                             if(nums.length > 0) {
                                 for(var j = 0; j < 19; j++) {
                                     game.board.hexes[j].num = nums[j];
@@ -2734,9 +2740,9 @@ window.init = function () {
                                     }
                                 }
                             }
-                        break;
                         case 'types':
                             var types = JSON.parse(state_event.state.types);
+                            game.state.types = types;
                             console.log(types);
                             if(types.length > 0) {
                                 var t = 0;
