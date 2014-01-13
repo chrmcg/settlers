@@ -462,7 +462,17 @@ game.board.randomize = function() {
         this.vertices[ports[i][0]].port = ports[i][1];
     }
 
+    // Assign randomized numbers
+    for(var i = 0; i < 19; i++) {
+        this.hexes[i].num = nums.shift();
+    }
 
+    // Assign randomized types
+    for(var i = 0; i < 19; i++) {
+        this.hexes[i].type = this.hexes[i].num == 0 ? 0 : types.shift();
+        this.hexes[i].robber = this.hexes[i].num == 0 ? 1 : 0;
+    }
+    
     // Pass hexes, vertices to shared state
     gapi.hangout.data.submitDelta({
         'vertices' : JSON.stringify(
@@ -483,16 +493,6 @@ game.board.randomize = function() {
         })(game.board.hexes))
     )});
 
-    // Assign randomized numbers
-    for(var i = 0; i < 19; i++) {
-        this.hexes[i].num = nums.shift();
-    }
-
-    // Assign randomized types
-    for(var i = 0; i < 19; i++) {
-        this.hexes[i].type = this.hexes[i].num == 0 ? 0 : types.shift();
-        this.hexes[i].robber = this.hexes[i].num == 0 ? 1 : 0;
-    }
 };
 
 game.board.init = function() {
@@ -1223,17 +1223,10 @@ game.state.init = function(player_count) {
         21: 'V', 22: 'V', 23: 'V', 24: 'V', 25: 'V', //Victory Point Card
     };
 
+
     if(gapi.hangout.data.getValue('hexes') === undefined) {
-        game.board.init();
-        game.statusbox.init();
-        game.selectbox.init();
-        game.menu.init();
         game.board.randomize();
     } else {
-        game.board.init();
-        game.statusbox.init();
-        game.selectbox.init();
-        game.menu.init();
         game.state.downloadState(gapi.hangout.data.getState());
     }
 };
@@ -2708,6 +2701,10 @@ window.init = function () {
                 game.state.downloadState(state_event.state);
             });
 
+            game.board.init();
+            game.statusbox.init();
+            game.selectbox.init();
+            game.menu.init();
             game.state.init(3);
             game.board.draw(700, 390);
 
