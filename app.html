@@ -2712,7 +2712,7 @@ window.init = function () {
             gapi.hangout.data.onStateChanged.add(function(state_event) {
                 if (state_event.state.id != gapi.hangout.getLocalParticipantId()) {
                    game.state.download(state_event.state);
-               } if (state_event.state.next_action != next_action) {
+               } if (state_event.state.next_action != game.state.next_action) {
                    game.proceed();
                }
             });
