@@ -2462,7 +2462,7 @@ game.actions.buildCity = function() {
 
     if(game.state.phase == 2 && (game.state.playerHas(game.state.turn, {3: 2, 5: 3}))) {
         game.state.next_action = 'playerControl';
-        gapi.hangout.data.submitDelta({'id', gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
+        gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
         game.board.showAvailableVertices(2, game.state.turn);
     } else {
         console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
@@ -2478,7 +2478,7 @@ game.actions.buildRoad = function(params) {
     } else if(game.state.phase == 2) {
         if(game.state.playerHas(game.state.turn, {1: 1, 4: 1}))  {
             game.state.next_action = 'playerControl';
-            gapi.hangout.data.submitDelta({'id', gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
+            gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
             game.board.showAvailableEdges(game.state.turn);
         } else {
             console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
@@ -2575,17 +2575,17 @@ game.actions.selectEdge = function(i, player, params) {
             game.state.turn++;
             game.statusbox.viewPlayer(game.state.turn);
         }
-        gapi.hangout.data.submitDelta({'id', gapi.hangout.getLocalParticipantId(), 'next_action': 'buildSettlement', 'phase': ''+game.state.phase, 'turn': ''+game.state.turn});
+        gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'buildSettlement', 'phase': ''+game.state.phase, 'turn': ''+game.state.turn});
         
     } else if(game.state.phase == 1) {
         
         if(game.state.turn == 1) {
             game.state.phase = 2;
-            gapi.hangout.data.submitDelta({'id', gapi.hangout.getLocalParticipantId(), 'next_action': 'rollDice', 'phase': ''+game.state.phase});
+            gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'rollDice', 'phase': ''+game.state.phase});
         } else {
             game.state.turn--;
             game.statusbox.viewPlayer(game.state.turn);
-            gapi.hangout.data.submitDelta({'id', gapi.hangout.getLocalParticipantId(), 'next_action': 'buildSettlement', 'turn': ''+game.state.turn});
+            gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'buildSettlement', 'turn': ''+game.state.turn});
         }
 
     } else if(game.state.phase == 2) {
@@ -2593,13 +2593,13 @@ game.actions.selectEdge = function(i, player, params) {
         console.log(params);
         if (params == 'undefined') { 
             game.state.next_action = 'playerControl';
-            gapi.hangout.data.submitDelta({'id', gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
+            gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
             game.state.deduct(game.state.turn, {1: 1, 4: 1});
         } else if (params == 'R') {
             game.board.showAvailableEdges(player, 'R1'); 
         } else {
             game.state.next_action = 'playerControl';
-            gapi.hangout.data.submitDelta({'id', gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
+            gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
         }
     } 
 
