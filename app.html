@@ -718,6 +718,9 @@ game.board.redraw = function() {
             prob.textContent = '';
         }
 
+        text.setAttribute('class', 'hex-content');
+        prob.setAttribute('class', 'hex-content');
+
         circle = this.hexes[i].circle;
         if (this.hexes[i].robber == 0) {
             circle.setAttribute('fill', 'rgba(0,0,0,0)');
