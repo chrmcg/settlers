@@ -1440,6 +1440,7 @@ game.actions.rollDice = function() {
     } else {
         var h, v, o;
         for(var i = 0; i < 19; i++) {
+            o = {};
             h = game.board.hexes[i]
             if(h.num == d) {
                 for(var j = 0; j < game.board.hexes[i].vertices.length; j++) {
