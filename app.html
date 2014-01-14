@@ -1425,7 +1425,7 @@ game.actions.rollDice = function() {
         obj['next_action'] = 'getRobbed';
         game.state.next_action = 'getRobbed';
     } else {
-        var h, v, obj;
+        var h, v, o;
         for(var i = 0; i < 19; i++) {
             h = game.board.hexes[i]
             if(h.num == d) {
@@ -1435,12 +1435,12 @@ game.actions.rollDice = function() {
                         obj = {};
                         switch(v.contents) {
                             case 1:
-                            obj[h.type] = 1;
-                            game.state.collect(v.owner, obj);
+                            o[h.type] = 1;
+                            game.state.collect(v.owner, o);
                             break;
                             case 2:
                             obj[h.type] = 2;
-                            game.state.collect(v.owner, obj);
+                            game.state.collect(v.owner, o);
                             break;
                             case 0: default:
 
