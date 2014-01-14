@@ -986,29 +986,42 @@ game.board.showAvailableEdges = function(player, params) {
 
 game.board.showAvailableVertices = function(type, player) {
     var a, b, c;
-    for(var i = 0; i < 54; i++) {
-        if(type == 1 && this.vertices[i].contents == 0) {
-            a = this.getNeighborVertices(i);
-            b = true;
-            for(var j = 0; j < a.length; j++) { if(this.vertices[a[j]].contents > 0) { b = false; } }
-            if(game.state.phase == 2) {
-                c = false;
-                for(var k = 0; k < this.vertices[i].edges.length; k++) {
-                    if(this.edges[this.vertices[i].edges[k]].owner == player) c = true;
+    if(type == 1) {
+        for (var i = 0; i < 54; i++) {
+            var neighbors = this.getNeighborVertices(i);
+            var draw = true;
+            for(var j = 0; j < neighbors.length; j++) {
+                var neighbor = neighbors[j];
+                if(this.vertices[neighbor].contents != 0) {
+                    draw = false;
                 }
-                if(c === false) b = false;
             }
-            if(b === true) { 
+            var edges = this.vertices[i].edges;
+            if(game.state.phase == 2) {
+                for(var j = 0; j < edges.length; j++) {
+                    var edge = edges[j];
+                    if(this.edges[edge].owner != player) {
+                        draw = false;
+                    }
+                }
+            }
+            if(this.vertices[i].contents != 0) {
+                draw = false;
+            }
+            if(draw) {
                 this.vertices[i].v.setAttribute('class', 'menu-item');
                 this.vertices[i].v.setAttribute('visibility', 'visible');
                 this.vertices[i].v.setAttribute('onmouseover', 'game.board.highlightVertex('+i+', ' + type + ', ' + player + ')');
                 this.vertices[i].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+i+',' + type + ')');
             }
-        } else if(type == 2 && this.vertices[i].contents == 1 && this.vertices[i].owner == player) {
-            this.vertices[i].v.setAttribute('class', 'menu-item');
-            this.vertices[i].v.setAttribute('onmouseover', 'game.board.highlightVertex('+i+', ' + type + ',' + player + ')');
-            this.vertices[i].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+i+',' + type + ')');
-
+        }
+    } else if(type == 2) {
+        for(var i = 0; i < 54; i++) {
+            if(this.vertices[i].contents == 1 && this.vertices[i].owner == player) {
+                this.vertices[i].v.setAttribute('class', 'menu-item');
+                this.vertices[i].v.setAttribute('onmouseover', 'game.board.highlightVertex('+i+', ' + type + ',' + player + ')');
+                this.vertices[i].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+i+',' + type + ')');
+            }
         }
     }
 };
