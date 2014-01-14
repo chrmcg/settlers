@@ -1435,12 +1435,12 @@ game.actions.rollDice = function() {
                         obj = {};
                         switch(v.contents) {
                             case 1:
-                            o[h.type] = 1;
-                            game.state.collect(v.owner, o);
+                                o[h.type] = 1;
+                                game.state.collect(v.owner, o);
                             break;
                             case 2:
-                            obj[h.type] = 2;
-                            game.state.collect(v.owner, o);
+                                o[h.type] = 2;
+                                game.state.collect(v.owner, o);
                             break;
                             case 0: default:
 
