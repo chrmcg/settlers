@@ -2710,10 +2710,11 @@ window.init = function () {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
             gapi.hangout.data.onStateChanged.add(function(state_event) {
-                if (state_event.state.id != gapi.hangout.getLocalParticipantId()) {
-                   game.state.download(state_event.state);
-               } if (state_event.state.next_action != game.state.next_action) {
+               if (state_event.state.next_action != game.state.next_action) {
                    game.proceed();
+               }
+               if (state_event.state.id != gapi.hangout.getLocalParticipantId()) {
+                   game.state.download(state_event.state);
                }
             });
 
