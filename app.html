@@ -784,7 +784,7 @@ game.board.redraw = function() {
     // Show correct player
     for(var i = 0; i < game.state.player_count; i++) {
         var player_field = game.statusbox.player_fields[i];
-        if(i == player-1) {
+        if(i == game.state.turn-1) {
             player_field.rect.setAttribute('height', '30px');
             player_field.rect.setAttribute('transform', 'translate(0, -10)');
         } else {
