@@ -781,6 +781,16 @@ game.board.redraw = function() {
             v.setAttribute('stroke', 'black');
         }
     }
+    // Show correct player
+    for(var i = 0; i < game.state.player_count; i++) {
+        if(i == player-1) {
+            this.player_fields[i].rect.setAttribute('height', '30px');
+            this.player_fields[i].rect.setAttribute('transform', 'translate(0, -10)');
+        } else {
+            this.player_fields[i].rect.setAttribute('height', '20px');
+            this.player_fields[i].rect.setAttribute('transform', '');
+        }
+    }
 };
 
 game.board.draw = function(w, h) {
