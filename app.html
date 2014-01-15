@@ -2699,7 +2699,7 @@ game.state.download = function(state) {
                 try {
                     game.state[key] = JSON.parse(value);
                 } catch(e) {
-                    game.state[key] = value;
+                    game.state[key] = parseInt(value);
                 }
             break;
         }
