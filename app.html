@@ -770,17 +770,20 @@ game.board.redraw = function() {
             v.setAttribute('x', this.vertices[i].x - 10);
             v.setAttribute('y', this.vertices[i].y - 10);
             v.setAttribute('onclick', '');
+        } else {
+            v.setAttribute('visibility', 'hidden');
         }
 
         if(this.vertices[i].port > 0) {
             if(this.vertices[i].port == 6) {
                 v.setAttribute('stroke', 'blue');
+                v.setAttribute('visibility', 'visible');
             } else {
                 v.setAttribute('stroke', this.colors[this.vertices[i].port]);
+                v.setAttribute('visibility', 'visible');
             }
         } else {
             v.setAttribute('stroke', 'black');
-            v.setAttribute('visibility', 'hidden');
         }
     }
     // Show correct player
