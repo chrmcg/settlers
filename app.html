@@ -746,6 +746,7 @@ game.board.redraw = function() {
         if(this.edges[i].owner != null) {
             e.setAttribute('stroke', this.pcolors[this.edges[i].owner-1]);
             e.setAttribute('stroke-width', '5');
+            e.setAttribute('visibility', 'visible');
         }
     }
 
