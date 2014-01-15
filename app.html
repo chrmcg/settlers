@@ -1077,7 +1077,7 @@ game.board.highlightVertex = function(i, type, player) {
             this.vertices[i].v.setAttribute('x', this.vertices[i].x - 10);
             this.vertices[i].v.setAttribute('y', this.vertices[i].y - 10);
             this.vertices[i].v.setAttribute('fill', game.board.pcolors[player-1]);
-            } else if(type == 2) {
+        } else if(type == 2) {
             this.vertices[i].v.setAttribute('width', '30');
             this.vertices[i].v.setAttribute('height', '30');
             this.vertices[i].v.setAttribute('x', this.vertices[i].x - 15);
@@ -1099,7 +1099,6 @@ game.board.unhighlightVertex = function(i, type) {
         this.vertices[i].v.setAttribute('height', '20');
         this.vertices[i].v.setAttribute('x', this.vertices[i].x - 10);
         this.vertices[i].v.setAttribute('y', this.vertices[i].y - 10);
-
     }
     this.vertices[i].v.setAttribute('onclick', '');
 };
@@ -2566,7 +2565,7 @@ game.actions.selectVertex = function(i, type) {
     var vertices = (function(vertices){ 
         var obj = [];
         for (var i = 0; i < vertices.length; i++) {
-            obj.push({contents : vertices[i].contents, owner : vertices[i].owner});
+            obj.push({contents : vertices[i].contents, owner : vertices[i].owner, port : vertices[i].port});
         }
         return obj;
     })(game.board.vertices);
