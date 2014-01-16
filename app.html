@@ -1515,20 +1515,20 @@ game.actions = {
 game.actions.pickColor = function(i, color) {
 
     var p = null;
-    for(var i = 0; i < this.players.length; i++) {
-        if(this.players[i].id == gapi.hangout.getLocalParticipant().person.id) {
+    for(var i = 0; i < game.startbox.players.length; i++) {
+        if(game.startbox.players[i].id == gapi.hangout.getLocalParticipant().person.id) {
             p = i;
         }
     }
     if(p != null) {
-        this.players[p].color = color;
+        game.startbox.players[p].color = color;
         this.rects[p].setAttribute('visibility', 'hidden');
 
         var obj = [];
-        for(var i = 0; i < this.players.length; i++) {
+        for(var i = 0; i < game.startbox.players.length; i++) {
             obj.push({
-                color: this.players[i].color,
-                id: this.players[i].id,
+                color: game.startbox.players[i].color,
+                id: game.startbox.players[i].id,
             });
         }
         gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
