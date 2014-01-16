@@ -79,7 +79,8 @@ game.startbox = {
     game: game,
     wrapper_outer: null,
     fields: [],
-    players: []
+    players: [],
+    button: null
 }
 
 game.startbox.init = function() {
@@ -88,7 +89,7 @@ game.startbox.init = function() {
 
     this.wrapper_outer.setAttribute('transform', 'translate(200, 80)');
 
-    var text;
+    var text, rect, button;
     for(var i = 0; i < 4; i++) {
         text = document.createElementNS(game.ns, 'text');
         text.setAttribute('x', '0');
@@ -97,6 +98,26 @@ game.startbox.init = function() {
         this.wrapper_outer.appendChild(text);
         this.players[i] = {text: text};
     }
+
+    button = document.createElementNS(game.ns, 'g');
+    rect = document.createElementNS(game.ns, 'rect');
+    rect.setAttribute('width', '100');
+    rect.setAttribute('height', '30');
+    rect.setAttribute('fill', 'gray');
+    text = document.createElementNS(game.ns, 'text');
+    text.textContent = 'START';
+    text.setAttribute('x', '50');
+    text.setAttribute('y', '15');
+    text.setAttribute('text-anchor', 'middle');
+
+    this.wrapper_outer.appendChild(g);
+    this.button.appendChild(rect);
+    this.button.appendChild(text);
+
+    this.button.setAttribute('x', '350');
+    this.button.setAttribute('y', '200');
+    
+
     game.startbox.onChanged(gapi.hangout.getEnabledParticipants());
 }
 game.startbox.onChanged = function(participants) {
@@ -111,6 +132,10 @@ game.startbox.onChanged = function(participants) {
         } else {
             this.players[i].text.setAttribute('visibility', 'hidden');
         }
+    }
+    if (participants.length > 1 && this.button !== null) {
+       // this.button.setAttribute('onclick', '');
+        this.button.children[0].setAttribute('fill', 'white');
     }
 }
 
