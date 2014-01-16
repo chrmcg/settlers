@@ -104,19 +104,18 @@ game.startbox.init = function() {
     rect.setAttribute('width', '100');
     rect.setAttribute('height', '30');
     rect.setAttribute('fill', 'gray');
+    rect.setAttribute('stroke', 'black');
     text = document.createElementNS(game.ns, 'text');
     text.textContent = 'START';
     text.setAttribute('x', '50');
-    text.setAttribute('y', '15');
+    text.setAttribute('y', '18');
     text.setAttribute('text-anchor', 'middle');
 
     this.wrapper_outer.appendChild(this.button);
     this.button.appendChild(rect);
     this.button.appendChild(text);
 
-    this.button.setAttribute('x', '350');
-    this.button.setAttribute('y', '200');
-    
+    this.button.setAttribute('transform', 'transform(20, 200)');
 
     game.startbox.onChanged(gapi.hangout.getEnabledParticipants());
 }
