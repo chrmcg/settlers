@@ -144,7 +144,7 @@ game.startbox.pickColor = function(i, color) {
     for(var i = 0; i < game.startbox.players.length; i++) {
         if(this.players[i].id == id) {
             this.players[i].color = color;
-            this.players[i].text.setAttribute('stroke', color);
+            this.players[i].text.setAttribute('fill', color);
             this.players[i].text.setAttribute('font-weight', 'bold');
             for (var j = 0; j < game.startbox.rects.length; j++) {
                 if (this.rects[j] == color) {
