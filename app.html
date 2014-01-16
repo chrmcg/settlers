@@ -89,7 +89,7 @@ game.startbox.init = function() {
 
     this.wrapper_outer.setAttribute('transform', 'translate(200, 80)');
 
-    var text, rect, button;
+    var text, rect;
     for(var i = 0; i < 4; i++) {
         text = document.createElementNS(game.ns, 'text');
         text.setAttribute('x', '0');
@@ -99,7 +99,7 @@ game.startbox.init = function() {
         this.players[i] = {text: text};
     }
 
-    button = document.createElementNS(game.ns, 'g');
+    this.button = document.createElementNS(game.ns, 'g');
     rect = document.createElementNS(game.ns, 'rect');
     rect.setAttribute('width', '100');
     rect.setAttribute('height', '30');
@@ -110,7 +110,7 @@ game.startbox.init = function() {
     text.setAttribute('y', '15');
     text.setAttribute('text-anchor', 'middle');
 
-    this.wrapper_outer.appendChild(button);
+    this.wrapper_outer.appendChild(this.button);
     this.button.appendChild(rect);
     this.button.appendChild(text);
 
