@@ -4,12 +4,14 @@ IMPLEMENT:
 
 - Move the VideoCanvas onto the app and show the VideoFeed of whoever's 
 turn it is (gapi.hangout.layout)
-
 - Align the player_fields in game.statusbox with the Hangouts "filmstrip"
-
 - Add touchscreen support (mouseover not supported, so 
   call game.actions.confirmPlacement or cancelPlacement on touchend)
+- Players can only move on their turns
+- Only start game once all players are present
 
 BUGS:
 
-- Cannot cancel building road/settlement/city
+- Cannot cancel building road/settlement/city (phase == 2 only)
+- Road options do not hide for other players after building a road (only if you proceed after action changes for every player)
+- Robber doesn't get placed correctly
