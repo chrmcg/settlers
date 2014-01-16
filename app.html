@@ -95,22 +95,21 @@ game.startbox.init = function() {
         text.setAttribute('y', ''+(20 * i));
         text.setAttribute('visibility', 'hidden');
         this.wrapper_outer.appendChild(text);
-        players[i] = {text: text};
+        this.players[i] = {text: text};
     }
     game.startbox.onChanged(gapi.hangout.getEnabledParticipants());
 }
 game.startbox.onChanged = function(participants) {
-    this.players = [];
     var participant;
     for(var i = 0; i < 4; i++) {
         if (i < participants.length) {
             participant = participants[i];
-            players[i].name = participant.person.displayName;
-            players[i].id = participant.person.id;
-            players[i].text.textContent = this.players[i].name;
-            players[i].text.setAttribute('visibility', 'visible');
+            this.players[i].name = participant.person.displayName;
+            this.players[i].id = participant.person.id;
+            this.players[i].text.textContent = this.players[i].name;
+            this.players[i].text.setAttribute('visibility', 'visible');
         } else {
-            players[i].text.setAttribute('visibility', 'hidden');
+            this.players[i].text.setAttribute('visibility', 'hidden');
         }
     }
 }
