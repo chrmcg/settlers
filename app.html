@@ -2893,8 +2893,15 @@ window.init = function() {
             game.startbox.init();
             var startbox_players = gapi.hangout.data.getValue('startbox_players'); 
             if (startbox_players !== undefined) {
-                game.startbox.players = JSON.parse(startbox_players);
+                var players = JSON.parse(startbox_players);
                 var id = gapi.hangout.getLocalParticipant().person.id;
+                for(var i = 0; i < players.length; i++) {
+                    for(var j = 0; j < game.startbox.players.length; j++) {
+                        if(players[i].id == game.startbox.players[j].id) {
+                            game.startbox.players[j].color = players[i].color;
+                        }
+                    }
+                }
                 for(var i = 0; i < game.startbox.rects.length; i++) {
                     for(var j = 0; j < game.startbox.players.length; j++) {
                         if(game.startbox.players[j].color == game.startbox.rects[i].getAttribute('fill')) {
