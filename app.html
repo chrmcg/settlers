@@ -80,6 +80,7 @@ game.startbox = {
     wrapper_outer: null,
     fields: [],
     players: [],
+    rects: [],
     button: null
 }
 
@@ -98,7 +99,8 @@ game.startbox.init = function() {
         rect.setAttribute('y', '0');
         rect.setAttribute('width', '100');
         rect.setAttribute('height', '50');
-        rect.setAttribute('onclick', '');
+        rect.setAttribute('onclick', 'game.actions.pickColor('+i+',"'+ colors[i] +'")');
+        this.rects.push(rect);
         g.appendChild(rect);
     }
     this.wrapper_outer.appendChild(g);
@@ -123,7 +125,7 @@ game.startbox.init = function() {
     text = document.createElementNS(game.ns, 'text');
     text.textContent = 'START';
     text.setAttribute('x', '50');
-    text.setAttribute('y', '18');
+    text.setAttribute('y', '21');
     text.setAttribute('text-anchor', 'middle');
 
     this.wrapper_outer.appendChild(this.button);
@@ -150,6 +152,8 @@ game.startbox.onChanged = function(participants) {
     }
     if (participants.length > 1 && this.button !== null) {
        // this.button.setAttribute('onclick', '');
+       // TODO: Also check that everyone has picked a color
+       // If you press Start w/o picking a color you get one randomly
         this.button.children[0].setAttribute('fill', 'white');
     }
 }
@@ -1508,6 +1512,30 @@ game.actions = {
     game: game
 };
 
+game.actions.pickColor = function(i, color) {
+
+    var p = null;
+    for(var i = 0; i < game.startbox.players.length; i++) {
+        if(game.startbox.players[i].id == gapi.hangout.getLocalParticipant().person.id) {
+            p = i;
+        }
+    }
+    if(p != null) {
+        game.startbox.players[p].color = color;
+        game.startbox.rects[p].setAttribute('visibility', 'hidden');
+
+        var obj = [];
+        for(var i = 0; i < game.startbox.players.length; i++) {
+            obj.push({
+                color: game.startbox.players[i].color,
+                id: game.startbox.players[i].id,
+            });
+        }
+        gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
+    }
+};
+
+
 game.actions.rollDice = function() {
     
     game.statusbox.viewPlayer(game.state.turn);
@@ -2826,6 +2854,18 @@ window.init = function() {
             gapi.hangout.onEnabledParticipantsChanged.add(function(participant_event) {
                 game.startbox.onChanged(participant_event.enabledParticipants);
             });
+
+            gapi.hangout.data.onStateChanged.add(function(state_event) {
+                game.startbox.players = JSON.parse(state_event.state.startbox_players);
+                for(var i = 0; i < game.startbox.rects.length; i++) {
+                    for(var j = 0; j < game.startbox.players.length; j++) {
+                        if(game.startbox.players[j].color == game.startbox.rects[i].getAttribute('fill')) {
+                            game.startbox.rects[i].setAttribute('visibility', 'hidden');
+                        }
+                    }
+                }
+            });
+            //TODO And then remove this from onStateChanged when its done
 /*
             game.board.init();
             game.state.init(3);
