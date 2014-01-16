@@ -142,19 +142,22 @@ game.startbox.pickColor = function(i, color) {
 
     var id = gapi.hangout.getLocalParticipant().person.id;
     for(var i = 0; i < game.startbox.players.length; i++) {
-        if(game.startbox.players[i].id == id) {
-            game.startbox.players[i].color = color;
+        if(this.players[i].id == id) {
+            this.players[i].color = color;
+            this.players[i].text.setAttribute('stroke', color);
+            this.players[i].text.setAttribute('font-weight', 'bold');
             for (var j = 0; j < game.startbox.rects.length; j++) {
-                if (game.startbox.rects[j] == color) {
-                    game.startbox.rects[j].setAttribute('visibility', 'hidden');
+                if (this.rects[j] == color) {
+                    this.rects[j].setAttribute('visibility', 'hidden');
                 }
+                this.rects[j].removeAttribute('onclick');
             }
 
             var obj = [];
-            for(var j = 0; j < game.startbox.players.length; j++) {
+            for(var j = 0; j < this.players.length; j++) {
                 obj.push({
-                    color: game.startbox.players[i].color,
-                    id: game.startbox.players[i].id,
+                    color: this.players[i].color,
+                    id: this.players[i].id,
                 });
             }
             gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
