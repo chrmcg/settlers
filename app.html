@@ -2870,6 +2870,7 @@ window.init = function() {
                     }
                 }
             });
+
             //TODO And then remove this from onStateChanged when its done
 /*
             game.board.init();
@@ -2890,6 +2891,21 @@ window.init = function() {
             //game.autosettle();*/
 
             game.startbox.init();
+            if (gapi.hangout.data.getValue().startbox_players !== undefined) {
+                var id = gapi.hangout.getLocalParticipant().person.id;
+                for(var i = 0; i < game.startbox.rects.length; i++) {
+                    for(var j = 0; j < game.startbox.players.length; j++) {
+                        if(game.startbox.players[j].color == game.startbox.rects[i].getAttribute('fill')) {
+                            game.startbox.rects[i].setAttribute('visibility', 'hidden');
+                            game.startbox.players[i].text.setAttribute('fill', game.startbox.players[i].color);
+                            game.startbox.players[i].text.setAttribute('font-weight', 'bold');
+                        }
+                        if(game.startbox.players[j].id == id && game.startbox.players[j].color !== undefined) {
+                            game.startbox.rects[i].removeAttribute('onclick');
+                        }
+                    }
+                }
+            }
         }
     });
 }
