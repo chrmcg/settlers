@@ -1522,7 +1522,7 @@ game.actions.pickColor = function(i, color) {
     }
     if(p != null) {
         game.startbox.players[p].color = color;
-        this.rects[p].setAttribute('visibility', 'hidden');
+        game.startbox.rects[p].setAttribute('visibility', 'hidden');
 
         var obj = [];
         for(var i = 0; i < game.startbox.players.length; i++) {
