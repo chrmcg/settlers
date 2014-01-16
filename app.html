@@ -90,7 +90,7 @@ game.startbox.init = function() {
 
     var text;
     for(var i = 0; i < 4; i++) {
-        text = document.createElement(game.ns, 'text');
+        text = document.createElementNS(game.ns, 'text');
         text.setAttribute('x', '0');
         text.setAttribute('y', ''+(20 * i));
         text.setAttribute('visibility', 'hidden');
