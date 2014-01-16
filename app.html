@@ -109,6 +109,7 @@ game.startbox.init = function() {
         text.setAttribute('x', '350');
         text.setAttribute('y', ''+(50 * (i + 2)));
         text.setAttribute('visibility', 'hidden');
+        text.setAttribute('text-anchor', 'middle');
         this.wrapper_outer.appendChild(text);
         this.players[i] = {text: text};
     }
