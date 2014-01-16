@@ -140,9 +140,9 @@ game.startbox.init = function() {
 
 game.startbox.pickColor = function(i, color) {
 
-    var p = null;
+    var id = gapi.hangout.getLocalParticipant().person.id;
     for(var i = 0; i < game.startbox.players.length; i++) {
-        if(game.startbox.players[i].id == gapi.hangout.getLocalParticipant().person.id) {
+        if(game.startbox.players[i].id == id) {
             game.startbox.players[i].color = color;
             for (var j = 0; j < game.startbox.rects.length; j++) {
                 if (game.startbox.rects[j] == color) {
