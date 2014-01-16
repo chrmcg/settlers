@@ -89,6 +89,19 @@ game.startbox.init = function() {
 
     this.wrapper_outer.setAttribute('transform', 'translate(200, 80)');
 
+    var colors = ['orange', 'red', 'blue', 'purple'];
+    var rect;
+    for(var i = 0; i < 4; i++) {
+        rect = document.createElementNS(game.ns, 'rect');
+        rect.setAttribute('fill', colors[i]);
+        rect.setAttribute('x', ''+(i*50));
+        rect.setAttribute('y', '50');
+        rect.setAttribute('width', '100');
+        rect.setAttribute('height', '50');
+        rect.setAttribute('onclick', '');
+        this.wrapper_outer.appendChild(rect);
+    }
+
     var text, rect;
     for(var i = 0; i < 4; i++) {
         text = document.createElementNS(game.ns, 'text');
@@ -116,6 +129,7 @@ game.startbox.init = function() {
     this.button.appendChild(text);
 
     this.button.setAttribute('transform', 'translate(20, 200)');
+    this.button.setAttribute('class', 'menu-item');
 
     game.startbox.onChanged(gapi.hangout.getEnabledParticipants());
 }
