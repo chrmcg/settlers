@@ -88,7 +88,9 @@ game.startbox.init = function() {
     game.svg.appendChild(this.wrapper_outer);
 
     var colors = ['orange', 'red', 'blue', 'purple'];
-    var rect;
+    var rect, g;
+    g = document.createElementNS(game.ns, 'g');
+    g.setAttribute('transform', 'translate(120, 20)');
     for(var i = 0; i < 4; i++) {
         rect = document.createElementNS(game.ns, 'rect');
         rect.setAttribute('fill', colors[i]);
@@ -97,14 +99,15 @@ game.startbox.init = function() {
         rect.setAttribute('width', '100');
         rect.setAttribute('height', '50');
         rect.setAttribute('onclick', '');
-        this.wrapper_outer.appendChild(rect);
+        g.appendChild(rect);
     }
+    this.wrapper_outer.appendChild(g);
 
     var text, rect;
     for(var i = 0; i < 4; i++) {
         text = document.createElementNS(game.ns, 'text');
         text.setAttribute('x', '350');
-        text.setAttribute('y', ''+(50 * (i + 1)));
+        text.setAttribute('y', ''+(50 * (i + 2)));
         text.setAttribute('visibility', 'hidden');
         this.wrapper_outer.appendChild(text);
         this.players[i] = {text: text};
