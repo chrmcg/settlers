@@ -99,7 +99,7 @@ game.startbox.init = function() {
         rect.setAttribute('y', '0');
         rect.setAttribute('width', '100');
         rect.setAttribute('height', '50');
-        rect.setAttribute('onclick', 'game.actions.pickColor('+i+','+ colors[i] +')');
+        rect.setAttribute('onclick', 'game.actions.pickColor('+i+',"'+ colors[i] +'")');
         this.rects.push(rect);
         g.appendChild(rect);
     }
