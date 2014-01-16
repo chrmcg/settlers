@@ -99,7 +99,7 @@ game.startbox.init = function() {
         rect.setAttribute('y', '0');
         rect.setAttribute('width', '100');
         rect.setAttribute('height', '50');
-        rect.setAttribute('onclick', 'game.actions.pickColor('+i+',"'+ colors[i] +'")');
+        rect.setAttribute('onclick', 'game.startbox.pickColor('+i+',"'+ colors[i] +'")');
         this.rects.push(rect);
         g.appendChild(rect);
     }
@@ -137,6 +137,31 @@ game.startbox.init = function() {
 
     game.startbox.onChanged(gapi.hangout.getEnabledParticipants());
 }
+
+game.startbox.pickColor = function(i, color) {
+
+    var p = null;
+    for(var i = 0; i < game.startbox.players.length; i++) {
+        if(game.startbox.players[i].id == gapi.hangout.getLocalParticipant().person.id) {
+            game.startbox.players[i].color = color;
+            for (var j = 0; j < game.startbox.rects.length; j++) {
+                if (game.startbox.rects[j] == color) {
+                    game.startbox.rects[j].setAttribute('visibility', 'hidden');
+                }
+            }
+
+            var obj = [];
+            for(var j = 0; j < game.startbox.players.length; j++) {
+                obj.push({
+                    color: game.startbox.players[i].color,
+                    id: game.startbox.players[i].id,
+                });
+            }
+            gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
+        }
+    }
+};
+
 game.startbox.onChanged = function(participants) {
     var participant;
     for(var i = 0; i < 4; i++) {
@@ -1510,29 +1535,6 @@ game.proceed = function() {
 
 game.actions = {
     game: game
-};
-
-game.actions.pickColor = function(i, color) {
-
-    var p = null;
-    for(var i = 0; i < game.startbox.players.length; i++) {
-        if(game.startbox.players[i].id == gapi.hangout.getLocalParticipant().person.id) {
-            p = i;
-        }
-    }
-    if(p != null) {
-        game.startbox.players[p].color = color;
-        game.startbox.rects[p].setAttribute('visibility', 'hidden');
-
-        var obj = [];
-        for(var i = 0; i < game.startbox.players.length; i++) {
-            obj.push({
-                color: game.startbox.players[i].color,
-                id: game.startbox.players[i].id,
-            });
-        }
-        gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
-    }
 };
 
 
