@@ -75,6 +75,46 @@ window.game = {};
 game.ns = 'http://www.w3.org/2000/svg';
 game.stateChangedCallback = null;
 
+game.startbox = {
+    game: game,
+    wrapper_outer: null,
+    fields: [],
+    players: []
+}
+
+game.startbox.init = function() {
+    this.wrapper_outer = document.createElementNS(game.ns, 'g');
+    game.svg.appendChild(this.wrapper_outer);
+
+    this.wrapper_outer.setAttribute('transform', 'translate(200, 80)');
+
+    var text;
+    for(var i = 0; i < 4; i++) {
+        text = document.createElement(game.ns, 'text');
+        text.setAttribute('x', '0');
+        text.setAttribute('y', ''+(20 * i));
+        text.setAttribute('visibility', 'hidden');
+        this.wrapper_outer.appendChild(text);
+        players[i] = {text: text};
+    }
+    game.startbox.onChanged(gapi.hangout.getEnabledParticipants());
+}
+game.startbox.onChanged = function(participants) {
+    this.players = [];
+    var participant;
+    for(var i = 0; i < 4; i++) {
+        if (i < participants.length) {
+            participant = participants[i];
+            players[i].name = participant.person.displayName;
+            players[i].id = participant.person.id;
+            players[i].text.textContent = this.players[i].name;
+            players[i].text.setAttribute('visibility', 'visible');
+        } else {
+            players[i].text.setAttribute('visibility', 'hidden');
+        }
+    }
+}
+
 game.statusbox = {
     game: game,
     wrapper_outer: null,
@@ -475,7 +515,7 @@ game.board.randomize = function() {
     
     // Pass hexes, vertices to shared state
     gapi.hangout.data.submitDelta({
-        'id': gapi.hangout.getLocalParticipantId(),
+        'id': gapi.hangout.getLocalParticipant().person.id,
         'vertices' : JSON.stringify(
         (function(vertices){
             var arr = [];
@@ -1285,7 +1325,7 @@ game.state.deduct = function(player, resources) {
     console.log('Player ' + player + ' is deducted: ' + str);
     var obj = {};
     obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
-    obj['id'] = gapi.hangout.getLocalParticipantId();
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
     this.updateCards(player);
 };
@@ -1301,7 +1341,7 @@ game.state.collect = function(player, resources) {
     }
     var obj = {};
     obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
-    obj['id'] = gapi.hangout.getLocalParticipantId();
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
     console.log('Player ' + player + ' collects: ' + str);
     this.updateCards(player);
@@ -1396,7 +1436,7 @@ game.state.updateVictoryPoints = function() {
     for(var i = 0; i < this.player_count; i++) {
         obj['p'+i] = JSON.stringify(this['p'+i]);
     }
-    obj['id'] = gapi.hangout.getLocalParticipantId();
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
     console.log('Victory points: p1 ' + this.p0.victoryPoints
                     + (this.p1?(', p2 ' + this.p1.victoryPoints):'')
@@ -1415,7 +1455,7 @@ game.state.updateCards = function(player) {
 
     var obj = {};
     obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
-    obj['id'] = gapi.hangout.getLocalParticipantId();
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
     game.statusbox.updateFields(player, resources);
 };
@@ -1436,7 +1476,7 @@ game.actions.rollDice = function() {
 
     var obj = {};
 
-    obj['id'] = gapi.hangout.getLocalParticipantId();
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     obj['next_action'] = 'playerControl';
     game.state.next_action = 'playerControl';
 
@@ -1447,7 +1487,7 @@ game.actions.rollDice = function() {
     console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
 
     if(d == 7) {
-        obj['id'] = gapi.hangout.getLocalParticipantId();
+        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
         obj['next_action'] = 'getRobbed';
         game.state.next_action = 'getRobbed';
     } else {
@@ -1507,7 +1547,7 @@ game.actions.getRobbed = function() {
         game.actions.selectCards('R', {card_count: cards});
         
     } else {
-        gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'moveRobber'});
+        gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'moveRobber'});
         game.proceed();
     }
 };
@@ -1546,7 +1586,7 @@ game.actions.selectRobber = function(i) {
     game.board.hexes[i].robber = 1;
 
     game.state.next_action = 'stealFrom';
-    gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'stealFrom'});
+    gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'stealFrom'});
     game.proceed();
 };
 
@@ -1568,7 +1608,7 @@ game.actions.stealFrom = function() {
 
     console.log('Choose one of (' + owners.join(', ') + ') to steal a card from');
     // TODO: user chooses from (owners) and randomly gets one of their cards
-    gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
+    gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'playerControl'});
     game.proceed();
 };
 
@@ -1609,7 +1649,7 @@ game.actions.buyDevCard = function() {
     game.state.updateVictoryPoints();
     game.state.next_action = 'playerControl';
     obj['next_action'] = 'playerControl';
-    obj['id'] = gapi.hangout.getLocalParticipantId();
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
     game.proceed();
 };
@@ -1647,7 +1687,7 @@ game.actions.playDevCard = function(type) {
             var obj = {};
             obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
             obj['edges'] = JSON.stringify(edges);
-            obj['id'] = gapi.hangout.getLocalParticipantId();
+            obj['id'] = gapi.hangout.getLocalParticipant().person.id;
             gapi.hangout.data.submitDelta(obj);
         }
     break;
@@ -2112,7 +2152,7 @@ game.actions.confirmSelect = function(reason, params) {
     game.state.next_action = 'playerControl';
     var obj = {next_action: 'playerControl'};
     obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
-    obj['id'] = gapi.hangout.getLocalParticipantId();
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
 
     game.actions.cancelSelect();
@@ -2144,7 +2184,7 @@ game.actions.confirmSelect = function(reason, params) {
     game.state.next_action = 'playerControl';
     var obj = {next_action: 'playerControl'};
     obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
-    obj['id'] = gapi.hangout.getLocalParticipantId();
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
 
     game.actions.cancelSelect();
@@ -2461,7 +2501,7 @@ game.actions.endTurn = function() {
 
     var obj = {'next_action': 'rollDice'};
     obj['turn'] = ''+game.state.turn;
-    obj['id'] = gapi.hangout.getLocalParticipantId();
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
     game.proceed();
 }
@@ -2485,7 +2525,7 @@ game.actions.buildCity = function() {
 
     if(game.state.phase == 2 && (game.state.playerHas(game.state.turn, {3: 2, 5: 3}))) {
         game.state.next_action = 'playerControl';
-        gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
+        gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'playerControl'});
         game.board.showAvailableVertices(2, game.state.turn);
     } else {
         console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
@@ -2501,7 +2541,7 @@ game.actions.buildRoad = function(params) {
     } else if(game.state.phase == 2) {
         if(game.state.playerHas(game.state.turn, {1: 1, 4: 1}))  {
             game.state.next_action = 'playerControl';
-            gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipantId(), 'next_action': 'playerControl'});
+            gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'playerControl'});
             game.board.showAvailableEdges(game.state.turn);
         } else {
             console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
@@ -2572,7 +2612,7 @@ game.actions.selectVertex = function(i, type) {
     var obj = {};
     obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
     obj['vertices'] = JSON.stringify(vertices);
-    obj['id'] =  gapi.hangout.getLocalParticipantId();
+    obj['id'] =  gapi.hangout.getLocalParticipant().person.id;
     if (game.state.phase == 0 || game.state.phase == 1) {
         game.state.next_action = 'buildRoad';
         obj['next_action'] = 'buildRoad';
@@ -2643,7 +2683,7 @@ game.actions.selectEdge = function(i, player, params) {
     })(game.board.edges);
     obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
     obj['edges'] = JSON.stringify(edges);
-    obj['id'] = gapi.hangout.getLocalParticipantId();
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
 
     game.proceed();
@@ -2740,10 +2780,14 @@ window.init = function() {
     gapi.hangout.onApiReady.add(function(eventObj) {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
-            gapi.hangout.data.onStateChanged.add(function(state_event) {
+           /* gapi.hangout.data.onStateChanged.add(function(state_event) {
                 game.state.download(state_event.state);
-            });
+            });*/
 
+            gapi.hangout.onEnabledParticipantsChanged.add(function(participant_event) {
+                game.startbox.onChanged(participant_event.enabledParticipants);
+            });
+/*
             game.board.init();
             game.state.init(3);
 
@@ -2759,7 +2803,9 @@ window.init = function() {
             game.board.draw(700, 390);
 
             game.proceed();
-            //game.autosettle();
+            //game.autosettle();*/
+
+            game.startbox.init();
         }
     });
 }
