@@ -2891,8 +2891,9 @@ window.init = function() {
             //game.autosettle();*/
 
             game.startbox.init();
-            if (gapi.hangout.data.getValue().startbox_players !== undefined) {
-                game.startbox.players = JSON.parse(state_event.state.startbox_players);
+            var startbox_players = gapi.hangout.data.getValue('startbox_players'); 
+            if (startbox_players !== undefined) {
+                game.startbox.players = JSON.parse(startbox_players);
                 var id = gapi.hangout.getLocalParticipant().person.id;
                 for(var i = 0; i < game.startbox.rects.length; i++) {
                     for(var j = 0; j < game.startbox.players.length; j++) {
