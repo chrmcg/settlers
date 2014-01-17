@@ -343,12 +343,14 @@ game.startbox.onChanged = function(participants) {
         }
     }
     for(var i = 0; i < this.rects.length; i++) {
+        this.rects[i].setAttribute('visibility', 'visible');
+    }
+    for(var i = 0; i < this.rects.length; i++) {
         for(var j = 0; j < this.players.length; j++) {
             if(this.players[j].color == this.rects[i].getAttribute('fill')) {
                 this.rects[i].setAttribute('visibility', 'hidden');
             }
-            if(this.players[j].id == id) {
-                current_player = j;
+            if(this.players[j].id == gapi.hangout.getLocalParticipant().person.id) {
                 if(this.players[j].color !== undefined) {
                     this.rects[i].removeAttribute('onclick');
                 } else {
