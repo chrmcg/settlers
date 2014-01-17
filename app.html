@@ -163,6 +163,7 @@ game.startbox.pickColor = function(i, color) {
                 obj.push({
                     color: this.players[j].color,
                     id: this.players[j].id,
+                    ready: this.players[j].ready, 
                 });
             }
             gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
@@ -175,6 +176,8 @@ game.startbox.refresh = function() {
     if (startbox_players !== undefined) {
         var players = JSON.parse(startbox_players);
         var id = gapi.hangout.getLocalParticipant().person.id;
+
+        var all_ready = true;
         for(var i = 0; i < players.length; i++) {
             for(var j = 0; j < game.startbox.players.length; j++) {
                 if(players[i].id == game.startbox.players[j].id) {
@@ -183,7 +186,11 @@ game.startbox.refresh = function() {
                         game.startbox.players[j].text.setAttribute('fill', game.startbox.players[j].color);
                         game.startbox.players[j].text.setAttribute('font-weight', 'bold');
                     }
+                    game.startbox.players[j].ready = players[i].ready;
                 }
+            }
+            if(players[i].ready !== true) {
+                all_ready = false;
             }
         }
         for(var i = 0; i < game.startbox.rects.length; i++) {
@@ -195,6 +202,18 @@ game.startbox.refresh = function() {
                     game.startbox.rects[i].removeAttribute('onclick');
                 }
             }
+        }
+
+        if (this.players.length > 1) {
+            // this.button.setAttribute('onclick', '');
+            // TODO: Also check that everyone has picked a color
+            // If you press Start w/o picking a color you get one randomly
+            this.button.children[0].setAttribute('fill', 'white');
+            this.button.setAttribute('onclick', 'game.startbox.setReady('+ gapi.hangout.getLocalParticipant().person.id +')');
+        }
+        if(all_ready === true) {
+            //randomize and assign players
+            //clear screen and start game
         }
     }
 };
@@ -212,12 +231,28 @@ game.startbox.onChanged = function(participants) {
             this.players[i].text.setAttribute('visibility', 'hidden');
         }
     }
-    if (participants.length > 1 && this.button !== null) {
-       // this.button.setAttribute('onclick', '');
-       // TODO: Also check that everyone has picked a color
-       // If you press Start w/o picking a color you get one randomly
-        this.button.children[0].setAttribute('fill', 'white');
+    
+}
+
+game.startbox.setReady = function(id) {
+    var all_ready = true;
+    for(var i = 0; i < this.players.length; i++) {
+        if(this.players[i].id == id) { 
+            this.players[i].ready = true;
+        }
     }
+
+    // upload players
+    var obj = [];
+    for(var j = 0; j < this.players.length; j++) {
+        obj.push({
+            color: this.players[j].color,
+            id: this.players[j].id,
+            ready: this.players[j].ready, 
+        });
+    }
+    gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
+
 }
 
 game.statusbox = {
