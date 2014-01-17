@@ -205,7 +205,7 @@ game.startbox.refresh = function() {
                 if(this.players[j].color == this.rects[i].getAttribute('fill')) {
                     this.rects[i].setAttribute('visibility', 'hidden');
                 }
-                if(this.players[j].id == id && this.players[j].color !== undefined) {
+                if(this.players[j].id == id) {
                     if(this.players[j].color !== undefined) {
                         this.rects[i].removeAttribute('onclick');
                     } else {
