@@ -143,26 +143,10 @@ game.startbox.init = function() {
     }
 }
 
-game.startbox.pickColor = function(i, color) {
+game.startbox.pickColor = function(id, color) {
+    this.players[id].color = color;
 
-    var id = gapi.hangout.getLocalParticipant().person.id;
-    for(var i = 0; i < game.startbox.players.length; i++) {
-        if(this.players[i].id == id) {
-            this.players[i].color = color;
-            this.players[i].text.setAttribute('fill', color);
-            this.players[i].text.setAttribute('font-weight', 'bold'); 
-
-            var obj = [];
-            for(var j = 0; j < this.players.length; j++) {
-                obj.push({
-                    color: this.players[j].color,
-                    id: this.players[j].id,
-                    ready: this.players[j].ready, 
-                });
-            }
-            gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
-        }
-    }
+    gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(this.players)});
 };
 
 game.startbox.refresh = function() {
@@ -171,12 +155,12 @@ game.startbox.refresh = function() {
         this.players = JSON.parse(gapi.hangout.data.getValue('startbox_players'));
     } catch(e) {
         console.log("JSON parse error: "+e.message);
+        console.log(gapi.hangout.data.getValue('startbox_players'));
     }
-
 
     var local_id = gapi.hangout.getLocalParticipant().person.id;
     for(var r = 0; r < this.rects.length; r++)  {
-        this.rects[r].setAttribute('onclick', 'game.startbox.pickColor('+local_id+','+this.rects[r].getAttribute('fill')+')');
+        this.rects[r].setAttribute('onclick', 'game.startbox.pickColor('+local_id+',"'+this.rects[r].getAttribute('fill')+'")');
         this.rects[r].setAttribute('visibility', 'visible');
     }
 
@@ -186,7 +170,7 @@ game.startbox.refresh = function() {
 
     var n = 0;
     var all_ready = true;
-    for(var i = 0; i < ids; i++) {
+    for(var i = 0; i < ids.length; i++) {
         for(var r = 0; r < this.rects.length; r++) {
             if(this.rects[r].getAttribute('fill') == this.players[ids[i]].color) {
                 this.rects[r].setAttribute('onclick', '');
@@ -196,18 +180,18 @@ game.startbox.refresh = function() {
 
         this.fields[n].text.setAttribute('fill', this.players[ids[i]].color);
         this.fields[n].text.textContent = this.players[ids[i]].name;
+        this.fields[n].text.setAttribute('visibility', 'visible');
         if(this.players[ids[i]].ready !== true) {
             all_ready = false;
         }
         n++;
     }
 
-    for(n = n; n < 4; n++) {
+    for(; n < 4; n++) {
         this.fields[n].text.setAttribute('fill', 'black');
         this.fields[n].text.textContent = '';
+        this.fields[n].text.setAttribute('visibility', 'hidden');
     }
-
-
 
     /*
 
@@ -313,11 +297,12 @@ game.startbox.onChanged = function(participants) {
     }
 
     for(var i = 0; i < participants.length; i++) {
-        if(this.players[participants[i].person.id] === undefined) {
-            this.players[participants[i].person.id] = {
+        var id = parseInt(participants[i].person.id);
+        if(this.players[id] === undefined) {
+            this.players[id] = {
                 color: null,
-                id: participants[i].person.id,
-                name: participants[i].person.name,
+                id: id,
+                name: participants[i].person.displayName,
                 ready: false,
             }
         }
