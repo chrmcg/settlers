@@ -103,6 +103,7 @@ game.startbox.init = function() {
         this.rects.push(rect);
         g.appendChild(rect);
     }
+    
     this.wrapper_outer.appendChild(g);
 
     var text, rect;
@@ -136,6 +137,10 @@ game.startbox.init = function() {
     this.button.setAttribute('class', 'menu-item');
 
     game.startbox.onChanged(gapi.hangout.getEnabledParticipants());
+
+    if(gapi.hangout.data.getValue('startbox_players') !== undefined) {
+        game.startbox.refresh();
+    }
 }
 
 game.startbox.pickColor = function(i, color) {
@@ -156,11 +161,40 @@ game.startbox.pickColor = function(i, color) {
             var obj = [];
             for(var j = 0; j < this.players.length; j++) {
                 obj.push({
-                    color: this.players[i].color,
-                    id: this.players[i].id,
+                    color: this.players[j].color,
+                    id: this.players[j].id,
                 });
             }
             gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
+        }
+    }
+};
+
+game.startbox.refresh = function() {
+    var startbox_players = gapi.hangout.data.getValue('startbox_players'); 
+    if (startbox_players !== undefined) {
+        var players = JSON.parse(startbox_players);
+        var id = gapi.hangout.getLocalParticipant().person.id;
+        for(var i = 0; i < players.length; i++) {
+            for(var j = 0; j < game.startbox.players.length; j++) {
+                if(players[i].id == game.startbox.players[j].id) {
+                    if (players[i].color !== undefined) {
+                        game.startbox.players[j].color = players[i].color;
+                        game.startbox.players[j].text.setAttribute('fill', game.startbox.players[j].color);
+                        game.startbox.players[j].text.setAttribute('font-weight', 'bold');
+                    }
+                }
+            }
+        }
+        for(var i = 0; i < game.startbox.rects.length; i++) {
+            for(var j = 0; j < game.startbox.players.length; j++) {
+                if(game.startbox.players[j].color == game.startbox.rects[i].getAttribute('fill')) {
+                    game.startbox.rects[i].setAttribute('visibility', 'hidden');
+                }
+                if(game.startbox.players[j].id == id && game.startbox.players[j].color !== undefined) {
+                    game.startbox.rects[i].removeAttribute('onclick');
+                }
+            }
         }
     }
 };
@@ -1478,6 +1512,7 @@ game.state.updateVictoryPoints = function() {
             this['p'+(player-1)].lr = 1;
         } else {
             this['p'+(player-1)].lr = 0;
+            A
         }
     }
 
@@ -2861,14 +2896,7 @@ window.init = function() {
             });
 
             gapi.hangout.data.onStateChanged.add(function(state_event) {
-                game.startbox.players = JSON.parse(state_event.state.startbox_players);
-                for(var i = 0; i < game.startbox.rects.length; i++) {
-                    for(var j = 0; j < game.startbox.players.length; j++) {
-                        if(game.startbox.players[j].color == game.startbox.rects[i].getAttribute('fill')) {
-                            game.startbox.rects[i].setAttribute('visibility', 'hidden');
-                        }
-                    }
-                }
+                game.startbox.refresh();
             });
 
             //TODO And then remove this from onStateChanged when its done
@@ -2891,30 +2919,6 @@ window.init = function() {
             //game.autosettle();*/
 
             game.startbox.init();
-            var startbox_players = gapi.hangout.data.getValue('startbox_players'); 
-            if (startbox_players !== undefined) {
-                var players = JSON.parse(startbox_players);
-                var id = gapi.hangout.getLocalParticipant().person.id;
-                for(var i = 0; i < players.length; i++) {
-                    for(var j = 0; j < game.startbox.players.length; j++) {
-                        if(players[i].id == game.startbox.players[j].id) {
-                            game.startbox.players[j].color = players[i].color;
-                        }
-                    }
-                }
-                for(var i = 0; i < game.startbox.rects.length; i++) {
-                    for(var j = 0; j < game.startbox.players.length; j++) {
-                        if(game.startbox.players[j].color == game.startbox.rects[i].getAttribute('fill')) {
-                            game.startbox.rects[i].setAttribute('visibility', 'hidden');
-                            game.startbox.players[i].text.setAttribute('fill', game.startbox.players[i].color);
-                            game.startbox.players[i].text.setAttribute('font-weight', 'bold');
-                        }
-                        if(game.startbox.players[j].id == id && game.startbox.players[j].color !== undefined) {
-                            game.startbox.rects[i].removeAttribute('onclick');
-                        }
-                    }
-                }
-            }
         }
     });
 }
@@ -2923,4 +2927,4 @@ window.init = function() {
 gadgets.util.registerOnLoadHandler(window.init);
 //init();
 </script>
-</body>
+</bodY>
