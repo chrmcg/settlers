@@ -326,7 +326,7 @@ game.startbox.onChanged = function(participants) {
             if(startbox_players !== undefined) {
                 players = JSON.parse(startbox_players);
                 for (var j = 0; j < players.length; j++) {
-                    if (this.players[i].id === players[j].id) {
+                    if (parts[i].id === players[j].id) {
                         this.players[i].color = players[j].color;
                         this.players[i].text.setAttribute('fill', this.players[i].color);
                         this.players[i].text.setAttribute('font-weight', 'bold');
@@ -340,14 +340,30 @@ game.startbox.onChanged = function(participants) {
             this.players[i].text.setAttribute('visibility', 'hidden');
         }
     }
+    for(var i = 0; i < this.rects.length; i++) {
+        for(var j = 0; j < this.players.length; j++) {
+            if(this.players[j].color == this.rects[i].getAttribute('fill')) {
+                this.rects[i].setAttribute('visibility', 'hidden');
+            }
+            if(this.players[j].id == id) {
+                current_player = j;
+                if(this.players[j].color !== undefined) {
+                    this.rects[i].removeAttribute('onclick');
+                } else {
+                    this.rects[i].setAttribute('onclick', 'game.startbox.pickColor('+i+',"'+ this.colors[i] +'")');
+                }
+            }
+        }
+    }
     var obj = [];
-    for(var j = 0; j < this.players.length; j++) {
+    for(var i = 0; i < this.players.length; i++) {
         obj.push({
-            color: this.players[j].color,
-            id: this.players[j].id,
-            ready: this.players[j].ready, 
+            color: this.players[i].color,
+            id: this.players[i].id,
+            ready: this.players[i].ready, 
         });
     }
+    
     gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
 }
 
