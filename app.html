@@ -99,7 +99,7 @@ game.startbox.init = function() {
         rect.setAttribute('y', '0');
         rect.setAttribute('width', '100');
         rect.setAttribute('height', '50');
-        rect.setAttribute('onclick', 'game.startbox.pickColor('+i+',"'+ this.colors[i] +'")');
+        //rect.setAttribute('onclick', 'game.startbox.pickColor('+i+',"'+ this.colors[i] +'")');
         this.rects.push(rect);
         g.appendChild(rect);
     }
@@ -114,7 +114,7 @@ game.startbox.init = function() {
         text.setAttribute('visibility', 'hidden');
         text.setAttribute('text-anchor', 'middle');
         this.wrapper_outer.appendChild(text);
-        this.players[i] = {text: text};
+        this.fields[i] = {text: text};
     }
 
     this.button = document.createElementNS(game.ns, 'g');
@@ -151,12 +151,14 @@ game.startbox.pickColor = function(i, color) {
             this.players[i].color = color;
             this.players[i].text.setAttribute('fill', color);
             this.players[i].text.setAttribute('font-weight', 'bold');
+            /*
             for (var j = 0; j < game.startbox.rects.length; j++) {
                 if (this.rects[j] == color) {
                     this.rects[j].setAttribute('visibility', 'hidden');
                 }
                 this.rects[j].removeAttribute('onclick');
             }
+            */
 
             var obj = [];
             for(var j = 0; j < this.players.length; j++) {
@@ -172,6 +174,50 @@ game.startbox.pickColor = function(i, color) {
 };
 
 game.startbox.refresh = function() {
+
+    try {
+        this.players = JSON.parse(gapi.hangout.data.getValue('startbox_players'));
+    } catch(e) {
+        console.log("JSON parse error: "+e.message);
+    }
+
+
+    var id = gapi.hangout.getLocalParticipant().person.id;
+    for(var r = 0; r < this.rects.length; r++)  {
+        this.rects[r].setAttribute('onclick', 'game.startbox.pickColor('+id+','+this.rects[r].getAttribute('fill')+')';
+        this.rects[r].setAttribute('visibility', 'visible');
+    }
+
+
+    var ids = Object.keys(this.players);
+    ids.sort();
+
+    var n = 0;
+    var all_ready = true;
+    for(var i = 0; i < ids; i++) {
+        for(var r = 0; r < this.rects.length; r++) {
+            if(this.rects[r].getAttribute('fill') == this.players[ids[i]].color) {
+                this.rects[r].setAttribute('onclick', '');
+                this.rects[r].setAttribute('visibility', 'hidden');
+            }
+        }
+
+        this.fields[n].text.setAttribute('fill', this.players[ids[i]].color);
+        this.fields[n].text.textContent = this.players[ids[i]].name;
+        if(this.players[ids[i]].ready !== true) {
+            all_ready = false;
+        }
+        n++;
+    }
+
+    for(n = n; n < 4; n++) {
+        this.fields[n].text.setAttribute('fill', 'black');
+        this.fields[n].text.textContent = '';
+    }
+
+
+
+    /*
     var startbox_players = gapi.hangout.data.getValue('startbox_players'); 
     if (startbox_players !== undefined) {
         var players = JSON.parse(startbox_players);
@@ -264,6 +310,7 @@ game.startbox.refresh = function() {
             }
         }
     }
+    */
 };
 
 game.startGame = function(count, start_state) {
@@ -298,6 +345,28 @@ game.startGame = function(count, start_state) {
 };
 
 game.startbox.onChanged = function(participants) {
+
+    var val = gapi.hangout.data.getValue('startbox_players');
+    if(val !== undefined && val.length > 0) {
+        this.players = JSON.parse(val);
+    } else {
+        this.players = {};
+    }
+
+    for(var i = 0; i < participants.length; i++) {
+        if(this.players[participants[i].person.id] === undefined) {
+            this.players[participants[i].person.id] = {
+                color: null,
+                id: participants[i].person.id,
+                name: participants[i].person.name,
+                ready: false,
+            }
+        }
+    }
+
+    gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(this.players)});
+
+    /*
     // Make a copy of participants array and sort
     // so that everyone has the same array
     var parts = [];
@@ -369,28 +438,13 @@ game.startbox.onChanged = function(participants) {
     }
     
     gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
+    */
 }
 
 game.startbox.setReady = function(id) {
-
-    for(var i = 0; i < this.players.length; i++) {
-        if(this.players[i].id == id) { 
-            this.players[i].ready = true;
-        }
-    }
-
-    // upload players
-    var obj = [];
-    for(var j = 0; j < this.players.length; j++) {
-        obj.push({
-            color: this.players[j].color,
-            id: this.players[j].id,
-            ready: this.players[j].ready, 
-        });
-    }
-    gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(obj)});
-
-}
+    this.players[id].ready = true;
+    gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(this.players)});
+};
 
 game.statusbox = {
     game: game,
