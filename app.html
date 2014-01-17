@@ -88,7 +88,7 @@ game.startbox.init = function() {
     this.wrapper_outer = document.createElementNS(game.ns, 'g');
     game.svg.appendChild(this.wrapper_outer);
 
-    var colors = ['orange', 'red', 'blue', 'purple'];
+    this.colors = ['orange', 'red', 'blue', 'purple'];
     var rect, g;
     g = document.createElementNS(game.ns, 'g');
     g.setAttribute('transform', 'translate(120, 20)');
@@ -99,7 +99,7 @@ game.startbox.init = function() {
         rect.setAttribute('y', '0');
         rect.setAttribute('width', '100');
         rect.setAttribute('height', '50');
-        rect.setAttribute('onclick', 'game.startbox.pickColor('+i+',"'+ colors[i] +'")');
+        rect.setAttribute('onclick', 'game.startbox.pickColor('+i+',"'+ this.colors[i] +'")');
         this.rects.push(rect);
         g.appendChild(rect);
     }
@@ -207,6 +207,8 @@ game.startbox.refresh = function() {
                 }
                 if(this.players[j].id == id && this.players[j].color !== undefined) {
                     this.rects[i].removeAttribute('onclick');
+                } else {
+                    this.rects[i].setAttribute('onclick', 'game.startbox.pickColor('+i+',"'+ this.colors[i] +'")');
                 }
             }
         }
