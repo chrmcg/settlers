@@ -179,27 +179,37 @@ game.startbox.refresh = function() {
 
         var all_ready = true;
         for(var i = 0; i < players.length; i++) {
-            for(var j = 0; j < game.startbox.players.length; j++) {
-                if(players[i].id == game.startbox.players[j].id) {
-                    if (players[i].color !== undefined) {
-                        game.startbox.players[j].color = players[i].color;
-                        game.startbox.players[j].text.setAttribute('fill', game.startbox.players[j].color);
-                        game.startbox.players[j].text.setAttribute('font-weight', 'bold');
+            for(var j = 0; j < this.players.length; j++) {
+                if(players[i].id == this.players[j].id) {
+                    if(players[i].color !== undefined) {
+                        this.players[j].color = players[i].color;
+                        this.players[j].text.setAttribute('fill', game.startbox.players[j].color);
+                        this.players[j].text.setAttribute('font-weight', 'bold');
                     }
-                    game.startbox.players[j].ready = players[i].ready;
-                }
+                    this.players[j].ready = players[i].ready;
             }
             if(players[i].ready !== true) {
                 all_ready = false;
             }
         }
-        for(var i = 0; i < game.startbox.rects.length; i++) {
-            for(var j = 0; j < game.startbox.players.length; j++) {
-                if(game.startbox.players[j].color == game.startbox.rects[i].getAttribute('fill')) {
-                    game.startbox.rects[i].setAttribute('visibility', 'hidden');
+        // If there are players with the same color because of latency, reset their color
+        // and make them choose again.  Only one player's color will stay.
+        for(var i = 0;  i < this.players.length; i++) {
+            for(var j = i + 1; j < this.players.length; j++) {
+                if (this.players[i].color == this.players[j].color) {
+                    this.players[j].color = undefined;
+                    this.players[j].text.setAttribute('fill', 'black');
+                    this.players[j].text.setAttribute('font-weight', 'normal');
                 }
-                if(game.startbox.players[j].id == id && game.startbox.players[j].color !== undefined) {
-                    game.startbox.rects[i].removeAttribute('onclick');
+            }
+        }
+        for(var i = 0; i < this.rects.length; i++) {
+            for(var j = 0; j < this.players.length; j++) {
+                if(this.players[j].color == this.rects[i].getAttribute('fill')) {
+                    this.rects[i].setAttribute('visibility', 'hidden');
+                }
+                if(this.players[j].id == id && this.players[j].color !== undefined) {
+                    this.rects[i].removeAttribute('onclick');
                 }
             }
         }
