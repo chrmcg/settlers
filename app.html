@@ -232,8 +232,9 @@ game.startbox.onChanged = function(participants) {
     for(var i = 0; i < participants.length; i++) {
         parts.push(participants[i]);
     }
-    var swapped = false;
+    var swapped;
     do {
+        swapped = false;
         for(var i = 0; i < parts.length - 1; i++) {
             if(parseInt(parts[i].person.id) > parseInt(parts[i+1].person.id)) {
                 var temp = parts[i];
