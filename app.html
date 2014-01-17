@@ -179,18 +179,14 @@ game.startbox.refresh = function() {
 
         var all_ready = true;
         for(var i = 0; i < players.length; i++) {
-            for(var j = 0; j < this.players.length; j++) {
-                if(players[i].id == this.players[j].id) {
-                    if(players[i].color !== undefined) {
-                        this.players[j].color = players[i].color;
-                        this.players[j].text.setAttribute('fill', game.startbox.players[j].color);
-                        this.players[j].text.setAttribute('font-weight', 'bold');
-                    }
-                    this.players[j].ready = players[i].ready;
-                }
+            if(players[i].color !== undefined) {
+                this.players[i].color = players[i].color;
+                this.players[i].text.setAttribute('fill', this.players[i].color);
+                this.players[i].text.setAttribute('font-weight', 'bold');
             }
-            if(players[i].ready !== true) {
-                all_ready = false;
+            this.players[i].ready = players[i].ready;
+            if(this.players[i].ready !== true) {
+                allReady = false;
             }
         }
         // If there are players with the same color because of latency, reset their color
@@ -230,12 +226,29 @@ game.startbox.refresh = function() {
 };
 
 game.startbox.onChanged = function(participants) {
-    var participant;
+    // Make a copy of participants array and sort
+    // so that everyone has the same array
+    var parts;
+    for(var i = 0; i < participants.length; i++) {
+        parts[i] = participants[i];
+    }
+    var swapped = false;
+    do {
+        for(var i = 0; i < parts.length - 1; i++) {
+            if(parseInt(parts[i].person.id) > parseInt(parts[i+1].person.id)) {
+                var temp = parts[i];
+                parts[i] = parts[i+1];
+                parts[i+1] = temp;
+                swapped = true;
+            }
+        }
+    } while(swapped);
+    var person;
     for(var i = 0; i < 4; i++) {
-        if (i < participants.length) {
-            participant = participants[i];
-            this.players[i].name = participant.person.displayName;
-            this.players[i].id = participant.person.id;
+        if (i < parts.length) {
+            person = parts[i].person;
+            this.players[i].name = person.displayName;
+            this.players[i].id = person.id;
             this.players[i].text.textContent = this.players[i].name;
             this.players[i].text.setAttribute('visibility', 'visible');
         } else {
