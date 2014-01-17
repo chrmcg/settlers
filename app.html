@@ -228,9 +228,9 @@ game.startbox.refresh = function() {
 game.startbox.onChanged = function(participants) {
     // Make a copy of participants array and sort
     // so that everyone has the same array
-    var parts;
+    var parts = [];
     for(var i = 0; i < participants.length; i++) {
-        parts[i] = participants[i];
+        parts.push(participants[i]);
     }
     var swapped = false;
     do {
