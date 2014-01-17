@@ -94,7 +94,7 @@ game.startbox.init = function() {
     g.setAttribute('transform', 'translate(120, 20)');
     for(var i = 0; i < 4; i++) {
         rect = document.createElementNS(game.ns, 'rect');
-        rect.setAttribute('fill', colors[i]);
+        rect.setAttribute('fill', this.colors[i]);
         rect.setAttribute('x', ''+(i*110));
         rect.setAttribute('y', '0');
         rect.setAttribute('width', '100');
