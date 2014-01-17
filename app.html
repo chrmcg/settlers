@@ -206,9 +206,11 @@ game.startbox.refresh = function() {
                     this.rects[i].setAttribute('visibility', 'hidden');
                 }
                 if(this.players[j].id == id && this.players[j].color !== undefined) {
-                    this.rects[i].removeAttribute('onclick');
-                } else {
-                    this.rects[i].setAttribute('onclick', 'game.startbox.pickColor('+i+',"'+ this.colors[i] +'")');
+                    if(this.players[j].color !== undefined) {
+                        this.rects[i].removeAttribute('onclick');
+                    } else {
+                        this.rects[i].setAttribute('onclick', 'game.startbox.pickColor('+i+',"'+ this.colors[i] +'")');
+                    }
                 }
             }
         }
