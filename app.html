@@ -176,6 +176,7 @@ game.startbox.refresh = function() {
     if (startbox_players !== undefined) {
         var players = JSON.parse(startbox_players);
         var id = gapi.hangout.getLocalParticipant().person.id;
+        var current_player;
 
         var all_ready = true;
         for(var i = 0; i < players.length; i++) {
@@ -206,6 +207,7 @@ game.startbox.refresh = function() {
                     this.rects[i].setAttribute('visibility', 'hidden');
                 }
                 if(this.players[j].id == id) {
+                    current_player = j;
                     if(this.players[j].color !== undefined) {
                         this.rects[i].removeAttribute('onclick');
                     } else {
@@ -215,18 +217,84 @@ game.startbox.refresh = function() {
             }
         }
 
-        if (this.players.length > 1) {
-            // this.button.setAttribute('onclick', '');
-            // TODO: Also check that everyone has picked a color
-            // If you press Start w/o picking a color you get one randomly
+        if (this.players.length > 1 && this.players[p].color !== undefined) {
             this.button.children[0].setAttribute('fill', 'white');
             this.button.setAttribute('onclick', 'game.startbox.setReady('+ gapi.hangout.getLocalParticipant().person.id +')');
+        } else {
+            this.button.children[0].setAttribute('fill', 'gray');
+            this.button.setAttribute('onclick', '');
         }
+
         if(all_ready === true) {
-            //randomize and assign players
-            //clear screen and start game
+
+            var start_state = [];
+            var ids = {};
+            var participants = gapi.hangout.getEnabledParticipants();
+            // set temporary array ids to each person's id
+            for(var i = 0; i < participants.length; i++) {
+                ids[i] = participants[i].person.id;
+            }
+
+            var pc = 0;
+            // for each participant X, pick a random key k from ids & set pX.id to it
+            for(var p = 0; p < participants.length; p++) {
+                start_state[p] = {};
+                var empty = true, k;
+                var i = 0;
+                for(var key in ids) {
+                    empty = false;
+                    if(Math.random() < 1 / ++i) k = key;
+                }
+                if(empty === true) {
+                    // all keys have been assigned; start the game
+                    game.startGame(pc, start_state);
+                } else {
+                    // assign this random key
+                    start_state[p].id = ids[k];
+                    pc++;
+
+                    // set the color for the player with this id
+                    for(var j = 0; j < this.players.length; j++) {
+                        if(this.players[j].id = ids[k]) {
+                            start_state[p].color = this.players[j].color;
+                        }
+                    }
+                    delete ids[k];
+                }
+            }
         }
     }
+};
+
+game.startGame = function(count, start_state) {
+    game.board.init();
+    game.state.init(start_state);
+
+    game.board.pcolors = [];
+    for(var i = 0; i < game.state.player_count; i++) {
+        game.board.pcolors[i] = game.state['p'+i].color;
+    }
+
+    gapi.hangout.data.onStateChanged.remove(function(state_event) {
+        game.startbox.refresh();
+    });
+    gapi.hangout.data.onStateChanged.add(function(state_event) {
+        game.state.download(state_event.state);
+    });
+
+    if(gapi.hangout.data.getValue('hexes') === undefined) {
+        game.board.randomize();
+    } else {
+        game.state.download(gapi.hangout.data.getState());
+    }
+
+    game.menu.init();
+    game.statusbox.init();
+    game.selectbox.init();
+    game.board.draw(700, 390);
+
+    game.proceed();
+    //game.autosettle();
 };
 
 game.startbox.onChanged = function(participants) {
@@ -264,7 +332,7 @@ game.startbox.onChanged = function(participants) {
 }
 
 game.startbox.setReady = function(id) {
-    var all_ready = true;
+
     for(var i = 0; i < this.players.length; i++) {
         if(this.players[i].id == id) { 
             this.players[i].ready = true;
@@ -291,7 +359,7 @@ game.statusbox = {
     player_fields: {},
 };
 
-game.statusbox.init = function() {
+game.statusbox.init = function(start_state) {
 
     var rect, text, button, obj, g, label;
     for(var p = 0; p < game.state.player_count; p++) {
@@ -1424,7 +1492,7 @@ game.state = {
     largest_army: 2,
 };
 
-game.state.init = function(player_count) {
+game.state.init = function(player_count, start_state) {
     this.player_count = player_count;
     for(var i = 0; i < player_count; i++) {
         this['p'+i] = {
@@ -1449,6 +1517,8 @@ game.state.init = function(player_count) {
             cities: 4,
             offer: {},
             proposal: {},
+            color: start_state[i].color,
+            id: start_state[i].id,
         }
     }
 
@@ -2951,9 +3021,7 @@ window.init = function() {
     gapi.hangout.onApiReady.add(function(eventObj) {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
-           /* gapi.hangout.data.onStateChanged.add(function(state_event) {
-                game.state.download(state_event.state);
-            });*/
+          
 
             gapi.hangout.onEnabledParticipantsChanged.add(function(participant_event) {
                 game.startbox.onChanged(participant_event.enabledParticipants);
@@ -2962,25 +3030,6 @@ window.init = function() {
             gapi.hangout.data.onStateChanged.add(function(state_event) {
                 game.startbox.refresh();
             });
-
-            //TODO And then remove this from onStateChanged when its done
-/*
-            game.board.init();
-            game.state.init(3);
-
-            if(gapi.hangout.data.getValue('hexes') === undefined) {
-                game.board.randomize();
-            } else {
-                game.state.download(gapi.hangout.data.getState());
-            }
-
-            game.menu.init();
-            game.statusbox.init();
-            game.selectbox.init();
-            game.board.draw(700, 390);
-
-            game.proceed();
-            //game.autosettle();*/
 
             game.startbox.init();
         }
