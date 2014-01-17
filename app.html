@@ -327,9 +327,11 @@ game.startbox.onChanged = function(participants) {
                 players = JSON.parse(startbox_players);
                 for (var j = 0; j < players.length; j++) {
                     if (parts[i].id === players[j].id) {
-                        this.players[i].color = players[j].color;
-                        this.players[i].text.setAttribute('fill', this.players[i].color);
-                        this.players[i].text.setAttribute('font-weight', 'bold');
+                        if (players[i].color !== undefined) {
+                            this.players[i].color = players[j].color;
+                            this.players[i].text.setAttribute('fill', this.players[i].color);
+                            this.players[i].text.setAttribute('font-weight', 'bold');
+                        }
                         this.players[i].ready = players[j].ready;
                     }
                 }
