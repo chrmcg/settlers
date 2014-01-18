@@ -250,7 +250,7 @@ game.startbox.refresh = function(state) {
 game.startGame = function(count, start_state) {
     
     game.board.init();
-    game.state.init(start_state);
+    game.state.init(count, start_state);
 
     game.board.pcolors = [];
     for(var i = 0; i < game.state.player_count; i++) {
@@ -1484,7 +1484,7 @@ game.state.init = function(player_count, start_state) {
             proposal: {},
             color: start_state[i].color,
             id: start_state[i].id,
-        }
+        };
     }
 
     this.devcards = {
