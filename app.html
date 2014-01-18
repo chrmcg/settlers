@@ -136,8 +136,20 @@ game.startbox.init = function() {
     this.button.setAttribute('transform', 'translate(20, 200)');
     this.button.setAttribute('class', 'menu-item');
 
+    // Initial download of player data
+    var val = gapi.hangout.data.getValue('startbox_players');
+    if(val !== undefined) {
+        this.players = JSON.parse(val);
+    } else { 
+        this.players = {};
+    }
+
+    // Initial addition of any new participants to local player data
+    // we do not need everyone to get this information because it is shared
+    // only submitDelta on color or readiness change.
     game.startbox.onChanged(gapi.hangout.getEnabledParticipants());
 
+    // Draw players and check player data for relevant information
     game.startbox.refresh();
 }
 
@@ -170,8 +182,14 @@ game.startbox.refresh = function(state) {
                 this.rects[r].setAttribute('visibility', 'hidden');
             }
         }
-
-        this.fields[n].text.setAttribute('fill', this.players[ids[i]].color);
+        
+        if(this.players[ids[i]].color !== undefined) {
+            this.fields[n].text.setAttribute('fill', this.players[ids[i]].color);
+            this.fields[n].text.setAttribute('font-weight', 'bold');
+        } else {
+            this.fields[n].text.setAttribute('fill', 'black');
+            this.fields[n].text.setAttribute('font-weight', 'normal');
+        }
         this.fields[n].text.textContent = this.players[ids[i]].name;
         this.fields[n].text.setAttribute('visibility', 'visible');
         if(this.players[ids[i]].ready !== true) {
@@ -230,6 +248,7 @@ game.startbox.refresh = function(state) {
 };
 
 game.startGame = function(count, start_state) {
+    
     game.board.init();
     game.state.init(start_state);
 
@@ -259,18 +278,12 @@ game.startGame = function(count, start_state) {
 };
 
 game.startbox.onChanged = function(participants) {
-    var val = gapi.hangout.data.getValue('startbox_players');
-    if(val !== undefined && val.length > 0) {
-        this.players = JSON.parse(val);
-    } else {
-        this.players = {};
-    }
-
+    // Check if all participants are in player array
+    // if not, add it
     for(var i = 0; i < participants.length; i++) {
         var id = participants[i].person.id;
         if(this.players[id] === undefined) {
             this.players[id] = {
-                color: null,
                 id: id,
                 name: participants[i].person.displayName,
                 ready: false,
@@ -278,23 +291,23 @@ game.startbox.onChanged = function(participants) {
         }
     }
 
-    if(val !== undefined) {
-        var deletes = [];
-        for(var id in this.players) {
-            var found = false;
-            for(var i = 0; i < participants.length; i++) {
-                var part_id = participants[i].person.id;
-                if(part_id === id) {
-                    found = true;
-                }
-            }
-            if (found === false) {
-                deletes.push(id);
+    // Check to see if there are any players 
+    // in the player array that have left, and delete them
+    var deletes = [];
+    for(var id in this.players) {
+        var found = false;
+        for(var i = 0; i < participants.length; i++) {
+            var part_id = participants[i].person.id;
+            if(part_id === id) {
+                found = true;
             }
         }
-        for(var i = 0; i < deletes.length; i++) {
-            delete this.players[deletes[i]];
+        if (found === false) {
+            deletes.push(id);
         }
+    }
+    for(var i = 0; i < deletes.length; i++) {
+        delete this.players[deletes[i]];
     }
 }
 
