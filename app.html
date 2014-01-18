@@ -220,7 +220,7 @@ game.startbox.refresh = function() {
         var participants = gapi.hangout.getEnabledParticipants();
         // set temporary array ids to each person's id
         for(var i = 0; i < participants.length; i++) {
-            ids[i].push(participants[i].person.id);
+            ids.push(participants[i].person.id);
         }
         // Randomize ids
         for(var i = 0; i < ids.length - 1; i++) {
