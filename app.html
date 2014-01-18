@@ -148,9 +148,6 @@ game.startbox.init = function() {
     // we do not need everyone to get this information because it is shared
     // only submitDelta on color or readiness change.
     game.startbox.onChanged(gapi.hangout.getEnabledParticipants());
-
-    // Draw players and check player data for relevant information
-    game.startbox.refresh();
 }
 
 game.startbox.pickColor = function(id, color) {
@@ -312,6 +309,9 @@ game.startbox.onChanged = function(participants) {
     for(var i = 0; i < deletes.length; i++) {
         delete this.players[deletes[i]];
     }
+    
+    // Draw players and check player data for relevant information
+    game.startbox.refresh();
 }
 
 game.startbox.setReady = function(id) {
