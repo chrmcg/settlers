@@ -106,7 +106,7 @@ game.startbox.init = function() {
     
     this.wrapper_outer.appendChild(g);
 
-    var text, rect;
+    var text;
     for(var i = 0; i < 4; i++) {
         text = document.createElementNS(game.ns, 'text');
         text.setAttribute('x', '350');
@@ -138,9 +138,7 @@ game.startbox.init = function() {
 
     game.startbox.onChanged(gapi.hangout.getEnabledParticipants());
 
-    if(gapi.hangout.data.getValue('startbox_players') !== undefined) {
-        game.startbox.refresh();
-    }
+    game.startbox.refresh();
 }
 
 game.startbox.pickColor = function(id, color) {
@@ -149,8 +147,10 @@ game.startbox.pickColor = function(id, color) {
     gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(this.players)});
 };
 
-game.startbox.refresh = function() {
-    this.players = JSON.parse(gapi.hangout.data.getValue('startbox_players'));
+game.startbox.refresh = function(state) {
+    if(state !== undefined && state.startbox_players !== undefined) {
+        this.players = JSON.parse(state.startbox_players);
+    }
 
     var local_id = gapi.hangout.getLocalParticipant().person.id;
     for(var r = 0; r < this.rects.length; r++)  {
@@ -238,7 +238,7 @@ game.startGame = function(count, start_state) {
         game.board.pcolors[i] = game.state['p'+i].color;
     }
 
-    gapi.hangout.data.onStateChanged.remove(game.startbox.refresh);
+    //gapi.hangout.data.onStateChanged.remove(game.startbox.refresh);
     gapi.hangout.data.onStateChanged.add(function(state_event) {
         game.state.download(state_event.state);
     });
@@ -278,24 +278,24 @@ game.startbox.onChanged = function(participants) {
         }
     }
 
-    var deletes = [];
-    for(var id in this.players) {
-        var found = false;
-        for(var i = 0; i < participants.length; i++) {
-            var part_id = participants[i].person.id;
-            if(part_id === id) {
-                found = true;
+    if(val !== undefined) {
+        var deletes = [];
+        for(var id in this.players) {
+            var found = false;
+            for(var i = 0; i < participants.length; i++) {
+                var part_id = participants[i].person.id;
+                if(part_id === id) {
+                    found = true;
+                }
+            }
+            if (found === false) {
+                deletes.push(id);
             }
         }
-        if (found === false) {
-            deletes.push(id);
+        for(var i = 0; i < deletes.length; i++) {
+            delete this.players[deletes[i]];
         }
     }
-    for(var i = 0; i < deletes.length; i++) {
-        delete this.players[deletes[i]];
-    }
-
-    gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(this.players)});
 }
 
 game.startbox.setReady = function(id) {
@@ -2977,7 +2977,9 @@ window.init = function() {
                 game.startbox.onChanged(participant_event.enabledParticipants);
             });
 
-            gapi.hangout.data.onStateChanged.add(game.startbox.refresh);
+            gapi.hangout.data.onStateChanged.add(function(state_event) {
+                game.startbox.refresh(state_event.state);
+            });
 
             game.startbox.init();
         }
