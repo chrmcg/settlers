@@ -144,6 +144,11 @@ game.startbox.init = function() {
         this.players = {};
     }
 
+    var id = gapi.hangout.getLocalParticipant().person.id;
+    if(this.players[id] !== undefined) {
+        delete this.players[id];
+    }
+
     // Initial addition of any new participants to local player data
     // we do not need everyone to get this information because it is shared
     // only submitDelta on color or readiness change.
