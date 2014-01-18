@@ -230,7 +230,7 @@ game.startbox.refresh = function() {
             ids[swap] = temp;
         }
         for(var i = 0; i < ids.length; i++) {
-            start_state.push({id: ids[i], this.players[ids[i]].color});
+            start_state.push({id: ids[i], color: this.players[ids[i]].color});
         }
         game.startGame(ids.length, start_state);
     }
