@@ -258,7 +258,7 @@ game.startGame = function(count, start_state) {
     }
 
     gapi.hangout.data.onStateChanged.remove(onStateChangedStartBox);
-    gapi.hangout.data.onEnabledParticipantsChanged.remove(onEnabledParticipantsChangedStartBox);
+    gapi.hangout.onEnabledParticipantsChanged.remove(onEnabledParticipantsChangedStartBox);
     gapi.hangout.data.onStateChanged.add(function(state_event) {
         game.state.download(state_event.state);
     });
@@ -1613,7 +1613,6 @@ game.state.updateVictoryPoints = function() {
             this['p'+(player-1)].lr = 1;
         } else {
             this['p'+(player-1)].lr = 0;
-            A
         }
     }
 
@@ -2977,7 +2976,7 @@ game.state.download = function(state) {
 var drawn;
 
 var onEnabledParticipantsChangedStartBox = function(participant_event) {
-    game.startbox.onChanged(participant_event.enabledParticipants());
+    game.startbox.onChanged(participant_event.enabledParticipants);
 };
 
 var onStateChangedStartBox = function(state_event) {
