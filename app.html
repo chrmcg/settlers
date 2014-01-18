@@ -269,6 +269,8 @@ game.startGame = function(count, start_state) {
         game.state.download(gapi.hangout.data.getState());
     }
 
+    game.svg.removeChild(game.startbox.wrapper_outer);
+
     game.menu.init();
     game.statusbox.init();
     game.selectbox.init();
