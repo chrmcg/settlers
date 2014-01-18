@@ -257,7 +257,8 @@ game.startGame = function(count, start_state) {
         game.board.pcolors[i] = game.state['p'+i].color;
     }
 
-    //gapi.hangout.data.onStateChanged.remove(game.startbox.refresh);
+    gapi.hangout.data.onStateChanged.remove(onStateChangedStartBox);
+    gapi.hangout.data.onEnabledParticipantsChanged.remove(onEnabledParticipantsChangedStartBox);
     gapi.hangout.data.onStateChanged.add(function(state_event) {
         game.state.download(state_event.state);
     });
@@ -2918,7 +2919,7 @@ game.autosettle = function() {
         game.actions.selectVertex(39, 1);
         game.actions.selectEdge(55);
     }
-}
+};
 
 game.state.download = function(state) {
     //Apply state_event changes
@@ -2969,9 +2970,17 @@ game.state.download = function(state) {
     if (drawn) {
         game.board.redraw();
     }
-}
+};
 
 var drawn;
+
+var onEnabledParticipantsChangedStartBox = function(participant_event) {
+    game.startbox.onChanged(participant_event.enabledParticipants());
+};
+
+var onStateChangedStartBox = function(state_event) {
+    game.startbox.refresh(state_event.state);
+};
 
 window.init = function() {
     game.svg = document.createElementNS(game.ns, 'svg');
@@ -2986,13 +2995,9 @@ window.init = function() {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
           
-            gapi.hangout.onEnabledParticipantsChanged.add(function(participant_event) {
-                game.startbox.onChanged(participant_event.enabledParticipants);
-            });
+            gapi.hangout.onEnabledParticipantsChanged.add(onEnabledParticipantsChangedStartBox);
 
-            gapi.hangout.data.onStateChanged.add(function(state_event) {
-                game.startbox.refresh(state_event.state);
-            });
+            gapi.hangout.data.onStateChanged.add(onStateChangedStartBox);
 
             game.startbox.init();
         }
