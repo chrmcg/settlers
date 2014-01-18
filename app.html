@@ -150,20 +150,13 @@ game.startbox.pickColor = function(id, color) {
 };
 
 game.startbox.refresh = function() {
-
-    try {
-        this.players = JSON.parse(gapi.hangout.data.getValue('startbox_players'));
-    } catch(e) {
-        console.log("JSON parse error: "+e.message);
-        console.log(gapi.hangout.data.getValue('startbox_players'));
-    }
+    this.players = JSON.parse(gapi.hangout.data.getValue('startbox_players'));
 
     var local_id = gapi.hangout.getLocalParticipant().person.id;
     for(var r = 0; r < this.rects.length; r++)  {
         this.rects[r].setAttribute('onclick', 'game.startbox.pickColor("'+local_id+'","'+this.rects[r].getAttribute('fill')+'")');
         this.rects[r].setAttribute('visibility', 'visible');
     }
-
 
     var ids = Object.keys(this.players);
     ids.sort();
@@ -245,9 +238,7 @@ game.startGame = function(count, start_state) {
         game.board.pcolors[i] = game.state['p'+i].color;
     }
 
-    gapi.hangout.data.onStateChanged.remove(function(state_event) {
-        game.startbox.refresh();
-    });
+    gapi.hangout.data.onStateChanged.remove(game.startbox.refresh);
     gapi.hangout.data.onStateChanged.add(function(state_event) {
         game.state.download(state_event.state);
     });
@@ -2982,14 +2973,11 @@ window.init = function() {
         if (eventObj.isApiReady) {
             console.log('API is ready!');
           
-
             gapi.hangout.onEnabledParticipantsChanged.add(function(participant_event) {
                 game.startbox.onChanged(participant_event.enabledParticipants);
             });
 
-            gapi.hangout.data.onStateChanged.add(function(state_event) {
-                game.startbox.refresh();
-            });
+            gapi.hangout.data.onStateChanged.add(game.startbox.refresh);
 
             game.startbox.init();
         }
