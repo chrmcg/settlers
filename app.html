@@ -157,7 +157,7 @@ game.startbox.pickColor = function(id, color) {
 };
 
 game.startbox.refresh = function(state) {
-    if(state !== undefined && state.startbox_players !== undefined) {
+    if(state.startbox_players !== undefined) {
         this.players = JSON.parse(state.startbox_players);
     }
 
@@ -278,19 +278,7 @@ game.startGame = function(count, start_state) {
 };
 
 game.startbox.onChanged = function(participants) {
-    // Check if all participants are in player array
-    // if not, add it
-    for(var i = 0; i < participants.length; i++) {
-        var id = participants[i].person.id;
-        if(this.players[id] === undefined) {
-            this.players[id] = {
-                id: id,
-                name: participants[i].person.displayName,
-                ready: false,
-            }
-        }
-    }
-
+    
     // Check to see if there are any players 
     // in the player array that have left, and delete them
     var deletes = [];
@@ -310,8 +298,23 @@ game.startbox.onChanged = function(participants) {
         delete this.players[deletes[i]];
     }
     
+    // Check if all participants are in player array
+    // if not, add it
+    for(var i = 0; i < participants.length; i++) {
+        var id = participants[i].person.id;
+        if(this.players[id] === undefined) {
+            this.players[id] = {
+                id: id,
+                name: participants[i].person.displayName,
+                ready: false,
+            }
+        }
+    }
+
+    gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(this.players)});
+
     // Draw players and check player data for relevant information
-    game.startbox.refresh();
+    game.startbox.refresh(gapi.hangout.data.getState());
 }
 
 game.startbox.setReady = function(id) {
