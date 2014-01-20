@@ -9,7 +9,7 @@ game.startGame = function(count, players) {
     window.downloadAndInit = function(state_event) {
 
         game.state.download(state_event.state, function(state) {
-            if(state.startbox_done == 'true') {
+            if(state.startbox_done == 'true' && game.startbox.wrapper_outer !== undefined) {
 
                 gapi.hangout.data.onStateChanged.remove(window.downloadAndInit);
                 gapi.hangout.data.onStateChanged.add(function(state_event) {
@@ -17,6 +17,7 @@ game.startGame = function(count, players) {
                 });
 
                 game.svg.removeChild(game.startbox.wrapper_outer);
+                delete game.startbox.wrapper_outer;
                 game.menu.init();
                 game.statusbox.init();
                 game.selectbox.init();
