@@ -8,18 +8,35 @@ game.startGame = function(count, players) {
 
     gapi.hangout.data.onStateChanged.add(function(state_event) {
         game.state.download(state_event.state);
-    });
 
-    if(gapi.hangout.data.getValue('hexes') === undefined) {
+        if (game.startbox.wrapper_outer !== undefined) {
+            game.svg.removeChild(game.startbox.wrapper_outer);
+            delete game.startbox.wrapper_outer;
+            game.menu.init();
+            game.statusbox.init();
+            game.selectbox.init();
+            game.board.draw(700, 390);
+            game.proceed();
+        }
+    });
+    var ids = [];
+    var participants = gapi.hangout.getEnabledParticipants();
+    // set temporary array ids to each person's id
+    for(var i = 0; i < participants.length; i++) {
+        ids.push(participants[i].person.id);
+    }
+
+    var lowest = '9999999999999999999999';
+    for(var i = 0; i < ids.length; i++) {
+        if (ids[i] < lowest) {
+            lowest = ids[i];
+        }
+    }
+
+    if(gapi.hangout.getLocalParticipant().person.id === lowest) {
         // Randomize players
         var start_state = [];
-        var ids = [];
-        var participants = gapi.hangout.getEnabledParticipants();
-        // set temporary array ids to each person's id
-        for(var i = 0; i < participants.length; i++) {
-            ids.push(participants[i].person.id);
-        }
-        // Randomize ids
+                // Randomize ids
         for(var i = 0; i < ids.length - 1; i++) {
             var swap = Math.floor(Math.random() * (ids.length - 1 - i)) + i + 1;
             temp = ids[i];
@@ -61,16 +78,15 @@ game.startGame = function(count, players) {
             obj['p'+i] = JSON.stringify(game.state['p'+i]);
         }
         gapi.hangout.data.submitDelta(obj);
-    } else {
-        game.state.download(gapi.hangout.data.getState());
+
+        game.svg.removeChild(game.startbox.wrapper_outer);
+        delete game.startbox.wrapper_outer;
+        game.menu.init();
+        game.statusbox.init();
+        game.selectbox.init();
+        game.board.draw(700, 390);
+        game.proceed();
     }
-    game.svg.removeChild(game.startbox.wrapper_outer);
-    delete game.startbox.wrapper_outer;
-    game.menu.init();
-    game.statusbox.init();
-    game.selectbox.init();
-    game.board.draw(700, 390);
-    game.proceed();
 };
 
 game.proceed = function() {
