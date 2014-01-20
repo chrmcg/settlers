@@ -1,8 +1,7 @@
 // <script> // so that vim can highlight the syntax
-game.startGame = function(count, start_state) {
-    
+game.startGame = function(count, players) {
+
     game.board.init();
-    game.state.init(count, start_state);
 
     game.board.pcolors = [];
     for(var i = 0; i < game.state.player_count; i++) {
@@ -16,7 +15,56 @@ game.startGame = function(count, start_state) {
     });
 
     if(gapi.hangout.data.getValue('hexes') === undefined) {
+
+        // Randomize players
+        var start_state = [];
+        var ids = [];
+        var participants = gapi.hangout.getEnabledParticipants();
+        // set temporary array ids to each person's id
+        for(var i = 0; i < participants.length; i++) {
+            ids.push(participants[i].person.id);
+        }
+        // Randomize ids
+        for(var i = 0; i < ids.length - 1; i++) {
+            var swap = Math.floor(Math.random() * (ids.length - 1 - i)) + i + 1;
+            temp = ids[i];
+            ids[i] = ids[swap];
+            ids[swap] = temp;
+        }
+        for(var i = 0; i < ids.length; i++) {
+            start_state.push({id: ids[i], color: players[ids[i]].color});
+        }
+
+        // Randomize board
         game.board.randomize();
+
+        // Initialize state.pX and randomize dev cards
+        game.state.init(count, start_state);
+
+        // Pass hexes, vertices, AND players to shared state
+        var obj = {
+            'vertices' : JSON.stringify(
+            (function(vertices){
+                var arr = [];
+                for(var i = 0; i < vertices.length; i++) { 
+                    arr.push({ contents: vertices[i].contents, owner: vertices[i].owner, port : vertices[i].port }); 
+                } 
+                return arr; 
+            })(game.board.vertices)),
+            'hexes' : JSON.stringify(
+            (function(hexes){
+                var arr = [];
+                for(var i = 0; i < hexes.length; i++) {
+                    arr.push({ num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
+                }
+                return arr;
+            })(game.board.hexes)),
+            'player_count' : game.state.player_count
+        };
+        for(var i = 0 ; i < game.state.player_count; i++) {
+            obj['p'+i] = JSON.stringify(game.state['p'+i]);
+        }
+        gapi.hangout.data.submitDelta(obj);
     } else {
         game.state.download(gapi.hangout.data.getState());
     }

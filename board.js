@@ -66,7 +66,6 @@ game.board.randomize = function() {
     
     // Pass hexes, vertices to shared state
     gapi.hangout.data.submitDelta({
-        'id': gapi.hangout.getLocalParticipant().person.id,
         'vertices' : JSON.stringify(
         (function(vertices){
             var arr = [];

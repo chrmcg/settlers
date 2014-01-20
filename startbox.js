@@ -150,25 +150,7 @@ game.startbox.refresh = function(state) {
     }
 
     if(all_ready === true) {
-
-        var start_state = [];
-        var ids = [];
-        var participants = gapi.hangout.getEnabledParticipants();
-        // set temporary array ids to each person's id
-        for(var i = 0; i < participants.length; i++) {
-            ids.push(participants[i].person.id);
-        }
-        // Randomize ids
-        for(var i = 0; i < ids.length - 1; i++) {
-            var swap = Math.floor(Math.random() * (ids.length - 1 - i)) + i + 1;
-            temp = ids[i];
-            ids[i] = ids[swap];
-            ids[swap] = temp;
-        }
-        for(var i = 0; i < ids.length; i++) {
-            start_state.push({id: ids[i], color: this.players[ids[i]].color});
-        }
-        game.startGame(ids.length, start_state);
+        game.startGame(ids.length, this.players);
     }
 };
 
