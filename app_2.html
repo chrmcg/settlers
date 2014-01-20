@@ -6,33 +6,11 @@ game.startGame = function(count, players) {
     gapi.hangout.data.onStateChanged.remove(window.onStateChangedStartBox);
     gapi.hangout.onEnabledParticipantsChanged.remove(window.onEnabledParticipantsChangedStartBox);
 
-    window.downloadAndInit = function(state_event) {
-
-        game.state.download(state_event.state, function(state) {
-            if(state.startbox_done == 'true' && game.startbox.wrapper_outer !== undefined) {
-
-                gapi.hangout.data.onStateChanged.remove(window.downloadAndInit);
-                gapi.hangout.data.onStateChanged.add(function(state_event) {
-                    game.state.download(state_event.state);
-                });
-
-                game.svg.removeChild(game.startbox.wrapper_outer);
-                delete game.startbox.wrapper_outer;
-                game.menu.init();
-                game.statusbox.init();
-                game.selectbox.init();
-                game.board.draw(700, 390);
-                game.proceed();
-            }
-        });
-
-    };
-
-    gapi.hangout.data.onStateChanged.add(window.downloadAndInit);
-    
+    gapi.hangout.data.onStateChanged.add(function(state_event) {
+        game.state.download(state_event.state);
+    });
 
     if(gapi.hangout.data.getValue('hexes') === undefined) {
-
         // Randomize players
         var start_state = [];
         var ids = [];
@@ -83,14 +61,16 @@ game.startGame = function(count, players) {
             obj['p'+i] = JSON.stringify(game.state['p'+i]);
         }
         gapi.hangout.data.submitDelta(obj);
-        game.svg.removeChild(game.startbox.wrapper_outer);
-        delete game.startbox.wrapper_outer;
-        game.menu.init();
-        game.statusbox.init();
-        game.selectbox.init();
-        game.board.draw(700, 390);
-        game.proceed();
+    } else {
+        game.state.download(gapi.hangout.data.getState());
     }
+    game.svg.removeChild(game.startbox.wrapper_outer);
+    delete game.startbox.wrapper_outer;
+    game.menu.init();
+    game.statusbox.init();
+    game.selectbox.init();
+    game.board.draw(700, 390);
+    game.proceed();
 };
 
 game.proceed = function() {
