@@ -84,26 +84,13 @@ game.startGame = function(count, players) {
         }
         gapi.hangout.data.submitDelta(obj);
         game.svg.removeChild(game.startbox.wrapper_outer);
+        delete game.startbox.wrapper_outer;
         game.menu.init();
         game.statusbox.init();
         game.selectbox.init();
         game.board.draw(700, 390);
         game.proceed();
-    } else {
-    /*
-        game.state.download(gapi.hangout.data.getState(), function() {
-
-            game.svg.removeChild(game.startbox.wrapper_outer);
-            game.menu.init();
-            game.statusbox.init();
-            game.selectbox.init();
-            game.board.draw(700, 390);
-            game.proceed();   
-        });
-    */
     }
-
-   
 };
 
 game.proceed = function() {
