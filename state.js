@@ -251,12 +251,12 @@ game.state.download = function(state, callback) {
             break;
             default:
                 try {
-                    game.state[key] = JSON.parse(value);
+                    this[key] = JSON.parse(value);
                 } catch(e) {
                     if (key == 'turn' || key == 'phase') {
-                        game.state[key] = parseInt(value)
+                        this[key] = parseInt(value)
                     } else {
-                        game.state[key] = value;
+                        this[key] = value;
                     }
                 }
             break;
@@ -265,8 +265,21 @@ game.state.download = function(state, callback) {
     if(callback != null) {
         callback(state);
     }
-    if (window.drawn === true) {
+    if(window.drawn === true) {
         game.board.redraw();
+    }
+    if(this.turn === this.getLocalPlayerNumber()) {
+        game.proceed();
+    } else {
+        Console.log("Lock out!");
     }
 };
 
+game.state.getLocalPlayerNumber = function() {
+    var id = gapi.hangout.getLocalParticipant().person.id;
+    for(var i = 0; i < this.player_count; i++) {
+        if(this['p'+i].id === id) {
+            return i + 1;
+        }
+    }
+};
