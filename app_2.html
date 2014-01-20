@@ -1,0 +1,93 @@
+
+game.startGame = function(count, start_state) {
+    
+    game.board.init();
+    game.state.init(count, start_state);
+
+    game.board.pcolors = [];
+    for(var i = 0; i < game.state.player_count; i++) {
+        game.board.pcolors[i] = game.state['p'+i].color;
+    }
+
+    gapi.hangout.data.onStateChanged.remove(onStateChangedStartBox);
+    gapi.hangout.onEnabledParticipantsChanged.remove(onEnabledParticipantsChangedStartBox);
+    gapi.hangout.data.onStateChanged.add(function(state_event) {
+        game.state.download(state_event.state);
+    });
+
+    if(gapi.hangout.data.getValue('hexes') === undefined) {
+        game.board.randomize();
+    } else {
+        game.state.download(gapi.hangout.data.getState());
+    }
+
+    game.svg.removeChild(game.startbox.wrapper_outer);
+
+    game.menu.init();
+    game.statusbox.init();
+    game.selectbox.init();
+    game.board.draw(700, 390);
+
+    game.proceed();
+    //game.autosettle();
+};
+
+game.proceed = function() {
+    console.log('%cPlayer '+this.state.turn+'\'s turn; Action: ' + this.state.next_action, 'color: '+game.board.pcolors[this.state.turn-1]);
+    this.actions[this.state.next_action]();
+};
+
+// For debugging
+game.autosettle = function() {
+    game.actions.selectVertex(10, 1);
+    game.actions.selectEdge(7);
+    game.actions.selectVertex(4, 1);
+    game.actions.selectEdge(8);
+    game.actions.selectVertex(21, 1);
+    game.actions.selectEdge(27);
+    game.actions.selectVertex(30, 1);
+    game.actions.selectEdge(42);
+    game.actions.selectVertex(42, 1);
+    game.actions.selectEdge(58);
+    game.actions.selectVertex(44, 1);
+    game.actions.selectEdge(59);
+    if(game.state.player_count > 3) {
+        game.actions.selectVertex(24, 1);
+        game.actions.selectEdge(31);
+        game.actions.selectVertex(39, 1);
+        game.actions.selectEdge(55);
+    }
+};
+
+window.onEnabledParticipantsChangedStartBox = function(participant_event) {
+    game.startbox.onChanged(participant_event.enabledParticipants);
+};
+
+window.onStateChangedStartBox = function(state_event) {
+    game.startbox.refresh(state_event.state);
+};
+
+window.init = function() {
+    game.svg = document.createElementNS(game.ns, 'svg');
+    game.svg.setAttribute('width', '700');
+    game.svg.setAttribute('height', '430');
+    document.getElementById("board").appendChild(game.svg);
+
+    window.drawn = false;
+
+    // When API is ready...
+    gapi.hangout.onApiReady.add(function(eventObj) {
+        if (eventObj.isApiReady) {
+            console.log('API is ready!');
+            gapi.hangout.onEnabledParticipantsChanged.add(window.onEnabledParticipantsChangedStartBox);
+            gapi.hangout.data.onStateChanged.add(window.onStateChangedStartBox);
+            game.startbox.init();
+        }
+    });
+}
+
+// Wait for gadget to load.                                                       
+gadgets.util.registerOnLoadHandler(window.init);
+//init();
+</script>
+</body>

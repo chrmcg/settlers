@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Catan</title>
+        <style type="text/css">
+        <!--
+        body {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            overflow: hidden;
+            height: 0px; /* dumb hack to make the page not scroll */
+        }    
+        #board {
+            text-align: center;
+        }
+        svg {
+            margin: auto;
+            border: 1px solid black;
+        }
+        .menu-item {
+            cursor: pointer;
+        }
+        text {
+            cursor: default;
+        }
+        .menu-item text {
+            cursor: pointer;
+        }
+        .hex-content {
+            font-family: sans-serif;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        }
+        -->
+        </style>
+    </head>
+<body>
+
+<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+<!--
+<script>
+    // Fake API to use if coding offline
+    gapi = {
+        hangout: {
+            onApiReady: {
+                add: function(f) {f({isApiReady:true});},
+            },
+            data : {
+                onStateChanged: null,
+                values: {},
+                getValue: function(v) {
+                    return this.values[v];
+                },
+                submitDelta: function(obj) {
+                    for(var i in obj) {
+                        this.values[i] = obj[i];
+                    }
+                },
+            }
+        },
+
+    };
+</script>
+-->
+
+<div id="board"></div>
+
+<script>
+window.game = {};
+game.ns = 'http://www.w3.org/2000/svg';
+
+
