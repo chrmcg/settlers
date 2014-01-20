@@ -8,11 +8,30 @@ game.startGame = function(count, players) {
         game.board.pcolors[i] = game.state['p'+i].color;
     }
 
-    gapi.hangout.data.onStateChanged.remove(onStateChangedStartBox);
-    gapi.hangout.onEnabledParticipantsChanged.remove(onEnabledParticipantsChangedStartBox);
-    gapi.hangout.data.onStateChanged.add(function(state_event) {
-        game.state.download(state_event.state);
-    });
+    gapi.hangout.data.onStateChanged.remove(window.onStateChangedStartBox);
+    gapi.hangout.onEnabledParticipantsChanged.remove(window.onEnabledParticipantsChangedStartBox);
+
+    window.downloadAndInit = function(state_event) {
+
+        game.state.download(state_event.state, function() {
+
+            gapi.hangout.data.onStateChanged.remove(window.downloadAndInit);
+            gapi.hangout.data.onStateChanged.add(function(state_event) {
+                game.state.download(state_event.state);
+            });
+
+            game.svg.removeChild(game.startbox.wrapper_outer);
+            game.menu.init();
+            game.statusbox.init();
+            game.selectbox.init();
+            game.board.draw(700, 390);
+            game.proceed();
+        });
+
+    };
+
+    gapi.hangout.data.onStateChanged.add(window.downloadAndInit);
+    
 
     if(gapi.hangout.data.getValue('hexes') === undefined) {
 
@@ -72,6 +91,7 @@ game.startGame = function(count, players) {
         game.board.draw(700, 390);
         game.proceed();
     } else {
+    /*
         game.state.download(gapi.hangout.data.getState(), function() {
 
             game.svg.removeChild(game.startbox.wrapper_outer);
@@ -81,6 +101,7 @@ game.startGame = function(count, players) {
             game.board.draw(700, 390);
             game.proceed();   
         });
+    */
     }
 
    
