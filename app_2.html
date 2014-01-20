@@ -106,7 +106,7 @@ game.startGame = function(count, players) {
 };
 
 game.proceed = function() {
-    console.log('%cPlayer '+this.state.turn+'\'s turn; Action: ' + this.state.next_action, 'color: '+game.state.['p'+(this.state.turn-1)].color);
+    console.log('%cPlayer '+this.state.turn+'\'s turn; Action: ' + this.state.next_action, 'color: '+game.state['p'+(this.state.turn-1)].color);
     this.actions[this.state.next_action]();
 };
 
