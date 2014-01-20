@@ -3,29 +3,26 @@ game.startGame = function(count, players) {
 
     game.board.init();
 
-    game.board.pcolors = [];
-    for(var i = 0; i < game.state.player_count; i++) {
-        game.board.pcolors[i] = game.state['p'+i].color;
-    }
-
     gapi.hangout.data.onStateChanged.remove(window.onStateChangedStartBox);
     gapi.hangout.onEnabledParticipantsChanged.remove(window.onEnabledParticipantsChangedStartBox);
 
     window.downloadAndInit = function(state_event) {
 
-        game.state.download(state_event.state, function() {
+        game.state.download(state_event.state, function(state) {
+            if(state.startbox_done == 'true') {
 
-            gapi.hangout.data.onStateChanged.remove(window.downloadAndInit);
-            gapi.hangout.data.onStateChanged.add(function(state_event) {
-                game.state.download(state_event.state);
-            });
+                gapi.hangout.data.onStateChanged.remove(window.downloadAndInit);
+                gapi.hangout.data.onStateChanged.add(function(state_event) {
+                    game.state.download(state_event.state);
+                });
 
-            game.svg.removeChild(game.startbox.wrapper_outer);
-            game.menu.init();
-            game.statusbox.init();
-            game.selectbox.init();
-            game.board.draw(700, 390);
-            game.proceed();
+                game.svg.removeChild(game.startbox.wrapper_outer);
+                game.menu.init();
+                game.statusbox.init();
+                game.selectbox.init();
+                game.board.draw(700, 390);
+                game.proceed();
+            }
         });
 
     };
@@ -78,7 +75,8 @@ game.startGame = function(count, players) {
                 }
                 return arr;
             })(game.board.hexes)),
-            'player_count' : ''+game.state.player_count
+            'player_count' : ''+game.state.player_count,
+            'startbox_done' : 'true',
         };
         for(var i = 0 ; i < game.state.player_count; i++) {
             obj['p'+i] = JSON.stringify(game.state['p'+i]);

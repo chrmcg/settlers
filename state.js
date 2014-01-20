@@ -263,7 +263,7 @@ game.state.download = function(state, callback) {
         }
     }
     if(callback != null) {
-        callback();
+        callback(state);
     }
     if (window.drawn === true) {
         game.board.redraw();
