@@ -218,7 +218,7 @@ game.state.updateCards = function(player) {
 };
 
 
-game.state.download = function(state) {
+game.state.download = function(state, callback) {
     //Apply state_event changes
     console.log(Object.keys(state));
 
@@ -261,6 +261,9 @@ game.state.download = function(state) {
                 }
             break;
         }
+    }
+    if(callback != null) {
+        callback();
     }
     if (window.drawn === true) {
         game.board.redraw();
