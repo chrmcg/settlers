@@ -20,7 +20,7 @@ game.statusbox.init = function(start_state) {
         g.setAttribute('transform', 'translate(' + ((margin+width) * p + offset) + ', 410)');
 
         rect = document.createElementNS(game.ns, 'rect');
-        rect.setAttribute('fill', game.board.pcolors[p]);
+        rect.setAttribute('fill', game.state['p'+p].color);
         rect.setAttribute('x', '0');
         rect.setAttribute('y', '0');
         rect.setAttribute('width', width);

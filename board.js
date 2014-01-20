@@ -63,26 +63,6 @@ game.board.randomize = function() {
         this.hexes[i].type = this.hexes[i].num == 0 ? 0 : types.shift();
         this.hexes[i].robber = this.hexes[i].num == 0 ? 1 : 0;
     }
-    
-    // Pass hexes, vertices to shared state
-    gapi.hangout.data.submitDelta({
-        'vertices' : JSON.stringify(
-        (function(vertices){
-            var arr = [];
-            for(var i = 0; i < vertices.length; i++) { 
-                arr.push({ contents: vertices[i].contents, owner: vertices[i].owner, port : vertices[i].port }); 
-            } 
-            return arr; 
-        })(game.board.vertices)),
-        'hexes' : JSON.stringify(
-        (function(hexes){
-            var arr = [];
-            for(var i = 0; i < hexes.length; i++) {
-                arr.push({ num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
-            }
-            return arr;
-        })(game.board.hexes))
-    });
 
 };
 
@@ -261,13 +241,6 @@ game.board.colors = [
     'rgb(134,147,163)'
 ];
 
-game.board.pcolors = [
-    'orange',
-    'red',
-    'blue',
-    'green'
-];
-
 game.board.redraw = function() {
 
     var hex, text, circle, group, bbox, points, prob;
@@ -334,7 +307,7 @@ game.board.redraw = function() {
         e = this.edges[i].e;
 
         if(this.edges[i].owner != null) {
-            e.setAttribute('stroke', this.pcolors[this.edges[i].owner-1]);
+            e.setAttribute('stroke', game.state['p'+(this.edges[i].owner-1)].color);
             e.setAttribute('stroke-width', '5');
             e.setAttribute('visibility', 'visible');
         }
@@ -345,7 +318,7 @@ game.board.redraw = function() {
         v = this.vertices[i].v;
 
         if(this.vertices[i].contents == 1) {
-            v.setAttribute('fill', this.pcolors[this.vertices[i].owner-1]);
+            v.setAttribute('fill', game.state['p'+(this.vertices[i].owner-1)].color);
             v.setAttribute('visibility', 'visible');
             v.setAttribute('width', '10');
             v.setAttribute('height', '10');
@@ -353,7 +326,7 @@ game.board.redraw = function() {
             v.setAttribute('y', this.vertices[i].y - 5);
             v.setAttribute('onclick', '');
         } else if(this.vertices[i].contents == 2) {
-            v.setAttribute('fill', this.pcolors[this.vertices[i].owner-1]);
+            v.setAttribute('fill', game.state['p'+(this.vertices[i].owner-1)].color);
             v.setAttribute('visibility', 'visible');
             v.setAttribute('width', '20');
             v.setAttribute('height', '20');
@@ -666,7 +639,7 @@ game.board.highlightVertex = function(i, type, player) {
             this.vertices[i].v.setAttribute('height', '20');
             this.vertices[i].v.setAttribute('x', this.vertices[i].x - 10);
             this.vertices[i].v.setAttribute('y', this.vertices[i].y - 10);
-            this.vertices[i].v.setAttribute('fill', game.board.pcolors[player-1]);
+            this.vertices[i].v.setAttribute('fill', game.state['p'+(player-1)].color);
         } else if(type == 2) {
             this.vertices[i].v.setAttribute('width', '30');
             this.vertices[i].v.setAttribute('height', '30');
@@ -695,7 +668,7 @@ game.board.unhighlightVertex = function(i, type) {
 
 game.board.highlightEdge = function(i, player, params) {
     this.edges[i].e.setAttribute('stroke-width', '10');
-    this.edges[i].e.setAttribute('stroke', game.board.pcolors[player-1]);
+    this.edges[i].e.setAttribute('stroke', game.state['p'+(player-1)].color);
     this.edges[i].e.setAttribute('onclick', 'game.actions.selectEdge('+i+','+player+',"'+params+'")');
 };
 
