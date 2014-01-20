@@ -528,8 +528,8 @@ game.board.draw = function(w, h) {
         this.vertices[i].v = v;
         game.svg.appendChild(v);
     }
-    if (!drawn) {
-        drawn = true;
+    if (!window.drawn) {
+        window.drawn = true;
         game.board.redraw();
     }
 };

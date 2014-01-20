@@ -5,7 +5,7 @@ game.statusbox = {
     player_fields: {},
 };
 
-game.statusbox.init = function(start_state) {
+game.statusbox.init = function() {
 
     var rect, text, button, obj, g, label;
     for(var p = 0; p < game.state.player_count; p++) {

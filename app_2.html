@@ -42,7 +42,7 @@ game.startGame = function(count, players) {
             (function(vertices){
                 var arr = [];
                 for(var i = 0; i < vertices.length; i++) { 
-                    arr.push({ contents: vertices[i].contents, owner: vertices[i].owner, port : vertices[i].port }); 
+                    arr.push({contents: vertices[i].contents, owner: vertices[i].owner, port : vertices[i].port}); 
                 } 
                 return arr; 
             })(game.board.vertices)),
@@ -50,7 +50,7 @@ game.startGame = function(count, players) {
             (function(hexes){
                 var arr = [];
                 for(var i = 0; i < hexes.length; i++) {
-                    arr.push({ num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
+                    arr.push({num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
                 }
                 return arr;
             })(game.board.hexes)),

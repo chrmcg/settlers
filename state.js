@@ -47,8 +47,6 @@ game.state.init = function(player_count, start_state) {
         19: 'M', 20: 'M', //Monopoly
         21: 'V', 22: 'V', 23: 'V', 24: 'V', 25: 'V', //Victory Point Card
     };
-
-
 };
 
 // 1 = WOOD, 2 = SHEEP, 3 = WHEAT, 4 = BRICK, 5 = ORE
@@ -271,7 +269,7 @@ game.state.download = function(state, callback) {
     if(this.turn === this.getLocalPlayerNumber()) {
         game.proceed();
     } else {
-        Console.log("Lock out!");
+        console.log("Lock out!");
     }
 };
 
