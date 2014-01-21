@@ -270,7 +270,8 @@ game.state.download = function(state) {
         game.board.redraw();
     }
     if (game.startbox.wrapper_outer === undefined) {
-        if(this.turn === this.getLocalPlayerNumber() && game.state.id !== gapi.hangout.getLocalParticipant().person.id) {
+        // If the turn just changed, then it is your turn, but the last data was sent by the other player
+        if(this.turn === this.getLocalPlayerNumber() && this.id !== gapi.hangout.getLocalParticipant().person.id) {
             game.proceed();
         }
     }
