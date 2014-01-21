@@ -88,6 +88,7 @@ game.startGame = function(count, players) {
         for(var i = 0 ; i < game.state.player_count; i++) {
             obj['p'+i] = JSON.stringify(game.state['p'+i]);
         }
+        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
         gapi.hangout.data.submitDelta(obj);
 
         game.svg.removeChild(game.startbox.wrapper_outer);

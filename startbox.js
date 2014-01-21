@@ -81,7 +81,7 @@ game.startbox.init = function() {
 game.startbox.pickColor = function(id, color) {
     this.players[id].color = color;
 
-    gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(this.players)});
+    gapi.hangout.data.submitDelta({id: gapi.hangout.getLocalParticipant().person.id, startbox_players: JSON.stringify(this.players)});
 };
 
 game.startbox.refresh = function(state) {
@@ -188,7 +188,7 @@ game.startbox.onChanged = function(participants) {
         }
     }
 
-    gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(this.players)});
+    gapi.hangout.data.submitDelta({id: gapi.hangout.getLocalParticipant().person.id, startbox_players: JSON.stringify(this.players)});
 
     // Draw players and check player data for relevant information
     game.startbox.refresh(gapi.hangout.data.getState());
@@ -196,5 +196,5 @@ game.startbox.onChanged = function(participants) {
 
 game.startbox.setReady = function(id) {
     this.players[id].ready = true;
-    gapi.hangout.data.submitDelta({startbox_players: JSON.stringify(this.players)});
+    gapi.hangout.data.submitDelta({id: gapi.hangout.getLocalParticipant().person.id, startbox_players: JSON.stringify(this.players)});
 };

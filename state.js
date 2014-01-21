@@ -216,7 +216,7 @@ game.state.updateCards = function(player) {
 };
 
 
-game.state.download = function(state, callback) {
+game.state.download = function(state) {
     //Apply state_event changes
     console.log(Object.keys(state));
 
@@ -260,17 +260,13 @@ game.state.download = function(state, callback) {
             break;
         }
     }
-    if(callback != null) {
-        callback(state);
-    }
+
     if(window.drawn === true) {
         game.board.redraw();
     }
     if (game.startbox.wrapper_outer === undefined) {
-        if(this.turn === this.getLocalPlayerNumber()) {
+        if(this.turn === this.getLocalPlayerNumber() && game.state.id !== gapi.hangout.getLocalParticipant().person.id) {
             game.proceed();
-        } else {
-            console.log("Lock out!");
         }
     }
 };

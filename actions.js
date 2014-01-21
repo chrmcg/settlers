@@ -172,7 +172,6 @@ game.actions.buyDevCard = function() {
 
 
             game.state['p'+(game.state.turn-1)]['c'+card]++;
-            var obj = {};
             obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
             gapi.hangout.data.submitDelta(obj);
             console.log('Player ' + game.state.turn + ' buys a ' + card + ' card');
@@ -200,6 +199,7 @@ game.actions.playDevCard = function(type) {
         game.state['p'+(game.state.turn-1)].cK--;
         var obj = {};
         obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
+        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
         gapi.hangout.data.submitDelta(obj);
         game.state.updateVictoryPoints();
 
