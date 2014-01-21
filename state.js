@@ -247,12 +247,15 @@ game.state.download = function(state) {
                     game.board.hexes[j].robber = hexes[j].robber;
                 }
             break;
+            case 'id':
+                this[key] = value;
+            break;
             default:
                 try {
                     this[key] = JSON.parse(value);
                 } catch(e) {
-                    if (key == 'turn' || key == 'phase') {
-                        this[key] = parseInt(value)
+                    if (key === 'turn' || key === 'phase') {
+                        this[key] = parseInt(value);
                     } else {
                         this[key] = value;
                     }

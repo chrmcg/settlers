@@ -334,11 +334,11 @@ game.board.redraw = function() {
             v.setAttribute('y', this.vertices[i].y - 10);
             v.setAttribute('onclick', '');
         } else {
-            v.setAttribute('visibility', 'hidden');
+            /*v.setAttribute('visibility', 'hidden');
             v.setAttribute('onclick', '');
             v.setAttribute('onmouseover', '');
             v.setAttribute('onmouseout', '');
-            v.setAttribute('class', '');
+            v.setAttribute('class', '');*/
         }
 
         if(this.vertices[i].port > 0) {
