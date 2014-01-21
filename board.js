@@ -335,6 +335,10 @@ game.board.redraw = function() {
             v.setAttribute('onclick', '');
         } else {
             v.setAttribute('visibility', 'hidden');
+            v.setAttribute('onclick', '');
+            v.setAttribute('onmouseover', '');
+            v.setAttribute('onmouseout', '');
+            v.setAttribute('class', '');
         }
 
         if(this.vertices[i].port > 0) {
