@@ -1020,15 +1020,20 @@ game.actions.cancelPlacement = function() {
 
 game.actions.playerControl = function() {
 
-    // TODO: activate controls only if game.state.turn == local player
     
-    var obj = {
-        'offerTrade': game.state.playerCardCount(game.state.turn) > 0,
-        'buildRoad': game.state.playerHas(game.state.turn, {1:1, 4:1}) && game.state['p'+(game.state.turn-1)].roads > 0,
-        'buildSettlement': game.state.playerHas(game.state.turn, {1:1, 2:1, 3:1, 4:1}) && game.state['p'+(game.state.turn-1)].settlements > 0,
-        'buildCity': game.state.playerHas(game.state.turn, {3:2, 5:3}) && game.state['p'+(game.state.turn-1)].cities > 0,
-        'buyDevCard': game.state.playerHas(game.state.turn, {2:1, 3:1, 5:1}),
-        'endTurn': true,
+    // Activate controls only if it's your turn
+    var obj;
+    if(game.state.turn === game.state.getLocalPlayerNumber()) {
+        obj = {
+            'offerTrade': game.state.playerCardCount(game.state.turn) > 0,
+            'buildRoad': game.state.playerHas(game.state.turn, {1:1, 4:1}) && game.state['p'+(game.state.turn-1)].roads > 0,
+            'buildSettlement': game.state.playerHas(game.state.turn, {1:1, 2:1, 3:1, 4:1}) && game.state['p'+(game.state.turn-1)].settlements > 0,
+            'buildCity': game.state.playerHas(game.state.turn, {3:2, 5:3}) && game.state['p'+(game.state.turn-1)].cities > 0,
+            'buyDevCard': game.state.playerHas(game.state.turn, {2:1, 3:1, 5:1}),
+            'endTurn': true,
+        };
+    } else {
+        obj = {'offerTrade': false, 'buildRoad': false, 'buildSettlement': false, 'buildCity': false, 'buyDevCard': false, 'endTurn': false};
     }
 
     game.statusbox.viewPlayer(game.state.turn);
@@ -1067,10 +1072,10 @@ game.actions.playerControl = function() {
         game.statusbox.fields[game.state.turn-1]['r'+i].button.setAttribute('onclick', 
             'game.actions.setupTrade('+game.state.turn+', 0, {'+i+':'+factor+'})'
             );
-        game.statusbox.fields[game.state.turn-1]['r'+i].button.children[0].setAttribute('fill', 'white');
+            game.statusbox.fields[game.state.turn-1]['r'+i].button.children[0].setAttribute('fill', 'white');
         } else {
-        game.statusbox.fields[game.state.turn-1]['r'+i].button.setAttribute('onclick', '');
-        game.statusbox.fields[game.state.turn-1]['r'+i].button.children[0].setAttribute('fill', 'gray');
+            game.statusbox.fields[game.state.turn-1]['r'+i].button.setAttribute('onclick', '');
+            game.statusbox.fields[game.state.turn-1]['r'+i].button.children[0].setAttribute('fill', 'gray');
         }
     }
 
