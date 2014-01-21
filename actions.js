@@ -919,6 +919,9 @@ game.actions.selectVertex = function(i, type) {
             game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 10);
         }
         game.board.vertices[i].v.setAttribute('onclick', '');
+        game.board.vertices[i].v.setAttribute('onmouseover', '');
+        game.board.vertices[i].v.setAttribute('onmouseout', '');
+        game.board.vertices[i].v.setAttribute('class', '');
     }
     game.board.hideEmptyVertices();
 

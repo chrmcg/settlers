@@ -266,10 +266,12 @@ game.state.download = function(state, callback) {
     if(window.drawn === true) {
         game.board.redraw();
     }
-    if(this.turn === this.getLocalPlayerNumber()) {
-        game.proceed();
-    } else {
-        console.log("Lock out!");
+    if (game.startbox.wrapper_outer === undefined) {
+        if(this.turn === this.getLocalPlayerNumber()) {
+            game.proceed();
+        } else {
+            console.log("Lock out!");
+        }
     }
 };
 

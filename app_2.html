@@ -16,7 +16,9 @@ game.startGame = function(count, players) {
             game.statusbox.init();
             game.selectbox.init();
             game.board.draw(700, 390);
-            game.proceed();
+            if (game.state.getLocalPlayerNumber() === 1) {
+                game.proceed();
+            }
         }
     });
     var ids = [];
@@ -36,12 +38,21 @@ game.startGame = function(count, players) {
     if(gapi.hangout.getLocalParticipant().person.id === lowest) {
         // Randomize players
         var start_state = [];
-                // Randomize ids
-        for(var i = 0; i < ids.length - 1; i++) {
-            var swap = Math.floor(Math.random() * (ids.length - 1 - i)) + i + 1;
-            temp = ids[i];
-            ids[i] = ids[swap];
-            ids[swap] = temp;
+        // Randomize ids
+        var idsobj = {};
+        for(var i = 0; i < ids.length; i++) {
+            idsobj[i] = ids[i];
+        }
+        ids = [];
+        for(var i = 0; i < count; i++) {
+            var j = 0, randid = null;
+            for(var key in idsobj) {
+                if (Math.random() < 1 / ++j) {
+                    randid = key;
+                }
+            }
+            ids[i] = idsobj[randid];
+            delete idsobj[randid];
         }
         for(var i = 0; i < ids.length; i++) {
             start_state.push({id: ids[i], color: players[ids[i]].color});
@@ -85,7 +96,9 @@ game.startGame = function(count, players) {
         game.statusbox.init();
         game.selectbox.init();
         game.board.draw(700, 390);
-        game.proceed();
+        if (game.state.getLocalPlayerNumber() === 1) {
+            game.proceed();
+        }
     }
 };
 
