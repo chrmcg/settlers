@@ -1036,7 +1036,7 @@ game.actions.playerControl = function() {
         obj = {'offerTrade': false, 'buildRoad': false, 'buildSettlement': false, 'buildCity': false, 'buyDevCard': false, 'endTurn': false};
     }
 
-    game.statusbox.viewPlayer(game.state.turn);
+    game.statusbox.viewPlayer(game.state.getLocalPlayerNumber());
 
     var action;
     for(var i = 0; i < game.menu.buttons.length; i++) {
