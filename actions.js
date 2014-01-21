@@ -1097,7 +1097,7 @@ game.actions.endTurn = function() {
     obj['turn'] = ''+game.state.turn;
     obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
-    game.proceed();
+    //game.proceed();
 }
 
 game.actions.winGame = function() {
