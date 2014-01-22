@@ -10,7 +10,6 @@ game.actions.rollDice = function() {
     var obj = {};
 
     obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    obj['next_action'] = 'playerControl';
     game.state.next_action = 'playerControl';
 
     var d1 = Math.floor(Math.random() * 6) + 1;
@@ -21,6 +20,7 @@ game.actions.rollDice = function() {
 
     if(d == 7) {
         game.state.next_action = 'getRobbed';
+        obj['next_action'] = 'getRobbed';
     } else {
         var h, v, o;
         for(var i = 0; i < 19; i++) {
@@ -617,7 +617,11 @@ game.actions.confirmSelect = function(reason, params) {
             a = parseInt(game.selectbox.fields['r'+j].num.textContent);
             if(a > 0) robbed[j] = a;
         }
-        game.state.deduct(game.state.turn, robbed);
+        game.state.deduct(game.state.getLocalPlayerNumber(), robbed);
+        var obj = {};
+        obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
+        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
+        gapi.hangout.data.submitDelta(obj);
         game.actions.cancelSelect();
     break;
     case '1':
@@ -1030,6 +1034,7 @@ game.actions.endTurn = function() {
     for(var i = 0; i < game.menu.buttons.length; i++) {
         game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
         game.menu.buttons[i].setAttribute('onclick', '');
+        game.menu.buttons[i].setAttribute('class', '');
     }
 
     game.actions.cancelPlacement();

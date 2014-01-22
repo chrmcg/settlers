@@ -263,6 +263,15 @@ game.state.download = function(state) {
         if(this.turn === this.getLocalPlayerNumber() && this.id !== gapi.hangout.getLocalParticipant().person.id) {
             game.proceed();
         }
+        if(this.turn !== this.getLocalPlayerNumber() && this.next_action === 'getRobbed') {
+            var cards = 0;
+            for(var i = 1; i <= 5; i++) {
+                cards += game.state['p'+(this.getLocalPlayerNumber()-1)]['r'+i];
+            }
+            if(cards > 7) {
+                game.actions.selectCards('R', {card_count: cards});
+            }
+        }
         var num = this.getLocalPlayerNumber();
         if(this['p'+(num-1)] !== undefined) {
             this.updateCards(num);
