@@ -20,7 +20,6 @@ game.actions.rollDice = function() {
     console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
 
     if(d == 7) {
-        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
         obj['next_action'] = 'getRobbed';
         game.state.next_action = 'getRobbed';
     } else {
@@ -52,6 +51,9 @@ game.actions.rollDice = function() {
         }
     }
 
+    for(var i = 0; i < game.state.player_count; i++) {
+        obj['p'+i] = JSON.stringify(this['p'+i]);
+    }
     gapi.hangout.data.submitDelta(obj);
     game.proceed();
 };

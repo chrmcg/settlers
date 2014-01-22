@@ -68,7 +68,6 @@ game.state.playerCardCount = function(player) {
 };
 
 game.state.deduct = function(player, resources) {
-
     var str = '';
 
     for(var type in resources) {
@@ -78,10 +77,6 @@ game.state.deduct = function(player, resources) {
         }
     }
     console.log('Player ' + player + ' is deducted: ' + str);
-    var obj = {};
-    obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    gapi.hangout.data.submitDelta(obj);
 };
 
 game.state.collect = function(player, resources) {
@@ -93,10 +88,6 @@ game.state.collect = function(player, resources) {
             str += resources[type] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][type] + ' ';
         }
     }
-    var obj = {};
-    obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    gapi.hangout.data.submitDelta(obj);
     console.log('Player ' + player + ' collects: ' + str);
 };
 
