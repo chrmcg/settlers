@@ -249,6 +249,7 @@ game.state.download = function(state) {
             break;
             case 'id':
                 this[key] = value;
+                console.log(value);
             break;
             default:
                 try {
@@ -256,6 +257,7 @@ game.state.download = function(state) {
                 } catch(e) {
                     if (key === 'turn' || key === 'phase') {
                         this[key] = parseInt(value);
+                        console.log(key + ': ' + this[key]);
                     } else {
                         this[key] = value;
                     }
