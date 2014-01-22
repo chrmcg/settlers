@@ -266,7 +266,10 @@ game.state.download = function(state) {
         if(this.turn === this.getLocalPlayerNumber() && this.id !== gapi.hangout.getLocalParticipant().person.id) {
             game.proceed();
         }
-        this.updateCards(this.getLocalPlayerNumber());
+        var num = this.getLocalPlayerNumber();
+        if(this['p'+(num-1)] !== undefined) {
+            this.updateCards(num);
+        }
     }
 };
 
