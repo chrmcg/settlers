@@ -82,7 +82,6 @@ game.actions.getRobbed = function() {
         game.actions.selectCards('R', {card_count: cards});
         
     } else {
-        gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'moveRobber'});
         game.proceed();
     }
 };
@@ -122,7 +121,6 @@ game.actions.selectRobber = function(i) {
     game.board.hexes[i].robber = 1;
 
     game.state.next_action = 'stealFrom';
-    gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'stealFrom'});
     game.proceed();
 };
 
@@ -170,10 +168,7 @@ game.actions.buyDevCard = function() {
             var card = game.state.devcards[k];
             delete game.state.devcards[k];
 
-
             game.state['p'+(game.state.turn-1)]['c'+card]++;
-            obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
-            gapi.hangout.data.submitDelta(obj);
             console.log('Player ' + game.state.turn + ' buys a ' + card + ' card');
             game.menu.refreshDevCards();
         }
@@ -183,9 +178,6 @@ game.actions.buyDevCard = function() {
 
     game.state.updateVictoryPoints();
     game.state.next_action = 'playerControl';
-    obj['next_action'] = 'playerControl';
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    gapi.hangout.data.submitDelta(obj);
     game.proceed();
 };
 
@@ -197,10 +189,6 @@ game.actions.playDevCard = function(type) {
     case 'K':
         game.state['p'+(game.state.turn-1)].army++;
         game.state['p'+(game.state.turn-1)].cK--;
-        var obj = {};
-        obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
-        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-        gapi.hangout.data.submitDelta(obj);
         game.state.updateVictoryPoints();
 
         game.actions.moveRobber();
@@ -211,20 +199,8 @@ game.actions.playDevCard = function(type) {
     case 'R':
         // Build 2 roads free of charge
         if (game.state['p'+(game.state.turn-1)].roads > 1) {
-            game.actions.buildRoad('R');
             game.state['p'+(game.state.turn-1)].cR--;
-            var edges = (function(edges){ 
-                var obj = [];
-                for (var i = 0; i < edges.length; i++) {
-                    obj[i] = {road : edges[i].road, owner : edges[i].owner};
-                }
-                return obj;
-            })(game.board.edges);
-            var obj = {};
-            obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
-            obj['edges'] = JSON.stringify(edges);
-            obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-            gapi.hangout.data.submitDelta(obj);
+            game.actions.buildRoad('R');
         }
     break;
     case 'M':
@@ -600,85 +576,69 @@ game.actions.confirmSelect = function(reason, params) {
     switch(reason) {
 
     case 'Y':
-    var ask = {}, a;
-    for(var j = 1; j <= 5; j++) {
-        a = parseInt(game.selectbox.fields['r'+j].num.textContent);
-        if(a > 0) ask[j] = a;
-    }
-    game.state.collect(game.state.turn, ask);
-
-    game.state['p'+(game.state.turn-1)].cY--;
-    game.state.next_action = 'playerControl';
-    var obj = {next_action: 'playerControl'};
-    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    gapi.hangout.data.submitDelta(obj);
-
-    game.actions.cancelSelect();
-    break;
-
-    case 'M':
-    var obj = {}, a;
-    for(var j = 1; j <= 5; j++) {
-        if(game.selectbox.fields['r'+j].num.textContent == 'M') {
-            obj = {};
-            obj[j] = 1;
+        var ask = {}, a;
+        for(var j = 1; j <= 5; j++) {
+            a = parseInt(game.selectbox.fields['r'+j].num.textContent);
+            if(a > 0) ask[j] = a;
         }
-    }
+        game.state['p'+(game.state.turn-1)].cY--;
+        game.state.collect(game.state.turn, ask);
 
-    var ask;
-    for(var p = 1; p <= game.state.player_count; p++) {
-        if(p != game.state.turn) {
-            ask = {};
-            for(var i in obj) {
-                ask[i] = obj[i] * game.state['p'+(p-1)]['r'+i];
-                if(ask[i] > 0) {
-                    game.actions.completeTrade(game.state.turn, p, {}, ask); 
+        game.actions.cancelSelect();
+    break;
+    case 'M':
+        var obj = {}, a;
+        for(var j = 1; j <= 5; j++) {
+            if(game.selectbox.fields['r'+j].num.textContent == 'M') {
+                obj = {};
+                obj[j] = 1;
+            }
+        }
+
+        var ask;
+        for(var p = 1; p <= game.state.player_count; p++) {
+            if(p != game.state.turn) {
+                ask = {};
+                for(var i in obj) {
+                    ask[i] = obj[i] * game.state['p'+(p-1)]['r'+i];
+                    if(ask[i] > 0) {
+                        game.actions.completeTrade(game.state.turn, p, {}, ask); 
+                    }
                 }
             }
         }
-    }
 
-    game.state['p'+(game.state.turn-1)].cM--;
-    game.state.next_action = 'playerControl';
-    var obj = {next_action: 'playerControl'};
-    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    gapi.hangout.data.submitDelta(obj);
+        game.state['p'+(game.state.turn-1)].cM--;
 
-    game.actions.cancelSelect();
+        game.actions.cancelSelect();
     break;
-
     case 'R':
-    var robbed = {}, a;
-    for(var j = 1; j <= 5; j++) {
-        a = parseInt(game.selectbox.fields['r'+j].num.textContent);
-        if(a > 0) robbed[j] = a;
-    }
-    game.state.deduct(game.state.turn, robbed);
-    game.actions.cancelSelect();
+        var robbed = {}, a;
+        for(var j = 1; j <= 5; j++) {
+            a = parseInt(game.selectbox.fields['r'+j].num.textContent);
+            if(a > 0) robbed[j] = a;
+        }
+        game.state.deduct(game.state.turn, robbed);
+        game.actions.cancelSelect();
     break;
-
     case '1':
-    var ask = {}, a;
-    for(var j = 1; j <= 5; j++) {
-        a = parseInt(game.selectbox.fields['r'+j].num.textContent);
-        if(a > 0) ask[j] = a;
-    }
-    
-    game.actions.cancelSelect();
-    game.actions.proposeTrade(params.from, params.to, params.offer, ask);
+        var ask = {}, a;
+        for(var j = 1; j <= 5; j++) {
+            a = parseInt(game.selectbox.fields['r'+j].num.textContent);
+            if(a > 0) ask[j] = a;
+        }
+        
+        game.actions.cancelSelect();
+        game.actions.proposeTrade(params.from, params.to, params.offer, ask);
     break;
-
     case 'O':
-    var offer = {}, a;
-    for(var j = 1; j <= 5; j++) {
-        a = parseInt(game.selectbox.fields['r'+j].num.textContent);
-        if(a > 0) offer[j] = a;
-    }
-    game.actions.announceOffer(game.state.turn, offer);
-    game.menu.displayOffers();
-
+        var offer = {}, a;
+        for(var j = 1; j <= 5; j++) {
+            a = parseInt(game.selectbox.fields['r'+j].num.textContent);
+            if(a > 0) offer[j] = a;
+        }
+        game.actions.announceOffer(game.state.turn, offer);
+        game.menu.displayOffers();
     break;
 
     default: break;
@@ -847,11 +807,8 @@ game.actions.buildSettlement = function() {
 };
 
 game.actions.buildCity = function() {
-    game.board.showAvailableVertices(2, game.state.turn);
-
     if(game.state.phase == 2 && (game.state.playerHas(game.state.turn, {3: 2, 5: 3}))) {
         game.state.next_action = 'playerControl';
-        gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'playerControl'});
         game.board.showAvailableVertices(2, game.state.turn);
     } else {
         console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
@@ -867,7 +824,6 @@ game.actions.buildRoad = function(params) {
     } else if(game.state.phase == 2) {
         if(game.state.playerHas(game.state.turn, {1: 1, 4: 1}))  {
             game.state.next_action = 'playerControl';
-            gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'playerControl'});
             game.board.showAvailableEdges(game.state.turn);
         } else {
             console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
@@ -925,7 +881,6 @@ game.actions.selectVertex = function(i, type) {
     }
     game.board.hideEmptyVertices();
 
-    game.state.updateVictoryPoints();
     var vertices = (function(vertices){ 
         var obj = [];
         for (var i = 0; i < vertices.length; i++) {
@@ -934,14 +889,11 @@ game.actions.selectVertex = function(i, type) {
         return obj;
     })(game.board.vertices);
     var obj = {};
-    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
     obj['vertices'] = JSON.stringify(vertices);
-    obj['id'] =  gapi.hangout.getLocalParticipant().person.id;
+    game.state.updateVictoryPoints(obj);
     if (game.state.phase == 0 || game.state.phase == 1) {
         game.state.next_action = 'buildRoad';
-        obj['next_action'] = 'buildRoad';
     }
-    gapi.hangout.data.submitDelta(obj);
 
     game.proceed();
 };

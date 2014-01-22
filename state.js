@@ -111,7 +111,7 @@ game.state.playerTradingFactors = function(player) {
     return obj;
 }
 
-game.state.updateVictoryPoints = function() {
+game.state.updateVictoryPoints = function(params) {
 
     var s, c, lr, la, vpc, player, p2, r;
 
@@ -181,6 +181,11 @@ game.state.updateVictoryPoints = function() {
         obj['p'+i] = JSON.stringify(this['p'+i]);
     }
     obj['id'] = gapi.hangout.getLocalParticipant().person.id;
+    if (params !== undefined) {
+        for (var key in params) {
+            obj[key] = params[key];
+        }
+    }
     gapi.hangout.data.submitDelta(obj);
     console.log('Victory points: p1 ' + this.p0.victoryPoints
                     + (this.p1?(', p2 ' + this.p1.victoryPoints):'')
