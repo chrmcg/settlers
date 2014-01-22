@@ -209,9 +209,7 @@ game.state.updateCards = function(player) {
 game.state.download = function(state) {
     //Apply state_event changes
     console.log(Object.keys(state));
-    if(state.next_action !== undefined) {
-        console.log(state.next_action);
-    }
+    
     for(var i in state) {
         var key = i;
         var value = state[i];
@@ -241,7 +239,6 @@ game.state.download = function(state) {
             break;
             case 'id':
                 this[key] = value;
-                console.log(value);
             break;
             default:
                 try {

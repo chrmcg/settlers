@@ -20,7 +20,6 @@ game.actions.rollDice = function() {
     console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
 
     if(d == 7) {
-        obj['next_action'] = 'getRobbed';
         game.state.next_action = 'getRobbed';
     } else {
         var h, v, o;
