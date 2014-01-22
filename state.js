@@ -206,10 +206,6 @@ game.state.updateCards = function(player) {
         resources[i] = this['p'+(player-1)]['r'+i];
     }
 
-    var obj = {};
-    obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    gapi.hangout.data.submitDelta(obj);
     game.statusbox.updateFields(player, resources);
 };
 
