@@ -948,8 +948,6 @@ game.actions.selectEdge = function(i, player, params) {
             obj['next_action'] = 'playerControl';
         }
     } 
-
-    game.state.updateVictoryPoints();
     var edges = (function(edges){ 
         var obj = [];
         for (var i = 0; i < edges.length; i++) {
@@ -957,10 +955,8 @@ game.actions.selectEdge = function(i, player, params) {
         }
         return obj;
     })(game.board.edges);
-    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
     obj['edges'] = JSON.stringify(edges);
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    gapi.hangout.data.submitDelta(obj);
+    game.state.updateVictoryPoints(obj);
 
     game.proceed();
 };
