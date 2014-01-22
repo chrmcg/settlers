@@ -913,7 +913,6 @@ game.actions.selectEdge = function(i, player, params) {
             game.state.phase = 1;
         } else {
             game.state.turn++;
-            game.statusbox.viewPlayer(game.state.turn);
         }
         game.state.next_action = 'buildSettlement';
         obj['next_action'] = 'buildSettlement';
@@ -927,7 +926,6 @@ game.actions.selectEdge = function(i, player, params) {
             obj['phase'] = ''+game.state.phase;
         } else {
             game.state.turn--;
-            game.statusbox.viewPlayer(game.state.turn);
             game.state.next_action = 'buildSettlement';
             obj['next_action'] = 'buildSettlement';
             obj['turn'] = ''+game.state.turn;
@@ -984,8 +982,6 @@ game.actions.playerControl = function() {
         console.log('playerControl, not your turn');
         obj = {'offerTrade': false, 'buildRoad': false, 'buildSettlement': false, 'buildCity': false, 'buyDevCard': false, 'endTurn': false};
     }
-
-    game.statusbox.viewPlayer(game.state.getLocalPlayerNumber());
 
     var action;
     for(var i = 0; i < game.menu.buttons.length; i++) {
