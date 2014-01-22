@@ -107,7 +107,7 @@ game.statusbox.init = function() {
         }
     }
 
-    this.viewPlayer(1);
+    this.viewPlayer(game.state.getLocalPlayerNumber());
 };
 
 game.statusbox.viewPlayer = function(player) {

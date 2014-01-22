@@ -971,6 +971,7 @@ game.actions.playerControl = function() {
     // Activate controls only if it's your turn
     var obj;
     if(game.state.turn === game.state.getLocalPlayerNumber()) {
+        console.log('playerControl, your turn');
         obj = {
             'offerTrade': game.state.playerCardCount(game.state.turn) > 0,
             'buildRoad': game.state.playerHas(game.state.turn, {1:1, 4:1}) && game.state['p'+(game.state.turn-1)].roads > 0,
@@ -980,6 +981,7 @@ game.actions.playerControl = function() {
             'endTurn': true,
         };
     } else {
+        console.log('playerControl, not your turn');
         obj = {'offerTrade': false, 'buildRoad': false, 'buildSettlement': false, 'buildCity': false, 'buyDevCard': false, 'endTurn': false};
     }
 
