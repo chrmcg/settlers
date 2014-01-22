@@ -5,8 +5,6 @@ game.actions = {
 
 
 game.actions.rollDice = function() {
-    
-    game.statusbox.viewPlayer(game.state.turn);
     game.menu.refreshDevCards();
 
     var obj = {};

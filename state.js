@@ -82,7 +82,6 @@ game.state.deduct = function(player, resources) {
     obj['p'+(player-1)] = JSON.stringify(this['p'+(player-1)]);
     obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
-    this.updateCards(player);
 };
 
 game.state.collect = function(player, resources) {
@@ -99,7 +98,6 @@ game.state.collect = function(player, resources) {
     obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
     console.log('Player ' + player + ' collects: ' + str);
-    this.updateCards(player);
 };
 
 game.state.playerTradingFactors = function(player) {
@@ -274,6 +272,7 @@ game.state.download = function(state) {
         if(this.turn === this.getLocalPlayerNumber() && this.id !== gapi.hangout.getLocalParticipant().person.id) {
             game.proceed();
         }
+        this.updateCards(this.getLocalPlayerNumber());
     }
 };
 
