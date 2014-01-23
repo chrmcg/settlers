@@ -1,3 +1,7 @@
+game.display = {
+    game: game
+};
+
 game.display.init = function() {
     // Call all functions to initialize visual objects
 }
