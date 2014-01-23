@@ -341,7 +341,7 @@ game.display.refreshVertices = function() {
     }
 };
 
-game.display.refreshPlayerFields() {
+game.display.refreshPlayerFields = function() {
     for(var i = 0; i < game.state.player_count; i++) {
         var player_field = game.statusbox.player_fields[i];
         if(i == game.state.turn-1) {
