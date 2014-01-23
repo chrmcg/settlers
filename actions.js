@@ -1,4 +1,3 @@
-
 game.actions = {
     game: game
 };
@@ -10,6 +9,7 @@ game.actions.rollDice = function() {
     var obj = {};
 
     obj['id'] = gapi.hangout.getLocalParticipant().person.id;
+    obj['next_action'] = 'playerControl';
     game.state.next_action = 'playerControl';
 
     var d1 = Math.floor(Math.random() * 6) + 1;
@@ -58,9 +58,6 @@ game.actions.rollDice = function() {
 };
 
 game.actions.getRobbed = function() {
-    
-    game.state.next_action = 'moveRobber';
-
     console.log('Each player with >7 cards has to select cards now...');
     var cards = 0; 
     for(var i = 1; i <= 5; i++) {
@@ -68,15 +65,11 @@ game.actions.getRobbed = function() {
     }
 
     if(cards > 7) {
-        game.menu.buttons.forEach(function(a){
-            if(['endTurn'].indexOf(a.getAttribute('data-action')) > -1){
-                a.setAttribute('visibility','hidden');
-            }
-        });
+        //TODO: setAttribute
+        game.display.hideButtons(['endTurn']);
         for(var i = 1; i <= 5; i++) {
             game.statusbox.fields[(game.state.turn-1)]['r'+i].button.setAttribute('onclick','');
             game.statusbox.fields[(game.state.turn-1)]['r'+i].button.children[0].setAttribute('fill','gray');
-            
         }
         game.actions.selectCards('R', {card_count: cards});
         
@@ -88,17 +81,8 @@ game.actions.getRobbed = function() {
 
 game.actions.moveRobber = function() {
     // Don't let the user do anything until the robber is moved
-    for(var i = 0; i < game.menu.buttons.length; i++) {
-        game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
-        game.menu.buttons[i].setAttribute('onclick', '');
-        game.menu.buttons[i].setAttribute('class', '');
-    }
-    for(var i = 0; i < game.state.player_count; i++) {
-        for(var j = 1; j <= 5; j++) {
-            game.statusbox.fields[i]['r'+j].button.children[0].setAttribute('fill', 'gray');
-            game.statusbox.fields[i]['r'+j].button.setAttribute('onclick', '');
-        }
-    }
+    game.display.disableAllMenuButtons();
+    game.display.disableAllExchangeButtons();
 
     // Move the robber
     for (var i = 0; i < 19; i++) {
@@ -211,11 +195,9 @@ game.actions.playDevCard = function(type) {
 
 
 game.actions.selectCards = function(reason, params) {
-
-    game.menu.buttons.forEach(function(a){
-        if(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','hidden');}
-        if(['confirmSelect', 'cancelSelect'].indexOf(a.getAttribute('data-action')) > -1){a.setAttribute('visibility','visible');}
-    });
+    game.display.hideMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard']);
+    game.display.showMenuButtons(['confirmSelect', 'cancelSelect']);
+    
     game.devcardbox.setAttribute('display', 'none');
     game.selectbox.wrapper_outer.setAttribute('display', 'inline');
     
@@ -298,7 +280,6 @@ game.actions.selectCards = function(reason, params) {
         });
 
         break;
-
        
         case 'R':
         // Robbed
@@ -386,7 +367,6 @@ game.actions.selectCards = function(reason, params) {
                 a.children[1].textContent = 'Confirm';
             }
         });
-
         break;
 
         case 'M':
@@ -398,7 +378,7 @@ game.actions.selectCards = function(reason, params) {
 
         this.inc = function(i) {
             this.incdec = null;
-            var c =  1+parseInt(game.selectbox.fields['r'+i].num.textContent);
+            var c = 1+parseInt(game.selectbox.fields['r'+i].num.textContent);
             if(c <= 1) {
                 if(reason == 'M') {
                     game.selectbox.fields['r'+i].num.textContent = 'M';
@@ -563,9 +543,6 @@ game.actions.selectCards = function(reason, params) {
             }
         });
         break;
-        
-        
-
         default: break;
     }
 };
@@ -621,6 +598,8 @@ game.actions.confirmSelect = function(reason, params) {
         var obj = {};
         obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
         obj['id'] = gapi.hangout.getLocalParticipant().person.id;
+        obj['next_action'] = 'moveRobber';
+        game.state.next_action = 'moveRobber';
         gapi.hangout.data.submitDelta(obj);
         game.actions.cancelSelect();
     break;
@@ -674,24 +653,18 @@ game.actions.cancelSelect = function(reset_offer) {
         console.log('Player '+game.state.turn+' has canceled trading');
     }
 
-    game.menu.buttons.forEach(function(a){
-        if(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn'].indexOf(a.getAttribute('data-action')) > -1){
-            a.setAttribute('visibility','visible');
-        }
-        if(['confirmSelect', 'cancelSelect'].indexOf(a.getAttribute('data-action')) > -1){
-            a.setAttribute('visibility','hidden');
-            a.children[0].setAttribute('fill','gray');
-            a.setAttribute('onclick','');
-        }
-    });
+    game.display.disableAllMenuButtons();
+    game.display.hideAllMenuButtons();
+   
     game.devcardbox.setAttribute('display', 'inline');
+    
     for(var i = 1; i <= 5; i++) {
         game.selectbox.fields['r'+i].num.setAttribute('visibility', 'visible');
         game.selectbox.fields['r'+i].dec_button.setAttribute('display', 'inline');
     }
     game.selectbox.wrapper_outer.setAttribute('display', 'none');
     game.tradebox.setAttribute('display', 'none');
-    game.menu.refreshDevCards();
+    game.display.refreshDevCards();
     game.proceed();
 };
 
@@ -798,91 +771,77 @@ game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
 // 1 = WOOD, 2 = SHEEP, 3 = WHEAT, 4 = BRICK, 5 = ORE
 
 game.actions.buildSettlement = function() {
+    var playerNum = game.state.getLocalPlayerNumber();
     if(game.state.phase == 0 || game.state.phase == 1) {
-        game.board.showAvailableVertices(1, game.state.turn);
+        game.board.showAvailableVertices(1, playerNum);
     } else if(game.state.phase == 2) {
-        if(game.state.playerHas(game.state.turn, {1: 1, 2: 1, 3: 1, 4: 1}))  {
-            game.board.showAvailableVertices(1, game.state.turn);
+        if(game.state.playerHas(num, {1: 1, 2: 1, 3: 1, 4: 1}))  {
+            game.board.showAvailableVertices(1, playerNum);
         } else {
-            console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
+            console.log('Cannot build. You have insufficient resources');
         }
     }
 };
 
 game.actions.buildCity = function() {
-    if(game.state.phase == 2 && (game.state.playerHas(game.state.turn, {3: 2, 5: 3}))) {
+    var playerNum = game.state.getLocalPlayerNumber();
+    if(game.state.phase == 2 && (game.state.playerHas(playerNum, {3: 2, 5: 3}))) {
         game.state.next_action = 'playerControl';
-        game.board.showAvailableVertices(2, game.state.turn);
+        game.board.showAvailableVertices(2, playerNum);
     } else {
-        console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
+        console.log('Cannot build. You have insufficient resources');
     }
 
 };
 
 game.actions.buildRoad = function(params) {
+
     if (params == 'R') {
-        game.board.showAvailableEdges(game.state.turn, 'R');
+        game.board.showAvailableEdges(playerNum, 'R');
     } else if(game.state.phase == 0 || game.state.phase == 1) {
-        game.board.showAvailableEdges(game.state.turn);
+        game.board.showAvailableEdges(playerNum);
     } else if(game.state.phase == 2) {
-        if(game.state.playerHas(game.state.turn, {1: 1, 4: 1}))  {
+        if(game.state.playerHas(playerNum, {1: 1, 4: 1}))  {
             game.state.next_action = 'playerControl';
-            game.board.showAvailableEdges(game.state.turn);
+            game.board.showAvailableEdges(playerNum);
         } else {
-            console.log('Cannot build. Player ' + game.state.turn + ' has insufficient resources');
+            console.log('Cannot build. You have insufficient resources');
         }
     }
 };
 
 game.actions.selectVertex = function(i, type) {
-    var stop = false;
+    var playerNum = game.state.getLocalPlayerNumber();
 
     if(game.state.phase == 0) {
-        game.state['p'+(game.state.turn-1)].firstSettlement = i;
+        game.state['p'+(playerNum-1)].firstSettlement = i;
     } else if(game.state.phase == 1) {
-        game.state['p'+(game.state.turn-1)].secondSettlement = i;
+        game.state['p'+(playerNum-1)].secondSettlement = i;
         var obj = {}, b;
         for(var j = 0; j < game.board.vertices[i].hexes.length; j++) {
             b = game.board.hexes[game.board.vertices[i].hexes[j]].type;
             if(obj[b] == null) obj[b] = 0;
             obj[b]++;
         }
-        game.state.collect(game.state.turn, obj);
+        game.state.collect(playerNum, obj);
     } else if(game.state.phase == 2) {
         if(type == 1) {
-            game.state.deduct(game.state.turn, {1: 1, 2: 1, 3: 1, 4: 1});
-            game.state['p'+(game.state.turn-1)].settlements--;
-        } else if(type == 2) {
-            if(game.board.vertices[i].owner == game.state.turn) {
-                game.state.deduct(game.state.turn, {3: 2, 5: 3});
+            game.state.deduct(playerNum, {1: 1, 2: 1, 3: 1, 4: 1});
+            game.state['p'+(playerNum-1)].settlements--;
+        } else if(type == 2 && game.board.vertices[i].owner === playerNum && game.board.vertices[i].contents === 1) {
+            if(game.board.vertices[i].owner === playerNum) {
+                game.state.deduct(playerNum, {3: 2, 5: 3});
                 game.state['p'+(game.state.turn-1)].cities--;
-            } else {
-                stop = true;
             }
         }
     }
 
-    if(stop === false) {
-        game.board.vertices[i].contents = type;
-        game.board.vertices[i].owner = game.state.turn;
-        game.board.vertices[i].v.setAttribute('fill', game.state['p'+(game.state.turn-1)].color);
-        if (type == 1) {
-            game.board.vertices[i].v.setAttribute('width', '10');
-            game.board.vertices[i].v.setAttribute('height', '10');
-            game.board.vertices[i].v.setAttribute('x', game.board.vertices[i].x - 5);
-            game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 5);
-        } else if (type == 2) {
-            game.board.vertices[i].v.setAttribute('width', '20');
-            game.board.vertices[i].v.setAttribute('height', '20');
-            game.board.vertices[i].v.setAttribute('x', game.board.vertices[i].x - 10);
-            game.board.vertices[i].v.setAttribute('y', game.board.vertices[i].y - 10);
-        }
-        game.board.vertices[i].v.setAttribute('onclick', '');
-        game.board.vertices[i].v.setAttribute('onmouseover', '');
-        game.board.vertices[i].v.setAttribute('onmouseout', '');
-        game.board.vertices[i].v.setAttribute('class', '');
+    if (type === 1) {
+        game.board.placeSettlement(i);
+    } else if (type === 2) {
+        game.board.placeCity(i);
     }
-    game.board.hideEmptyVertices();
+    game.display.hideEmptyVertices();
 
     var vertices = (function(vertices){ 
         var obj = [];
@@ -902,18 +861,14 @@ game.actions.selectVertex = function(i, type) {
 };
 
 game.actions.selectEdge = function(i, player, params) {
-    game.board.edges[i].road = 1;
-    game.board.edges[i].owner = game.state.turn;
-    game.board.edges[i].e.setAttribute('stroke', game.state['p'+(game.state.turn-1)].color);
-    game.board.edges[i].e.setAttribute('stroke-width', '5');
-    game.board.edges[i].e.setAttribute('onclick', '');
+    game.board.placeRoad(i);
 
-    game.board.hideEmptyEdges();
-
+    game.display.hideEmptyEdges();
+    
     var obj = {};
 
-    if(game.state.phase == 0) {
-        if(game.state.turn == game.state.player_count) {
+    if(game.state.phase === 0) {
+        if(game.state.turn === game.state.player_count) {
             game.state.phase = 1;
         } else {
             game.state.turn++;
@@ -922,8 +877,8 @@ game.actions.selectEdge = function(i, player, params) {
         obj['next_action'] = 'buildSettlement';
         obj['phase'] = ''+game.state.phase;
         obj['turn'] = ''+game.state.turn;
-    } else if(game.state.phase == 1) { 
-        if(game.state.turn == 1) {
+    } else if(game.state.phase === 1) { 
+        if(game.state.turn === 1) {
             game.state.phase = 2;
             game.state.next_action = 'rollDice';
             obj['next_action'] = 'rollDice';
@@ -935,13 +890,13 @@ game.actions.selectEdge = function(i, player, params) {
             obj['turn'] = ''+game.state.turn;
         }
 
-    } else if(game.state.phase == 2) {
+    } else if(game.state.phase === 2) {
         game.state['p'+(game.state.turn-1)].roads--;
         console.log(params);
         if (params === undefined) { 
             game.state.next_action = 'playerControl';
             obj['next_action'] = 'playerControl';
-            game.state.deduct(game.state.turn, {1: 1, 4: 1});
+            game.state.deduct(player, {1: 1, 4: 1});
         } else if (params == 'R') {
             game.board.showAvailableEdges(player, 'R1'); 
         } else {
@@ -962,83 +917,18 @@ game.actions.selectEdge = function(i, player, params) {
     game.proceed();
 };
 
-game.actions.cancelPlacement = function() {
-    game.board.hideEmptyVertices();
-    game.board.hideEmptyEdges();
-};
 
 game.actions.playerControl = function() {
-
-    
-    // Activate controls only if it's your turn
-    var obj;
-    if(game.state.turn === game.state.getLocalPlayerNumber()) {
-        console.log('playerControl, your turn');
-        obj = {
-            'offerTrade': game.state.playerCardCount(game.state.turn) > 0,
-            'buildRoad': game.state.playerHas(game.state.turn, {1:1, 4:1}) && game.state['p'+(game.state.turn-1)].roads > 0,
-            'buildSettlement': game.state.playerHas(game.state.turn, {1:1, 2:1, 3:1, 4:1}) && game.state['p'+(game.state.turn-1)].settlements > 0,
-            'buildCity': game.state.playerHas(game.state.turn, {3:2, 5:3}) && game.state['p'+(game.state.turn-1)].cities > 0,
-            'buyDevCard': game.state.playerHas(game.state.turn, {2:1, 3:1, 5:1}),
-            'endTurn': true,
-        };
-    } else {
-        console.log('playerControl, not your turn');
-        obj = {'offerTrade': false, 'buildRoad': false, 'buildSettlement': false, 'buildCity': false, 'buyDevCard': false, 'endTurn': false};
-    }
-
-    var action;
-    for(var i = 0; i < game.menu.buttons.length; i++) {
-        action = game.menu.buttons[i].getAttribute('data-action');
-        if(obj[action] === true) {
-            game.menu.buttons[i].children[0].setAttribute('fill', 'white');
-            game.menu.buttons[i].setAttribute('onclick', 'game.actions.' + action+'()');
-            game.menu.buttons[i].setAttribute('class', 'menu-item');
-        } else {
-            game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
-            game.menu.buttons[i].setAttribute('onclick', '');
-            game.menu.buttons[i].setAttribute('class', '');
-
-        }
-    }
-
-    game.menu.refreshDevCards();
-    for(var i = 0; i < game.menu.devcards.length; i++) {
-        if(game.menu.devcards[i].text.textContent.length > 0) {
-            game.menu.devcards[i].button.children[0].setAttribute('fill', 'white');
-        } else {
-            game.menu.devcards[i].button.children[0].setAttribute('fill', 'gray');
-        }
-    }
-
-    var obj, factor;
-    var f_obj = game.state.playerTradingFactors(game.state.turn);
-    for(var i = 1; i <= 5; i++) {
-        factor = f_obj[i];
-        obj = {}; obj[i] = factor;
-        game.statusbox.fields[game.state.turn-1]['r'+i].button.children[1].textContent = factor + ':1';
-        if(game.state.playerHas(game.state.turn, obj) === true) {
-        game.statusbox.fields[game.state.turn-1]['r'+i].button.setAttribute('onclick', 
-            'game.actions.setupTrade('+game.state.turn+', 0, {'+i+':'+factor+'})'
-            );
-            game.statusbox.fields[game.state.turn-1]['r'+i].button.children[0].setAttribute('fill', 'white');
-        } else {
-            game.statusbox.fields[game.state.turn-1]['r'+i].button.setAttribute('onclick', '');
-            game.statusbox.fields[game.state.turn-1]['r'+i].button.children[0].setAttribute('fill', 'gray');
-        }
-    }
-
+    game.display.refreshMenuButtons();
+    game.display.refreshDevCards(); 
+    game.display.refreshExchangeButtons(); 
 };
 
 game.actions.endTurn = function() {
-    for(var i = 0; i < game.menu.buttons.length; i++) {
-        game.menu.buttons[i].children[0].setAttribute('fill', 'gray');
-        game.menu.buttons[i].setAttribute('onclick', '');
-        game.menu.buttons[i].setAttribute('class', '');
-    }
+    game.display.disableAllMenuButtons();
 
-    game.actions.cancelPlacement();
-    game.actions.cancelSelect();
+    game.display.cancelPlacement();
+    game.display.cancelSelect();
 
     game.state.next_action = 'rollDice';
     game.state.turn = game.state.turn == game.state.player_count ? 1 : game.state.turn+1;
@@ -1047,10 +937,8 @@ game.actions.endTurn = function() {
     obj['turn'] = ''+game.state.turn;
     obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     gapi.hangout.data.submitDelta(obj);
-    //game.proceed();
 }
 
 game.actions.winGame = function() {
     console.log('Player ' + game.state.turn + ' wins the game!');
 };
-

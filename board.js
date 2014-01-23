@@ -242,132 +242,13 @@ game.board.colors = [
 ];
 
 game.board.redraw = function() {
-
-    var hex, text, circle, group, bbox, points, prob;
-    for(var i = 0; i < 19; i++) {
-
-        this.hexes[i].circle.parentElement.children[0].setAttribute('fill', game.board.colors[this.hexes[i].type]);
-
-        if(this.hexes[i].num != 0) {
-            text = this.hexes[i].circle.parentElement.children[1];
-            text.textContent = this.hexes[i].num;
-
-            prob = this.hexes[i].circle.parentElement.children[2];
-
-            if (this.hexes[i].num == 2 || this.hexes[i].num == 12) {
-                prob.textContent = "\u2022";
-                prob.setAttribute('fill', 'white');
-                text.setAttribute('fill', 'white');
-            } else if (this.hexes[i].num == 3 || this.hexes[i].num == 11) {
-                prob.textContent = "\u2022\u2022";
-                prob.setAttribute('fill', 'white');
-                text.setAttribute('fill', 'white');
-            } else if (this.hexes[i].num == 4 || this.hexes[i].num == 10) {
-                prob.textContent = "\u2022\u2022\u2022";
-                prob.setAttribute('fill', 'white');
-                text.setAttribute('fill', 'white');
-            } else if (this.hexes[i].num == 5 || this.hexes[i].num == 9) {
-                prob.textContent = "\u2022\u2022\u2022\u2022";
-                prob.setAttribute('fill', 'white');
-                text.setAttribute('fill', 'white');
-            } else if (this.hexes[i].num == 6 || this.hexes[i].num == 8) {
-                prob.textContent = "\u2022\u2022\u2022\u2022\u2022";
-                prob.setAttribute('fill', '#ff0000');
-                text.setAttribute('fill', '#ff0000');
-            }            
-        } else {
-            text = this.hexes[i].circle.parentElement.children[1];
-            text.textContent = '';
-            prob = this.hexes[i].circle.parentElement.children[2];
-            prob.textContent = '';
-        }
-
-        text.setAttribute('class', 'hex-content');
-        prob.setAttribute('class', 'hex-content');
-
-        circle = this.hexes[i].circle;
-        if (this.hexes[i].robber == 0) {
-            circle.setAttribute('fill', 'rgba(0,0,0,0)');
-        } else {
-            circle.setAttribute('fill', 'rgba(1,1,1,0.6)');
-        }
-        
-        // Fix centering of nums
-        if(this.hexes[i].num != 0) {
-            bbox = text.getBBox();
-            text.setAttribute('x', this.hexes[i].cx - bbox.width/2);
-            text.setAttribute('y', this.hexes[i].cy + bbox.height/4);
-            bbox = prob.getBBox();
-            prob.setAttribute('x', this.hexes[i].cx - bbox.width/2);
-        }
-    }
-
-    var e;
-    for(var i = 0; i < 72; i++) {
-        e = this.edges[i].e;
-
-        if(this.edges[i].owner != null) {
-            e.setAttribute('stroke', game.state['p'+(this.edges[i].owner-1)].color);
-            e.setAttribute('stroke-width', '5');
-            e.setAttribute('visibility', 'visible');
-        }
-    }
-
-    var v;
-    for(var i = 0; i < 54; i++) {
-        v = this.vertices[i].v;
-
-        if(this.vertices[i].contents == 1) {
-            v.setAttribute('fill', game.state['p'+(this.vertices[i].owner-1)].color);
-            v.setAttribute('visibility', 'visible');
-            v.setAttribute('width', '10');
-            v.setAttribute('height', '10');
-            v.setAttribute('x', this.vertices[i].x - 5);
-            v.setAttribute('y', this.vertices[i].y - 5);
-            v.setAttribute('onclick', '');
-        } else if(this.vertices[i].contents == 2) {
-            v.setAttribute('fill', game.state['p'+(this.vertices[i].owner-1)].color);
-            v.setAttribute('visibility', 'visible');
-            v.setAttribute('width', '20');
-            v.setAttribute('height', '20');
-            v.setAttribute('x', this.vertices[i].x - 10);
-            v.setAttribute('y', this.vertices[i].y - 10);
-            v.setAttribute('onclick', '');
-        } else {
-            /*v.setAttribute('visibility', 'hidden');
-            v.setAttribute('onclick', '');
-            v.setAttribute('onmouseover', '');
-            v.setAttribute('onmouseout', '');
-            v.setAttribute('class', '');*/
-        }
-
-        if(this.vertices[i].port > 0) {
-            if(this.vertices[i].port == 6) {
-                v.setAttribute('stroke', 'blue');
-                v.setAttribute('visibility', 'visible');
-            } else {
-                v.setAttribute('stroke', this.colors[this.vertices[i].port]);
-                v.setAttribute('visibility', 'visible');
-            }
-        } else {
-            v.setAttribute('stroke', 'black');
-        }
-    }
-    // Show correct player
-    for(var i = 0; i < game.state.player_count; i++) {
-        var player_field = game.statusbox.player_fields[i];
-        if(i == game.state.turn-1) {
-            player_field.rect.setAttribute('height', '30px');
-            player_field.rect.setAttribute('transform', 'translate(0, -10)');
-        } else {
-            player_field.rect.setAttribute('height', '20px');
-            player_field.rect.setAttribute('transform', '');
-        }
-    }
+    game.display.refreshHexes();
+    game.display.refreshEdges();
+    game.display.refreshVertices();
+    game.display.refreshPlayerFields();
 };
 
 game.board.draw = function(w, h) {
-
     w = w*2/3;
 
     var rx, ry;
@@ -612,29 +493,6 @@ game.board.showAvailableVertices = function(type, player) {
     }
 };
 
-game.board.hideEmptyVertices = function() {
-    for(var i = 0; i < 54; i++) {
-        if(this.vertices[i].contents == 0 && this.vertices[i].port == 0) {
-            this.vertices[i].v.setAttribute('visibility', 'hidden');
-        }
-        this.vertices[i].v.setAttribute('onmouseover', '');
-        this.vertices[i].v.setAttribute('onmouseout', '');
-        this.vertices[i].v.setAttribute('onclick', '');
-        this.vertices[i].v.setAttribute('class', '');
-    }
-};
-
-game.board.hideEmptyEdges = function() {
-    for(var i = 0; i < 72; i++) {
-        if(this.edges[i].road == 0) {
-            this.edges[i].e.setAttribute('visibility', 'hidden');
-        }
-        this.edges[i].e.setAttribute('onmouseover', '');
-        this.edges[i].e.setAttribute('onmouseout', '');
-        this.edges[i].e.setAttribute('onclick', '');
-        this.edges[i].e.setAttribute('class', '');
-    }
-};
 
 game.board.highlightVertex = function(i, type, player) {
     if(game.state.turn == player) {
@@ -736,18 +594,18 @@ game.board.roadLength = function(player) {
 };
 
 game.board.getPaths = function(player, edge, edge_path, vertex_path, paths) {
-    var n_arr = this.getOwnedNeighborEdges(player, edge);
+    var neighbors = this.getOwnedNeighborEdges(player, edge);
     var v, ep, vp;
-    if(n_arr.length == 0) paths.push([edge]);
-    for(var i = 0; i < n_arr.length; i++) {
-        if(edge_path.indexOf(n_arr[i]) > -1) continue;
+    if(neighbors.length == 0) paths.push([edge]);
+    for(var i = 0; i < neighbors.length; i++) {
+        if(edge_path.indexOf(neighbors[i]) > -1) continue;
         else {
             v = this.getVertexBetweenEdges(edge, n_arr[i]);
             if(vertex_path.indexOf(v) > -1) continue;
             else if(this.vertices[v].owner != null && this.vertices[v].owner != player) continue;
             else {
                 ep = edge_path.slice(0);
-                ep.push(n_arr[i]);
+                ep.push(neighbors[i]);
                 vp = vertex_path.slice(0);                
                 vp.push(v);
                 paths.push(this.getPaths(player, n_arr[i], ep, vp, paths));
@@ -769,4 +627,23 @@ game.board.unhighlightRobber = function(i) {
         this.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
         this.hexes[i].circle.setAttribute('onclick', '');
     }
+};
+
+game.board.placeSettlement = function(i) {
+    this.vertices[i].owner = game.state.getLocalPlayerNumber();
+    this.vertices[i].contents = 1;
+    game.display.placeSettlement();
+};
+
+game.board.placeCity = function(i) {
+    if(this.vertices[i].owner === game.state.getLocalPlayerNumber() && this.vertices[i].contents === 1) {
+        this.vertices[i].contents = 2;
+        game.display.placeCity();
+    }
+};
+
+game.board.placeRoad = function(i) {
+    this.edges[i].owner = game.state.getLocalPlayerNumber();
+    this.edges[i].road = 1;
+    game.display.placeRoad();
 };

@@ -77,6 +77,7 @@ game.state.deduct = function(player, resources) {
         }
     }
     console.log('Player ' + player + ' is deducted: ' + str);
+    game.display.updateResourceCounts();
 };
 
 game.state.collect = function(player, resources) {
@@ -89,6 +90,7 @@ game.state.collect = function(player, resources) {
         }
     }
     console.log('Player ' + player + ' collects: ' + str);
+    game.display.updateResourceCounts();
 };
 
 game.state.playerTradingFactors = function(player) {
@@ -194,22 +196,10 @@ game.state.updateVictoryPoints = function(params) {
                     );
 };
 
-game.state.updateCards = function(player) {
-    var str = '';
-    var resources = {};
-    for(var i = 1; i <= 5; i++) {
-        str += this['p'+(player-1)]['r'+i] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][i] + ' ';
-        resources[i] = this['p'+(player-1)]['r'+i];
-    }
-
-    game.statusbox.updateFields(player, resources);
-};
-
-
 game.state.download = function(state) {
-    //Apply state_event changes
     console.log(Object.keys(state));
     
+    //Apply state_event changes
     for(var i in state) {
         var key = i;
         var value = state[i];
@@ -220,6 +210,7 @@ game.state.download = function(state) {
                     game.board.edges[j].owner = edges[j].owner;
                     game.board.edges[j].road = edges[j].road;
                 }
+                game.display.refreshEdges();
             break;
             case 'vertices':
                 var vertices = JSON.parse(value);
@@ -228,6 +219,7 @@ game.state.download = function(state) {
                     game.board.vertices[j].owner = vertices[j].owner;
                     game.board.vertices[j].port = vertices[j].port;
                 }
+                game.display.refreshVertices();
             break;
             case 'hexes':
                 var hexes = JSON.parse(value);
@@ -236,6 +228,7 @@ game.state.download = function(state) {
                     game.board.hexes[j].type = hexes[j].type;
                     game.board.hexes[j].robber = hexes[j].robber;
                 }
+                game.display.refreshHexes();
             break;
             case 'id':
                 this[key] = value;
@@ -258,12 +251,13 @@ game.state.download = function(state) {
     if(window.drawn === true) {
         game.board.redraw();
     }
+    var num = this.getLocalPlayerNumber();
+    // This makes sure that this doesn't happen before everything is initialized
     if (game.startbox.wrapper_outer === undefined) {
-        // If the turn just changed, then it is your turn, but the last data was sent by the other player
-        if(this.turn === this.getLocalPlayerNumber() && this.id !== gapi.hangout.getLocalParticipant().person.id) {
+        if(this.turn === num && this.next_action === 'rollDice') {
             game.proceed();
         }
-        if(this.turn !== this.getLocalPlayerNumber() && this.next_action === 'getRobbed') {
+        if(this.turn !== num && this.next_action === 'getRobbed') {
             var cards = 0;
             for(var i = 1; i <= 5; i++) {
                 cards += game.state['p'+(this.getLocalPlayerNumber()-1)]['r'+i];
@@ -272,10 +266,7 @@ game.state.download = function(state) {
                 game.actions.selectCards('R', {card_count: cards});
             }
         }
-        var num = this.getLocalPlayerNumber();
-        if(this['p'+(num-1)] !== undefined) {
-            this.updateCards(num);
-        }
+        game.display.refreshResourceCounts();
     }
 };
 
