@@ -94,7 +94,7 @@ game.display.enableExchangeButtons = function(resources) {
     for(var i = 0; i < resources.length; i++) {
         game.statusbox.fields['r'+resources[i]].button.children[0].setAttribute('fill', 'white');
         game.statusbox.fields['r'+resources[i]].button.setAttribute('onclick',
-                'game.actions.setupTrade('+playerNumber+', 0, {'+resources[i]+':'+f_obj[resources[i]]'})');
+            'game.actions.setupTrade('+playerNumber+', 0, {'+resources[i]+':'+f_obj[resources[i]]+'})');
     }
 };
 
