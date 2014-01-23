@@ -99,7 +99,7 @@ game.startbox.refresh = function(state) {
     ids.sort();
 
     var n = 0;
-    var all_ready = true;
+    var num_ready = 0;
     for(var i = 0; i < ids.length; i++) {
         for(var r = 0; r < this.rects.length; r++) {
             if(this.rects[r].getAttribute('fill') == this.players[ids[i]].color) {
@@ -118,7 +118,7 @@ game.startbox.refresh = function(state) {
         this.fields[n].text.textContent = this.players[ids[i]].name;
         this.fields[n].text.setAttribute('visibility', 'visible');
         if(this.players[ids[i]].ready !== true) {
-            all_ready = false;
+            num_ready++;
         }
         n++;
     }
@@ -149,7 +149,7 @@ game.startbox.refresh = function(state) {
         this.button.setAttribute('onclick', '');
     }
 
-    if(all_ready === true) {
+    if(num_ready > 1) {
         game.startGame(ids.length, this.players);
     }
 };
