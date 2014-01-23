@@ -4,7 +4,7 @@ game.display = {
 
 game.display.init = function() {
     // Call all functions to initialize visual objects
-}
+};
 
 game.display.hideMenuButtons = function(actions) {
     game.menu.buttons.forEach(function(button) {
@@ -208,31 +208,30 @@ game.display.placeCity = function(i) {
         game.board.vertices[i].v.setAttribute('onmouseover', '');
         game.board.vertices[i].v.setAttribute('onmouseout', '');
         game.board.vertices[i].v.setAttribute('class', '');
-
     }
 };
 
 game.display.hideEmptyVertices = function() {
     for(var i = 0; i < 54; i++) {
-        if(this.vertices[i].contents == 0 && this.vertices[i].port == 0) {
-            this.vertices[i].v.setAttribute('visibility', 'hidden');
+        if(game.board.vertices[i].contents == 0 && this.vertices[i].port == 0) {
+            game.board.vertices[i].v.setAttribute('visibility', 'hidden');
         }
-        this.vertices[i].v.setAttribute('onmouseover', '');
-        this.vertices[i].v.setAttribute('onmouseout', '');
-        this.vertices[i].v.setAttribute('onclick', '');
-        this.vertices[i].v.setAttribute('class', '');
+        game.board.vertices[i].v.setAttribute('onmouseover', '');
+        game.board.vertices[i].v.setAttribute('onmouseout', '');
+        game.board.vertices[i].v.setAttribute('onclick', '');
+        game.board.vertices[i].v.setAttribute('class', '');
     }
 };
 
 game.display.hideEmptyEdges = function() {
     for(var i = 0; i < 72; i++) {
-        if(this.edges[i].road == 0) {
-            this.edges[i].e.setAttribute('visibility', 'hidden');
+        if(game.board.edges[i].road == 0) {
+            game.board.edges[i].e.setAttribute('visibility', 'hidden');
         }
-        this.edges[i].e.setAttribute('onmouseover', '');
-        this.edges[i].e.setAttribute('onmouseout', '');
-        this.edges[i].e.setAttribute('onclick', '');
-        this.edges[i].e.setAttribute('class', '');
+        game.board.edges[i].e.setAttribute('onmouseover', '');
+        game.board.edges[i].e.setAttribute('onmouseout', '');
+        game.board.edges[i].e.setAttribute('onclick', '');
+        game.board.edges[i].e.setAttribute('class', '');
     }
 };
 
@@ -243,7 +242,7 @@ game.display.placeRoad = function(i) {
 };
 
 game.display.refreshHexes = function() {
-    var obj = [0, 0, "\u2022", "\u2022\u2022", "\u2022\u2022\u2022", "\u2022\u2022\u2022\u2022", 
+    var dots = [0, 0, "\u2022", "\u2022\u2022", "\u2022\u2022\u2022", "\u2022\u2022\u2022\u2022", 
         "\u2022\u2022\u2022\u2022\u2022", 0, "\u2022\u2022\u2022\u2022\u2022", "\u2022\u2022\u2022\u2022",
         "\u2022\u2022\u2022", "\u2022\u2022", "\u2022"];
     var text, prob, circle, bbox;
@@ -256,7 +255,7 @@ game.display.refreshHexes = function() {
 
             prob = game.board.hexes[i].circle.parentElement.children[2];
 
-            prob.textContent = obj[i];
+            prob.textContent = dots[game.board.hexes[i].num];
             if(game.board.hexes[i].num  === 6 || game.board.hexes[i].num === 8) {
                 prob.setAttribute('fill', 'red');
                 text.setAttribute('fill', 'red');
@@ -308,18 +307,18 @@ game.display.refreshEdges = function() {
 game.display.refreshVertices = function() {
     var v;
     for(var i = 0; i < 54; i++) {
-        v = this.vertices[i].v;
+        v = game.board.vertices[i].v;
 
-        if(this.vertices[i].contents == 1) {
-            v.setAttribute('fill', game.state['p'+(this.vertices[i].owner-1)].color);
+        if(game.board.vertices[i].contents == 1) {
+            v.setAttribute('fill', game.state['p'+(game.board.vertices[i].owner-1)].color);
             v.setAttribute('visibility', 'visible');
             v.setAttribute('width', '10');
             v.setAttribute('height', '10');
             v.setAttribute('x', this.vertices[i].x - 5);
             v.setAttribute('y', this.vertices[i].y - 5);
             v.setAttribute('onclick', '');
-        } else if(this.vertices[i].contents == 2) {
-            v.setAttribute('fill', game.state['p'+(this.vertices[i].owner-1)].color);
+        } else if(game.board.vertices[i].contents == 2) {
+            v.setAttribute('fill', game.state['p'+(game.board.vertices[i].owner-1)].color);
             v.setAttribute('visibility', 'visible');
             v.setAttribute('width', '20');
             v.setAttribute('height', '20');
@@ -328,12 +327,12 @@ game.display.refreshVertices = function() {
             v.setAttribute('onclick', '');
         }
 
-        if(this.vertices[i].port > 0) {
-            if(this.vertices[i].port === 6) {
+        if(game.board.vertices[i].port > 0) {
+            if(game.board.vertices[i].port === 6) {
                 v.setAttribute('stroke', 'blue');
                 v.setAttribute('visibility', 'visible');
             } else {
-                v.setAttribute('stroke', this.colors[this.vertices[i].port]);
+                v.setAttribute('stroke', game.board.colors[game.board.vertices[i].port]);
                 v.setAttribute('visibility', 'visible');
             }
         } else {
