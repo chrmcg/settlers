@@ -632,18 +632,18 @@ game.board.unhighlightRobber = function(i) {
 game.board.placeSettlement = function(i) {
     this.vertices[i].owner = game.state.getLocalPlayerNumber();
     this.vertices[i].contents = 1;
-    game.display.placeSettlement();
+    game.display.placeSettlement(i);
 };
 
 game.board.placeCity = function(i) {
     if(this.vertices[i].owner === game.state.getLocalPlayerNumber() && this.vertices[i].contents === 1) {
         this.vertices[i].contents = 2;
-        game.display.placeCity();
+        game.display.placeCity(i);
     }
 };
 
 game.board.placeRoad = function(i) {
     this.edges[i].owner = game.state.getLocalPlayerNumber();
     this.edges[i].road = 1;
-    game.display.placeRoad();
+    game.display.placeRoad(i);
 };
