@@ -53,8 +53,8 @@ game.actions.rollDice = function() {
     for(var i = 0; i < game.state.player_count; i++) {
         obj['p'+i] = JSON.stringify(game.state['p'+i]);
     }
-    gapi.hangout.data.submitDelta(obj);
     game.proceed();
+    gapi.hangout.data.submitDelta(obj);
 };
 
 game.actions.getRobbed = function() {
