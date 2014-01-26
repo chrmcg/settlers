@@ -577,7 +577,6 @@ game.board.roadLength = function(player) {
         }
     }
 
-    var n_arr, v;
     var paths = [];
     for(i = 0; i < e_arr.length; i++) {
         this.getPaths(player, e_arr[i], [e_arr[i]], [], paths);
@@ -600,7 +599,7 @@ game.board.getPaths = function(player, edge, edge_path, vertex_path, paths) {
     for(var i = 0; i < neighbors.length; i++) {
         if(edge_path.indexOf(neighbors[i]) > -1) continue;
         else {
-            v = this.getVertexBetweenEdges(edge, n_arr[i]);
+            v = this.getVertexBetweenEdges(edge, neighbors[i]);
             if(vertex_path.indexOf(v) > -1) continue;
             else if(this.vertices[v].owner != null && this.vertices[v].owner != player) continue;
             else {
@@ -608,7 +607,7 @@ game.board.getPaths = function(player, edge, edge_path, vertex_path, paths) {
                 ep.push(neighbors[i]);
                 vp = vertex_path.slice(0);                
                 vp.push(v);
-                paths.push(this.getPaths(player, n_arr[i], ep, vp, paths));
+                paths.push(this.getPaths(player, neighbors[i], ep, vp, paths));
             }
         }
     }
