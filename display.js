@@ -213,7 +213,7 @@ game.display.placeCity = function(i) {
 
 game.display.hideEmptyVertices = function() {
     for(var i = 0; i < 54; i++) {
-        if(game.board.vertices[i].contents == 0 && this.vertices[i].port == 0) {
+        if(game.board.vertices[i].contents == 0 && game.board.vertices[i].port == 0) {
             game.board.vertices[i].v.setAttribute('visibility', 'hidden');
         }
         game.board.vertices[i].v.setAttribute('onmouseover', '');
@@ -296,7 +296,7 @@ game.display.refreshEdges = function() {
     for(var i = 0; i < 72; i++) {
         e = game.board.edges[i].e;
 
-        if(game.board.edges[i].owner !== undefined) {
+        if(game.board.edges[i].owner !== null) {
             e.setAttribute('stroke', game.state['p'+(game.board.edges[i].owner-1)].color);
             e.setAttribute('stroke-width', '5');
             e.setAttribute('visibility', 'visible');
@@ -314,16 +314,16 @@ game.display.refreshVertices = function() {
             v.setAttribute('visibility', 'visible');
             v.setAttribute('width', '10');
             v.setAttribute('height', '10');
-            v.setAttribute('x', this.vertices[i].x - 5);
-            v.setAttribute('y', this.vertices[i].y - 5);
+            v.setAttribute('x', game.board.vertices[i].x - 5);
+            v.setAttribute('y', game.board.vertices[i].y - 5);
             v.setAttribute('onclick', '');
         } else if(game.board.vertices[i].contents == 2) {
             v.setAttribute('fill', game.state['p'+(game.board.vertices[i].owner-1)].color);
             v.setAttribute('visibility', 'visible');
             v.setAttribute('width', '20');
             v.setAttribute('height', '20');
-            v.setAttribute('x', this.vertices[i].x - 10);
-            v.setAttribute('y', this.vertices[i].y - 10);
+            v.setAttribute('x', game.board.vertices[i].x - 10);
+            v.setAttribute('y', game.board.vertices[i].y - 10);
             v.setAttribute('onclick', '');
         }
 

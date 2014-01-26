@@ -117,7 +117,7 @@ game.startbox.refresh = function(state) {
         }
         this.fields[n].text.textContent = this.players[ids[i]].name;
         this.fields[n].text.setAttribute('visibility', 'visible');
-        if(this.players[ids[i]].ready !== true) {
+        if(this.players[ids[i]].ready === true) {
             num_ready++;
         }
         n++;
