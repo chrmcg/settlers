@@ -795,7 +795,7 @@ game.actions.buildCity = function() {
 };
 
 game.actions.buildRoad = function(params) {
-
+    var playerNum = game.state.getLocalPlayerNumber();
     if (params == 'R') {
         game.board.showAvailableEdges(playerNum, 'R');
     } else if(game.state.phase == 0 || game.state.phase == 1) {
