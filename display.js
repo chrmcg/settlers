@@ -179,8 +179,8 @@ game.display.refreshDevCards = function() {
 };
 
 game.display.cancelPlacement = function() {
-    game.board.hideEmptyVertices();
-    game.board.hideEmptyEdges();
+    this.hideEmptyVertices();
+    this.hideEmptyEdges();
 };
 
 game.display.placeSettlement = function(i) {
