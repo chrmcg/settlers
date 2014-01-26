@@ -210,7 +210,6 @@ game.state.download = function(state) {
                     game.board.edges[j].owner = edges[j].owner;
                     game.board.edges[j].road = edges[j].road;
                 }
-                game.display.refreshEdges();
             break;
             case 'vertices':
                 var vertices = JSON.parse(value);
@@ -219,7 +218,6 @@ game.state.download = function(state) {
                     game.board.vertices[j].owner = vertices[j].owner;
                     game.board.vertices[j].port = vertices[j].port;
                 }
-                game.display.refreshVertices();
             break;
             case 'hexes':
                 var hexes = JSON.parse(value);
@@ -228,7 +226,6 @@ game.state.download = function(state) {
                     game.board.hexes[j].type = hexes[j].type;
                     game.board.hexes[j].robber = hexes[j].robber;
                 }
-                game.display.refreshHexes();
             break;
             case 'id':
                 this[key] = value;
