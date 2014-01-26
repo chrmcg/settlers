@@ -656,8 +656,9 @@ game.actions.cancelSelect = function(reset_offer) {
         console.log('Player '+game.state.turn+' has canceled trading');
     }
 
-    game.display.disableAllMenuButtons();
-    game.display.hideAllMenuButtons();
+    game.display.showMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard']);
+    game.display.disableMenuButtons(['confirmSelect', 'cancelSelect']);
+    game.display.hideMenuButtons(['confirmSelect', 'cancelSelect']);
    
     game.devcardbox.setAttribute('display', 'inline');
     
