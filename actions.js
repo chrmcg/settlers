@@ -4,7 +4,7 @@ game.actions = {
 
 
 game.actions.rollDice = function() {
-    game.menu.refreshDevCards();
+    game.display.refreshDevCards();
 
     var obj = {};
 
@@ -153,7 +153,7 @@ game.actions.buyDevCard = function() {
 
             game.state['p'+(game.state.turn-1)]['c'+card]++;
             console.log('Player ' + game.state.turn + ' buys a ' + card + ' card');
-            game.menu.refreshDevCards();
+            game.display.refreshDevCards();
         }
     } else {
         console.log('Player ' + game.state.turn + ' cannot afford a dev card');
