@@ -16,6 +16,7 @@ game.startGame = function(count, players) {
             game.statusbox.init();
             game.selectbox.init();
             game.board.draw(700, 390);
+            game.state.download(state_event.state);
         }
     });
     var ids = [];
@@ -68,7 +69,7 @@ game.startGame = function(count, players) {
                 var arr = [];
                 for(var i = 0; i < vertices.length; i++) { 
                     arr.push({contents: vertices[i].contents, owner: vertices[i].owner, port : vertices[i].port}); 
-                } 
+                }
                 return arr; 
             })(game.board.vertices)),
             'hexes' : JSON.stringify(
@@ -94,6 +95,7 @@ game.startGame = function(count, players) {
         game.statusbox.init();
         game.selectbox.init();
         game.board.draw(700, 390);
+        game.state.download(gapi.hangout.data.getState());
     }
 };
 
