@@ -252,7 +252,7 @@ game.state.download = function(state) {
     // This makes sure that this doesn't happen before everything is initialized
     if (game.startbox.wrapper_outer === undefined) {
         if(this.turn === num) {
-            if(this.next_action === 'rollDice' || ((this.phase === 0 || this.phase === 1) && this.next_action === 'buildSettlement')) {
+            if((this.next_action === 'rollDice' && window.diceRolled === false) || ((this.phase === 0 || this.phase === 1) && this.next_action === 'buildSettlement')) {
                 game.proceed();
             }
         }

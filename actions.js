@@ -17,6 +17,7 @@ game.actions.rollDice = function() {
     var d = d1 + d2;
 
     console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
+    window.diceRolled = true;
 
     if(d == 7) {
         game.state.next_action = 'getRobbed';
@@ -930,11 +931,12 @@ game.actions.endTurn = function() {
     game.display.disableAllMenuButtons();
 
     game.display.cancelPlacement();
-    game.display.cancelSelect();
+    game.actions.cancelSelect();
 
     game.state.next_action = 'rollDice';
     game.state.turn = game.state.turn == game.state.player_count ? 1 : game.state.turn+1;
 
+    window.diceRolled = false;
     var obj = {'next_action': 'rollDice'};
     obj['turn'] = ''+game.state.turn;
     obj['id'] = gapi.hangout.getLocalParticipant().person.id;

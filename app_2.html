@@ -141,6 +141,7 @@ window.init = function() {
     document.getElementById("board").appendChild(game.svg);
 
     window.drawn = false;
+    window.diceRolled = false;
 
     // When API is ready...
     gapi.hangout.onApiReady.add(function(eventObj) {
