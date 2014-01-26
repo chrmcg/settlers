@@ -77,7 +77,7 @@ game.state.deduct = function(player, resources) {
         }
     }
     console.log('Player ' + player + ' is deducted: ' + str);
-    game.display.updateResourceCounts();
+    game.display.refreshResourceCounts();
 };
 
 game.state.collect = function(player, resources) {
@@ -90,7 +90,7 @@ game.state.collect = function(player, resources) {
         }
     }
     console.log('Player ' + player + ' collects: ' + str);
-    game.display.updateResourceCounts();
+    game.display.refreshResourceCounts();
 };
 
 game.state.playerTradingFactors = function(player) {
