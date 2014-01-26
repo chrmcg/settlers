@@ -74,6 +74,8 @@ game.actions.getRobbed = function() {
         game.actions.selectCards('R', {card_count: cards});
         
     } else {
+        game.state.next_action = 'playerControl';
+        gapi.hangout.data.submitDelta({next_action: 'playerControl'});
         game.proceed();
     }
 };

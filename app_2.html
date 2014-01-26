@@ -16,9 +16,6 @@ game.startGame = function(count, players) {
             game.statusbox.init();
             game.selectbox.init();
             game.board.draw(700, 390);
-            if (game.state.getLocalPlayerNumber() === 1) {
-                game.proceed();
-            }
         }
     });
     var ids = [];
@@ -97,9 +94,6 @@ game.startGame = function(count, players) {
         game.statusbox.init();
         game.selectbox.init();
         game.board.draw(700, 390);
-        if (game.state.getLocalPlayerNumber() === 1) {
-            game.proceed();
-        }
     }
 };
 
