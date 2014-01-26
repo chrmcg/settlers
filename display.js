@@ -296,7 +296,7 @@ game.display.refreshEdges = function() {
     for(var i = 0; i < 72; i++) {
         e = game.board.edges[i].e;
 
-        if(game.board.edges[i].owner !== undefined) {
+        if(game.board.edges[i].owner !== null) {
             e.setAttribute('stroke', game.state['p'+(game.board.edges[i].owner-1)].color);
             e.setAttribute('stroke-width', '5');
             e.setAttribute('visibility', 'visible');
