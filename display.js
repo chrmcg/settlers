@@ -98,10 +98,17 @@ game.display.enableExchangeButtons = function(resources) {
     }
 };
 
-game.display.disableAllExchangeButtons = function(resources) {
+game.display.disableExchangeButtons = function(resources) {
     for(var i = 0; i < resources.length; i++) {
         game.statusbox.fields['r'+resources[i]].button.children[0].setAttribute('fill', 'gray');
         game.statusbox.fields['r'+resources[i]].button.setAttribute('onclick', '');
+    }
+};
+
+game.display.disableAllExchangeButtons = function() {
+    for(var i = 1; i <= 5; i++) {
+        game.statusbox.fields['r'+i].button.children[0].setAttribute('fill', 'gray');
+        game.statusbox.fields['r'+i].button.setAttribute('onclick', '');
     }
 };
 
