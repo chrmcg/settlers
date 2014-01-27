@@ -62,7 +62,6 @@ game.display.refreshMenuButtons = function() {
     var obj;
     var playerNumber = game.state.getLocalPlayerNumber();
     if(game.state.turn === playerNumber) {
-        console.log('playerControl, your turn');
         obj = {
             'offerTrade': game.state.playerCardCount(game.state.turn) > 0,
             'buildRoad': game.state.playerHas(game.state.turn, {1:1, 4:1}) && game.state['p'+(game.state.turn-1)].roads > 0,
@@ -71,9 +70,6 @@ game.display.refreshMenuButtons = function() {
             'buyDevCard': game.state.playerHas(game.state.turn, {2:1, 3:1, 5:1}),
             'endTurn': true,
         };
-    } else {
-        console.log('playerControl, not your turn');
-        obj = {'offerTrade': false, 'buildRoad': false, 'buildSettlement': false, 'buildCity': false, 'buyDevCard': false, 'endTurn': false};
     }
 
     var action;

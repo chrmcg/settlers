@@ -645,7 +645,6 @@ game.actions.acceptOffer = function(from, offer) {
 }
 
 game.actions.cancelSelect = function(reset_offer) {
-
     if(reset_offer === true) {
         // Reset your offer to null
         game.state['p'+(game.state.turn-1)].offer = {};
@@ -666,7 +665,6 @@ game.actions.cancelSelect = function(reset_offer) {
     game.selectbox.wrapper_outer.setAttribute('display', 'none');
     game.tradebox.setAttribute('display', 'none');
     game.display.refreshDevCards();
-    game.proceed();
 };
 
 game.actions.announceOffer = function(player, offer) {
@@ -929,7 +927,8 @@ game.actions.playerControl = function() {
 
 game.actions.endTurn = function() {
     game.display.disableAllMenuButtons();
-
+    game.display.enableMenuButtons(['offerTrade']);
+    
     game.display.cancelPlacement();
     game.actions.cancelSelect();
 
