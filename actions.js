@@ -915,7 +915,9 @@ game.actions.selectEdge = function(i, player, params) {
     })(game.board.edges);
     obj['edges'] = JSON.stringify(edges);
     game.state.updateVictoryPoints(obj);
-    game.proceed();
+    if (game.state.phase === 2) {
+        game.proceed();
+    }
 };
 
 
