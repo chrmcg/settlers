@@ -67,7 +67,7 @@ game.actions.getRobbed = function() {
 
     if(cards > 7) {
         //TODO: setAttribute
-        game.display.hideButtons(['endTurn']);
+        game.display.hideMenuButtons(['endTurn']);
         for(var i = 1; i <= 5; i++) {
             game.statusbox.fields[(game.state.turn-1)]['r'+i].button.setAttribute('onclick','');
             game.statusbox.fields[(game.state.turn-1)]['r'+i].button.children[0].setAttribute('fill','gray');
