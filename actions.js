@@ -66,14 +66,11 @@ game.actions.getRobbed = function() {
     }
 
     if(cards > 7) {
-        //TODO: setAttribute
-        game.display.hideMenuButtons(['endTurn']);
+        game.display.disableMenuButtons(['endTurn']);
         game.display.disableAllExchangeButtons();
         game.actions.selectCards('R', {card_count: cards});
-        
     } else {
-        game.state.next_action = 'playerControl';
-        gapi.hangout.data.submitDelta({next_action: 'playerControl'});
+        game.state.next_action = 'moveRobber';
         game.proceed();
     }
 };
@@ -102,7 +99,16 @@ game.actions.selectRobber = function(i) {
         game.board.hexes[j].circle.setAttribute('onclick', '');
     }
     game.board.hexes[i].robber = 1;
-
+    var obj = {'hexes' : JSON.stringify(
+        (function(hexes){
+            var arr = [];
+            for(var i = 0; i < hexes.length; i++) {
+                arr.push({num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
+            }
+            return arr;
+        })(game.board.hexes))
+    };
+    gapi.hangout.data.submitDelta(obj);
     game.state.next_action = 'stealFrom';
     game.proceed();
 };
@@ -122,9 +128,10 @@ game.actions.stealFrom = function() {
     }
 
     game.state.next_action = 'playerControl';
-
     console.log('Choose one of (' + owners.join(', ') + ') to steal a card from');
     // TODO: user chooses from (owners) and randomly gets one of their cards
+    game.display.refreshMenuButtons();
+    game.display.refreshExchangeButtons();
     gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'playerControl'});
     game.proceed();
 };
@@ -603,6 +610,9 @@ game.actions.confirmSelect = function(reason, params) {
         game.state.next_action = 'moveRobber';
         gapi.hangout.data.submitDelta(obj);
         game.actions.cancelSelect();
+        if(game.state.turn === game.state.getLocalPlayerNumber()) {
+            game.proceed();
+        }
     break;
     case '1':
         var ask = {}, a;
@@ -775,7 +785,7 @@ game.actions.buildSettlement = function() {
     if(game.state.phase == 0 || game.state.phase == 1) {
         game.board.showAvailableVertices(1, playerNum);
     } else if(game.state.phase == 2) {
-        if(game.state.playerHas(num, {1: 1, 2: 1, 3: 1, 4: 1}))  {
+        if(game.state.playerHas(playerNum, {1: 1, 2: 1, 3: 1, 4: 1}))  {
             game.board.showAvailableVertices(1, playerNum);
         } else {
             console.log('Cannot build. You have insufficient resources');
@@ -851,6 +861,8 @@ game.actions.selectVertex = function(i, type) {
         return obj;
     })(game.board.vertices);
     var obj = {};
+    game.state.next_action = 'playerControl';
+    obj['next_action'] = 'playerControl';
     if (game.state.phase == 0 || game.state.phase == 1) {
         game.state.next_action = 'buildRoad';
         obj['next_action'] = 'buildRoad';

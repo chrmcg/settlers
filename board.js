@@ -463,19 +463,21 @@ game.board.showAvailableVertices = function(type, player) {
                     draw = false;
                 }
             }
+            var draw2 = true;
             var edges = this.vertices[i].edges;
             if(game.state.phase == 2) {
+                draw2 = false;
                 for(var j = 0; j < edges.length; j++) {
                     var edge = edges[j];
-                    if(this.edges[edge].owner != player) {
-                        draw = false;
+                    if(this.edges[edge].owner === player) {
+                        draw2 = true;
                     }
                 }
             }
             if(this.vertices[i].contents != 0) {
                 draw = false;
             }
-            if(draw) {
+            if(draw && draw2) {
                 this.vertices[i].v.setAttribute('class', 'menu-item');
                 this.vertices[i].v.setAttribute('visibility', 'visible');
                 this.vertices[i].v.setAttribute('onmouseover', 'game.board.highlightVertex('+i+', ' + type + ', ' + player + ')');

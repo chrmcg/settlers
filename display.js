@@ -70,6 +70,16 @@ game.display.refreshMenuButtons = function() {
             'buyDevCard': game.state.playerHas(game.state.turn, {2:1, 3:1, 5:1}),
             'endTurn': true,
         };
+    } else {
+        obj = {
+            'offerTrade': true,
+            'buildRoad': false,
+            'buildSettlement': false,
+            'buildCity': false,
+            'buyDevCard': false,
+            'endTurn': true,
+        };
+
     }
 
     var action;
@@ -177,6 +187,7 @@ game.display.refreshDevCards = function() {
             game.menu.devcards[i].button.children[0].setAttribute('fill', 'white');
         } else {
             game.menu.devcards[i].button.children[0].setAttribute('fill', 'gray');
+            game.menu.devcards[i].button.setAttribute('onclick', '');
         }
     }
 };

@@ -263,6 +263,8 @@ game.state.download = function(state) {
             }
             if(cards > 7) {
                 game.actions.selectCards('R', {card_count: cards});
+            } else {
+                this.next_action = 'playerControl';
             }
         }
         game.display.refreshResourceCounts();
