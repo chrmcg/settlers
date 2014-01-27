@@ -855,11 +855,12 @@ game.actions.selectVertex = function(i, type) {
         return obj;
     })(game.board.vertices);
     var obj = {};
-    obj['vertices'] = JSON.stringify(vertices);
-    game.state.updateVictoryPoints(obj);
     if (game.state.phase == 0 || game.state.phase == 1) {
         game.state.next_action = 'buildRoad';
+        obj['next_action'] = 'buildRoad';
     }
+    obj['vertices'] = JSON.stringify(vertices);
+    game.state.updateVictoryPoints(obj);
 
     game.proceed();
 };
@@ -917,7 +918,6 @@ game.actions.selectEdge = function(i, player, params) {
     })(game.board.edges);
     obj['edges'] = JSON.stringify(edges);
     game.state.updateVictoryPoints(obj);
-
     game.proceed();
 };
 
