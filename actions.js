@@ -283,8 +283,9 @@ game.actions.selectCards = function(reason, params) {
        
         case 'R':
         // Robbed
+        var playerNum = game.state.getLocalPlayerNumber();
         var cards_robbed = Math.floor(params.card_count / 2);
-        console.log('Player '+game.state.turn+' has '+params.card_count+' cards and must discard '+cards_robbed);
+        console.log('Player '+playerNum+' has '+params.card_count+' cards and must discard '+cards_robbed);
         this.incdec = function(i, amt) {
             var c = amt+parseInt(game.selectbox.fields['r'+i].num.textContent);
             game.selectbox.fields['r'+i].num.textContent = c;
@@ -296,7 +297,7 @@ game.actions.selectCards = function(reason, params) {
                 sum += obj[j];
             }
 
-            var limit = game.state['p'+(game.state.turn-1)]['r'+i];
+            var limit = game.state['p'+(playerNum-1)]['r'+i];
 
             if(c >= limit) {
                 game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', 'game.actions.incdec('+i+',-1)');
@@ -310,7 +311,7 @@ game.actions.selectCards = function(reason, params) {
                 game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', '');
             }
 
-            if(sum == cards_robbed && game.state.playerHas(game.state.turn, obj) === true) {
+            if(sum == cards_robbed && game.state.playerHas(playerNum, obj) === true) {
                 for(var j = 1; j <= 5; j++) {
                     game.selectbox.fields['r'+j].inc_button.children[0].setAttribute('fill', 'gray');
                     game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', '');
@@ -324,7 +325,7 @@ game.actions.selectCards = function(reason, params) {
                 });
             } else if(sum < cards_robbed) {
                 for(var j = 1; j <= 5; j++) {
-                    if(obj[j] < game.state['p'+(game.state.turn-1)]['r'+j]) {
+                    if(obj[j] < game.state['p'+(playerNum-1)]['r'+j]) {
                         game.selectbox.fields['r'+j].inc_button.children[0].setAttribute('fill', 'white');
                         game.selectbox.fields['r'+j].inc_button.setAttribute('onclick', 'game.actions.incdec('+j+',1)');
                     } else {
@@ -345,7 +346,7 @@ game.actions.selectCards = function(reason, params) {
 
         for(var i = 1; i <= 5; i++) {
             game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
-            if(game.state['p'+(game.state.turn-1)]['r'+i] > 0) {
+            if(game.state['p'+(playerNum-1)]['r'+i] > 0) {
                 game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
                 game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
             } else {
@@ -892,16 +893,18 @@ game.actions.selectEdge = function(i, player, params) {
 
     } else if(game.state.phase === 2) {
         game.state['p'+(game.state.turn-1)].roads--;
-        console.log(params);
-        if (params === undefined) { 
-            game.state.next_action = 'playerControl';
-            obj['next_action'] = 'playerControl';
-            game.state.deduct(player, {1: 1, 4: 1});
-        } else if (params == 'R') {
-            game.board.showAvailableEdges(player, 'R1'); 
+        if(params === 'R') {
+            // This means we just built a road for free
+            // and now we are going to build a second one (Road Building Card)
+            game.board.showAvailableEdges(player, 'R1');
         } else {
             game.state.next_action = 'playerControl';
             obj['next_action'] = 'playerControl';
+            if(params !== 'R1') {
+                // We are not on our second road for the Road Building Card,
+                // we are paying for it
+                game.state.deduct(player, {1: 1, 4: 1});
+            }
         }
     } 
     var edges = (function(edges){ 
