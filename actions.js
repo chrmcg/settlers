@@ -825,8 +825,10 @@ game.actions.selectVertex = function(i, type) {
 
     if(game.state.phase == 0) {
         game.state['p'+(playerNum-1)].firstSettlement = i;
+        game.state['p'+(playerNum-1)].settlements--;
     } else if(game.state.phase == 1) {
         game.state['p'+(playerNum-1)].secondSettlement = i;
+        game.state['p'+(playerNum-1)].settlements--;
         var obj = {}, b;
         for(var j = 0; j < game.board.vertices[i].hexes.length; j++) {
             b = game.board.hexes[game.board.vertices[i].hexes[j]].type;
@@ -842,6 +844,7 @@ game.actions.selectVertex = function(i, type) {
             if(game.board.vertices[i].owner === playerNum) {
                 game.state.deduct(playerNum, {3: 2, 5: 3});
                 game.state['p'+(game.state.turn-1)].cities--;
+                game.state['p'+(game.state.turn-1)].settlements++;
             }
         }
     }
