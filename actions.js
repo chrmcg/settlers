@@ -83,16 +83,26 @@ game.actions.moveRobber = function() {
 
     // Move the robber
     for (var i = 0; i < 19; i++) {
+        game.board.hexes[i].robber = 0;
         game.board.hexes[i].circle.setAttribute('class', 'menu-item');
         game.board.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
         game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
         game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
     }
+    var obj = {'hexes' : JSON.stringify(
+        (function(hexes){
+            var arr = [];
+            for(var i = 0; i < hexes.length; i++) {
+                arr.push({num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
+            }
+            return arr;
+        })(game.board.hexes))
+    };
+    gapi.hangout.data.submitDelta(obj);
 };
 
 game.actions.selectRobber = function(i) {
     for (var j = 0; j < 19; j++) {
-        game.board.hexes[j].robber = 0;
         game.board.hexes[j].circle.setAttribute('class', '');
         game.board.hexes[j].circle.setAttribute('onmouseover', '');
         game.board.hexes[j].circle.setAttribute('onmouseout', '');
