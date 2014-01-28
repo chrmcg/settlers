@@ -515,19 +515,14 @@ game.board.highlightVertex = function(i, type, player) {
 };
 
 game.board.unhighlightVertex = function(i, type) {
-    if(type == 1) {
-        this.vertices[i].v.setAttribute('width', '10');
-        this.vertices[i].v.setAttribute('height', '10');
-        this.vertices[i].v.setAttribute('x', this.vertices[i].x - 5);
-        this.vertices[i].v.setAttribute('y', this.vertices[i].y - 5);
-        this.vertices[i].v.setAttribute('fill', 'white');
-    } else if (type == 2) {
-        this.vertices[i].v.setAttribute('width', '20');
-        this.vertices[i].v.setAttribute('height', '20');
-        this.vertices[i].v.setAttribute('x', this.vertices[i].x - 10);
-        this.vertices[i].v.setAttribute('y', this.vertices[i].y - 10);
-    }
+    this.vertices[i].v.setAttribute('width', '10');
+    this.vertices[i].v.setAttribute('height', '10');
+    this.vertices[i].v.setAttribute('x', this.vertices[i].x - 5);
+    this.vertices[i].v.setAttribute('y', this.vertices[i].y - 5);
     this.vertices[i].v.setAttribute('onclick', '');
+    if(type == 1) {
+        this.vertices[i].v.setAttribute('fill', 'white');
+    }
 };
 
 game.board.highlightEdge = function(i, player, params) {
