@@ -784,8 +784,7 @@ game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
         game.menu.displayOffers();
         game.actions.cancelSelect();
     }
-
-    game.proceed();
+    //TODO: Check if playerControl needs to be called or if cancelSelect suffices
 };
 
 // 1 = WOOD, 2 = SHEEP, 3 = WHEAT, 4 = BRICK, 5 = ORE
