@@ -267,9 +267,9 @@ game.state.download = function(state) {
                 game.actions.selectCards('R', {card_count: cards});
             } else {
                 this.next_action = 'playerControl';
-                obj = {};
             }
             this['p'+(this.getLocalPlayerNumber()-1)].robbed = true;
+            console.log("robbed!");
             var obj = {};
             obj['p'+(this.getLocalPlayerNumber()-1)] = JSON.stringify(this['p'+(this.getLocalPlayerNumber()-1)]);
             gapi.hangout.data.submitDelta(obj);
