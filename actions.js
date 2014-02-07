@@ -686,6 +686,7 @@ game.actions.cancelSelect = function(reset_offer) {
     game.selectbox.wrapper_outer.setAttribute('display', 'none');
     game.tradebox.setAttribute('display', 'none');
     game.display.refreshDevCards();
+    game.display.refreshExchangeButtons();
 };
 
 game.actions.announceOffer = function(player, offer) {
