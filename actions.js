@@ -977,7 +977,7 @@ game.actions.endTurn = function() {
     var obj = {'next_action': 'rollDice'};
     obj['turn'] = ''+game.state.turn;
     obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    obj['p'+(game.state.turn-1)] = game.state['p'+(game.state.turn-1)];
+    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
     gapi.hangout.data.submitDelta(obj);
 }
 
