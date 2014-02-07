@@ -968,7 +968,9 @@ game.actions.playerControl = function() {
 game.actions.endTurn = function() {
     game.display.disableAllMenuButtons();
     game.display.enableMenuButtons(['offerTrade']);
-    
+   
+    game.display.disableAllExchangeButtons();
+
     game.display.cancelPlacement();
     game.actions.cancelSelect();
 
