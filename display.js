@@ -189,7 +189,7 @@ game.display.refreshDevCards = function() {
     }
     for(var i = 0; i < game.menu.devcards.length; i++) {
         if(game.menu.devcards[i].text.textContent.length > 0 && game.state.turn === playerNum
-                && (p.newcards[letters[i]] === undefined || ['c'+letters[i]] > p.newcards[letters[i]]) {
+                && (p.newcards[letters[i]] === undefined || ['c'+letters[i]] > p.newcards[letters[i]])) {
             game.menu.devcards[i].button.children[0].setAttribute('fill', 'white');
         } else {
             game.menu.devcards[i].button.children[0].setAttribute('fill', 'gray');
