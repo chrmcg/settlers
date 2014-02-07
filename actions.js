@@ -181,7 +181,7 @@ game.actions.buyDevCard = function() {
         console.log('Player ' + game.state.turn + ' cannot afford a dev card');
     }
 
-    game.state.updateVictoryPoints();
+    game.state.updateVictoryPoints({devcards: JSON.stringify(game.state.devcards)});
     game.state.next_action = 'playerControl';
     game.proceed();
 };
