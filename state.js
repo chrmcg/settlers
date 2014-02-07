@@ -269,7 +269,6 @@ game.state.download = function(state) {
                 this.next_action = 'playerControl';
             }
             this['p'+(this.getLocalPlayerNumber()-1)].robbed = true;
-            console.log("robbed!");
             var obj = {};
             obj['p'+(this.getLocalPlayerNumber()-1)] = JSON.stringify(this['p'+(this.getLocalPlayerNumber()-1)]);
             gapi.hangout.data.submitDelta(obj);
