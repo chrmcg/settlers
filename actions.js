@@ -58,10 +58,10 @@ game.actions.rollDice = function() {
         }
     }
 
+    game.proceed();
     for(var i = 0; i < game.state.player_count; i++) {
         obj['p'+i] = JSON.stringify(game.state['p'+i]);
     }
-    game.proceed();
     gapi.hangout.data.submitDelta(obj);
 };
 
