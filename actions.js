@@ -89,6 +89,7 @@ game.actions.moveRobber = function() {
         game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
         game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
     }
+
     var obj = {'hexes' : JSON.stringify(
         (function(hexes){
             var arr = [];
@@ -194,6 +195,7 @@ game.actions.playDevCard = function(type) {
         game.state['p'+(game.state.turn-1)].army++;
         game.state['p'+(game.state.turn-1)].cK--;
         game.state.updateVictoryPoints();
+        game.display.refreshDevCards();
 
         game.actions.moveRobber();
     break;
@@ -203,8 +205,9 @@ game.actions.playDevCard = function(type) {
     case 'R':
         // Build 2 roads free of charge
         if (game.state['p'+(game.state.turn-1)].roads > 1) {
-            game.state['p'+(game.state.turn-1)].cR--;
             game.actions.buildRoad('R');
+            game.state['p'+(game.state.turn-1)].cR--;
+            game.display.refreshDevCards();
         }
     break;
     case 'M':
