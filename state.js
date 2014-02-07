@@ -258,7 +258,7 @@ game.state.download = function(state) {
                 game.proceed();
             }
         }
-        if(this.turn !== num && this.next_action === 'getRobbed' && this['p'+(this.getLocalPlayerNumber()].robbed === false) {
+        if(this.turn !== num && this.next_action === 'getRobbed' && this['p'+(this.getLocalPlayerNumber()-1)].robbed === false) {
             var cards = 0;
             for(var i = 1; i <= 5; i++) {
                 cards += this['p'+(this.getLocalPlayerNumber()-1)]['r'+i];
