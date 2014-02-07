@@ -268,18 +268,18 @@ game.state.download = function(state) {
             } else {
                 this.next_action = 'playerControl';
                 obj = {};
-                obj['p'+(this.getLocalPlayerNumber()-1)] =this['p'+(this.getLocalPlayerNumber()-1)];
+                obj['p'+(this.getLocalPlayerNumber()-1)] = JSON.stringify(this['p'+(this.getLocalPlayerNumber()-1)]);
                 gapi.hangout.data.submitDelta(obj);
             }
             this['p'+(this.getLocalPlayerNumber()-1)].robbed = true;
         } else if (this.turn === num && this.next_action === 'getRobbed') {
             var numrobbed = 0;
-            for(var i = 0; i < game.state.player_count; i++) {
+            for(var i = 0; i < this.player_count; i++) {
                 if(this['p'+i].robbed === true) {
                     numrobbed++;
                 }
             }
-            if(numrobbed === game.state.player_count) {
+            if(numrobbed === this.player_count) {
                 game.state.next_action = 'moveRobber';
                 game.proceed();
             }
