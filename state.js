@@ -279,7 +279,7 @@ game.state.download = function(state) {
                     numrobbed++;
                 }
             }
-            if(numrobbed === player_count) {
+            if(numrobbed === game.state.player_count) {
                 game.state.next_action = 'moveRobber';
                 game.proceed();
             }
