@@ -25,10 +25,6 @@ game.actions.rollDice = function() {
         for(var i = 0; i < game.state.player_count; i++) {
             game.state['p'+i].robbed = false;
         }
-        for(var i = 0; i < game.state.player_count; i++) {
-            obj['p'+i] = JSON.stringify(game.state['p'+i]);
-        }
-        gapi.hangout.data.submitDelta(obj);
     } else {
         var h, v, o;
         for(var i = 0; i < 19; i++) {

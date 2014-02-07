@@ -281,6 +281,7 @@ game.state.download = function(state) {
             }
             if(numrobbed === this.player_count) {
                 game.state.next_action = 'moveRobber';
+                gapi.hangout.data.submitDelta({next_action: 'moveRobber'});
                 game.proceed();
             }
         }
