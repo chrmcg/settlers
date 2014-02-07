@@ -270,6 +270,7 @@ game.state.download = function(state) {
                 obj = {};
             }
             this['p'+(this.getLocalPlayerNumber()-1)].robbed = true;
+            var obj = {};
             obj['p'+(this.getLocalPlayerNumber()-1)] = JSON.stringify(this['p'+(this.getLocalPlayerNumber()-1)]);
             gapi.hangout.data.submitDelta(obj);
         } else if (this.turn === num && this.next_action === 'getRobbed') {

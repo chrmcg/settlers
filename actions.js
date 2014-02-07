@@ -74,6 +74,7 @@ game.actions.getRobbed = function() {
         game.actions.selectCards('R', {card_count: cards});
     }
     game.state['p'+(game.state.getLocalPlayerNumber()-1)].robbed = true;
+    var obj = {};
     obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
     gapi.hangout.data.submitDelta(obj);
 };
