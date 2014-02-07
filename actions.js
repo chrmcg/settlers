@@ -169,6 +169,10 @@ game.actions.buyDevCard = function() {
             delete game.state.devcards[k];
 
             game.state['p'+(game.state.turn-1)]['c'+card]++;
+            if(game.state['p'+(game.state.turn-1)].newcards[card] === undefined) {
+                game.state['p'+(game.state.turn-1)].newcards[card] = 0;
+            }
+            game.state['p'+(game.state.turn-1)].newcards[card]++;
             console.log('Player ' + game.state.turn + ' buys a ' + card + ' card');
             game.display.refreshDevCards();
         }
@@ -969,6 +973,7 @@ game.actions.endTurn = function() {
     game.state.turn = game.state.turn == game.state.player_count ? 1 : game.state.turn+1;
 
     window.diceRolled = false;
+    game.state['p'+(game.state.turn-1)].newcards = {};
     var obj = {'next_action': 'rollDice'};
     obj['turn'] = ''+game.state.turn;
     obj['id'] = gapi.hangout.getLocalParticipant().person.id;

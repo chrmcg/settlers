@@ -153,12 +153,14 @@ game.display.refreshDevCards = function() {
         game.menu.devcards[j].button.setAttribute('visibility', 'hidden');
     }
 
+    var letters = [];
     var i = 0;
     if(p.cK > 0) {
         game.menu.devcards[i].text.setAttribute('visibility', 'visible');
         game.menu.devcards[i].button.setAttribute('visibility', 'visible');
         game.menu.devcards[i].text.textContent = 'Knight' + (p.cK > 1 ? ' x'+p.cK : '');
         game.menu.devcards[i].button.setAttribute('onclick', 'game.actions.playDevCard("K")');
+        letters[i] = 'K';
         i++;
     }
     if(p.cM > 0) {
@@ -166,6 +168,7 @@ game.display.refreshDevCards = function() {
         game.menu.devcards[i].button.setAttribute('visibility', 'visible');
         game.menu.devcards[i].text.textContent = 'Monopoly' + (p.cM > 1 ? ' x'+p.cM : '');
         game.menu.devcards[i].button.setAttribute('onclick', 'game.actions.playDevCard("M")');
+        letters[i] = 'M';
         i++;
     }
     if(p.cR > 0) {
@@ -173,6 +176,7 @@ game.display.refreshDevCards = function() {
         game.menu.devcards[i].button.setAttribute('visibility', 'visible');
         game.menu.devcards[i].text.textContent = 'Road Building' + (p.cR > 1 ? ' x'+p.cR : '');
         game.menu.devcards[i].button.setAttribute('onclick', 'game.actions.playDevCard("R")');
+        letters[i] = 'R';
         i++;
     }
     if(p.cY > 0) {
@@ -180,10 +184,12 @@ game.display.refreshDevCards = function() {
         game.menu.devcards[i].button.setAttribute('visibility', 'visible');
         game.menu.devcards[i].text.textContent = 'Year of Plenty' + (p.cY > 1 ? ' x'+p.cY : '');
         game.menu.devcards[i].button.setAttribute('onclick', 'game.actions.playDevCard("Y")');
+        letters[i] = 'Y';
         i++;
     }
     for(var i = 0; i < game.menu.devcards.length; i++) {
-        if(game.menu.devcards[i].text.textContent.length > 0 && game.state.turn === playerNum) {
+        if(game.menu.devcards[i].text.textContent.length > 0 && game.state.turn === playerNum
+                && (p.newcards[letters[i]] === undefined || ['c'+letters[i]] > p.newcards[letters[i]]) {
             game.menu.devcards[i].button.children[0].setAttribute('fill', 'white');
         } else {
             game.menu.devcards[i].button.children[0].setAttribute('fill', 'gray');

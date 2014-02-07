@@ -30,6 +30,7 @@ game.state.init = function(player_count, start_state) {
             cY: 0, //Year of Plenty cards
             cM: 0, //Monopoly cards
             cV: 0, //Victory Point Card cards
+            newcards: {},
             roads: 15,
             settlements: 5,
             cities: 4,
