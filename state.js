@@ -38,6 +38,7 @@ game.state.init = function(player_count, start_state) {
             proposal: {},
             color: start_state[i].color,
             id: start_state[i].id,
+            robbed: false
         };
     }
 
@@ -257,15 +258,30 @@ game.state.download = function(state) {
                 game.proceed();
             }
         }
-        if(this.turn !== num && this.next_action === 'getRobbed') {
+        if(this.turn !== num && this.next_action === 'getRobbed' && this['p'+(this.getLocalPlayerNumber()].robbed === false) {
             var cards = 0;
             for(var i = 1; i <= 5; i++) {
-                cards += game.state['p'+(this.getLocalPlayerNumber()-1)]['r'+i];
+                cards += this['p'+(this.getLocalPlayerNumber()-1)]['r'+i];
             }
             if(cards > 7) {
                 game.actions.selectCards('R', {card_count: cards});
             } else {
                 this.next_action = 'playerControl';
+                obj = {};
+                obj['p'+(this.getLocalPlayerNumber()-1)] =this['p'+(this.getLocalPlayerNumber()-1)];
+                gapi.hangout.data.submitDelta(obj);
+            }
+            this['p'+(this.getLocalPlayerNumber()-1)].robbed = true;
+        } else if (this.turn === num && this.next_action === 'getRobbed') {
+            var numrobbed = 0;
+            for(var i = 0; i < game.state.player_count; i++) {
+                if(this['p'+i].robbed === true) {
+                    numrobbed++;
+                }
+            }
+            if(numrobbed === player_count) {
+                game.state.next_action = 'moveRobber';
+                game.proceed();
             }
         }
         game.display.refreshResourceCounts();

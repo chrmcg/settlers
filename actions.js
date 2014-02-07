@@ -22,6 +22,9 @@ game.actions.rollDice = function() {
     if(d == 7) {
         game.state.next_action = 'getRobbed';
         obj['next_action'] = 'getRobbed';
+        for(var i = 0; i < game.state.player_count; i++) {
+            game.state['p'+i].robbed = false;
+        }
     } else {
         var h, v, o;
         for(var i = 0; i < 19; i++) {
@@ -69,10 +72,8 @@ game.actions.getRobbed = function() {
         game.display.disableMenuButtons(['endTurn']);
         game.display.disableAllExchangeButtons();
         game.actions.selectCards('R', {card_count: cards});
-    } else {
-        game.state.next_action = 'moveRobber';
-        game.proceed();
     }
+    game.state['p'+(game.state.getLocalPlayerNumber()-1)].robbed = true;
 };
 
 
