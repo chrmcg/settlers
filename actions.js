@@ -780,16 +780,16 @@ game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
         game.state['p'+(p_A-1)].proposal = {};
         game.state['p'+(p_B-1)].offer = {};
         game.state['p'+(p_B-1)].proposal = {};
-        //TODO: submitDelta of game.state[p pA] and [p pB]
-        obj = {};
-        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-        for(var i = 0; i < game.state.player_count; i++) {
-            obj['p'+i] = JSON.stringify(game.state['p'+i]);
-        }
-        gapi.hangout.data.submitDelta(obj);
+                gapi.hangout.data.submitDelta(obj);
         game.menu.displayOffers();
         game.actions.cancelSelect();
     }
+    obj = {};
+    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
+    for(var i = 0; i < game.state.player_count; i++) {
+        obj['p'+i] = JSON.stringify(game.state['p'+i]);
+    }
+
     //TODO: Check if playerControl needs to be called or if cancelSelect suffices
 };
 
