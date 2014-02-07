@@ -686,7 +686,6 @@ game.actions.cancelSelect = function(reset_offer) {
     game.selectbox.wrapper_outer.setAttribute('display', 'none');
     game.tradebox.setAttribute('display', 'none');
     game.display.refreshDevCards();
-    game.display.refreshExchangeButtons();
 };
 
 game.actions.announceOffer = function(player, offer) {
@@ -790,6 +789,7 @@ game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
         obj['p'+i] = JSON.stringify(game.state['p'+i]);
     }
     gapi.hangout.data.submitDelta(obj);
+    game.display.refreshExchangeButtons();
     //TODO: Check if playerControl needs to be called or if cancelSelect suffices
 };
 
