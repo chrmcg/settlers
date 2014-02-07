@@ -576,7 +576,7 @@ game.actions.confirmSelect = function(reason, params) {
             if(a > 0) ask[j] = a;
         }
         game.state['p'+(game.state.turn-1)].cY--;
-        game.actions.completeTrade(game.state.getLocalPlayerNum(), 0, {}, ask);
+        game.actions.completeTrade(game.state.getLocalPlayerNumber(), 0, {}, ask);
 
         game.actions.cancelSelect();
     break;
