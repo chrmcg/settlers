@@ -8,6 +8,8 @@ game.state = {
     devcards: {},
     longest_road: 0,
     largest_army: 2,
+    d1: 0,
+    d2: 0
 };
 
 game.state.init = function(player_count, start_state) {
