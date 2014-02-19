@@ -307,7 +307,7 @@ game.state.download = function(state) {
                             if(m.ask[k] != j.offer[k]) bool = false;
                         }
                         if(bool === true) {
-                            game.actions.completeTrade(m.from, m.to, offer, ask);
+                            game.actions.completeTrade(j.from, m.to, j.offer, m.ask);
                             console.log('Trade confirmed: Player '+m.from+' trades '+JSON.stringify(offer)+' to player '+ m.to+' for '+JSON.stringify(ask));
                         }
                     }
