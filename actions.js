@@ -665,8 +665,8 @@ game.actions.acceptOffer = function(from, offer) {
 
     var sum;
     sum = 0;
-    for(var j in game.state['p'+(game.state.turn-1)].offer) { 
-        sum += game.state['p'+(game.state.turn-1)].offer[j]; 
+    for(var j in game.state['p'+(game.state.getLocalPlayerNumber()-1)].offer) { 
+        sum += game.state['p'+(game.state.getLocalPlayerNumber()-1)].offer[j]; 
     }
     if(sum == 0) {
         console.log('You must offer something');
@@ -679,9 +679,9 @@ game.actions.acceptOffer = function(from, offer) {
 game.actions.cancelSelect = function(reset_offer) {
     if(reset_offer === true) {
         // Reset your offer to null
-        game.state['p'+(game.state.turn-1)].offer = {};
-        game.state['p'+(game.state.turn-1)].proposal = {};
-        console.log('Player '+game.state.turn+' has canceled trading');
+        game.state['p'+(game.state.getLocalPlayerNumber()-1)].offer = {};
+        game.state['p'+(game.state.getLocalPlayerNumber()-1)].proposal = {};
+        console.log('Player '+game.state.getLocalPlayerNumber()+' has canceled trading');
     }
 
     game.display.showMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard']);
@@ -736,7 +736,9 @@ game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
                     if(ask[k] != j.offer[k]) bool = false;
                 }
                 if(bool === true) {
-                    game.actions.completeTrade(p_from, p_to, offer, ask);
+                    if(game.state.turn === game.state.getLocalPlayerNumber() || p_to === game.state.turn) {
+                        game.actions.completeTrade(p_from, p_to, offer, ask);
+                    }
                     console.log('Trade confirmed: Player '+p_from+' trades '+JSON.stringify(offer)+' to player '+ p_to+' for '+JSON.stringify(ask));
                 }
             }
