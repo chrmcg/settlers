@@ -298,17 +298,18 @@ game.state.download = function(state) {
             for(var i = 0; i < game.state.player_count; i++) {
                 j = game.state['p'+i].proposal;
                 for(var m = i+1; m < game.state.player_count; m++) {
-                    if(j.from == m.to && j.to == m.from) {
+                    z = game.state['p'+i].proposal;
+                    if(j.from == z.to && j.to == z.from) {
                         var bool = true;
                         for(var k in offer) {
-                            if(m.offer[k] != j.ask[k]) bool = false;
+                            if(z.offer[k] != j.ask[k]) bool = false;
                         }
                         for(var k in ask) {
-                            if(m.ask[k] != j.offer[k]) bool = false;
+                            if(z.ask[k] != j.offer[k]) bool = false;
                         }
                         if(bool === true) {
-                            game.actions.completeTrade(j.from, m.to, j.offer, m.ask);
-                            console.log('Trade confirmed: Player '+m.from+' trades '+JSON.stringify(offer)+' to player '+ m.to+' for '+JSON.stringify(ask));
+                            game.actions.completeTrade(j.from, z.to, j.offer, z.ask);
+                            console.log('Trade confirmed: Player '+j.from+' trades '+JSON.stringify(j.offer)+' to player '+ z.to+' for '+JSON.stringify(z.ask));
                         }
                     }
                 }
