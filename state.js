@@ -298,13 +298,13 @@ game.state.download = function(state) {
             for(var i = 0; i < game.state.player_count; i++) {
                 j = game.state['p'+i].proposal;
                 for(var m = i+1; m < game.state.player_count; m++) {
-                    z = game.state['p'+i].proposal;
+                    z = game.state['p'+m].proposal;
                     if(j.from == z.to && j.to == z.from) {
                         var bool = true;
-                        for(var k in offer) {
+                        for(var k in z.offer) {
                             if(z.offer[k] != j.ask[k]) bool = false;
                         }
-                        for(var k in ask) {
+                        for(var k in z.ask) {
                             if(z.ask[k] != j.offer[k]) bool = false;
                         }
                         if(bool === true) {
