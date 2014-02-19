@@ -292,7 +292,7 @@ game.state.download = function(state) {
                 offer = true;
             }
         }
-        if(offer === true && game.selectbox.wrapper_outer.getAttribute('display') !== 'none') {
+        if(game.selectbox.wrapper_outer.getAttribute('display') !== 'none') {
             game.menu.displayOffers();
         }
         game.display.refreshResourceCounts();
