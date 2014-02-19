@@ -502,7 +502,7 @@ game.actions.selectCards = function(reason, params) {
                 sum += obj[j];
             }
 
-            var limit = game.state['p'+(game.state.turn-1)]['r'+i];
+            var limit = game.state['p'+(game.state.getLocalPlayerNumber()-1)]['r'+i];
 
             if(c >= limit) {
                 game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', 'game.actions.incdec('+i+',-1)');
@@ -549,7 +549,7 @@ game.actions.selectCards = function(reason, params) {
             game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
             game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('onclick', '');
 
-            if(parseInt(game.state['p'+(game.state.turn-1)]['r'+i]) > 0) {
+            if(parseInt(game.state['p'+(game.state.getLocalPlayerNumber()-1)]['r'+i]) > 0) {
                 game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
                 game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
             } else {
@@ -651,7 +651,7 @@ game.actions.confirmSelect = function(reason, params) {
             a = parseInt(game.selectbox.fields['r'+j].num.textContent);
             if(a > 0) offer[j] = a;
         }
-        game.actions.announceOffer(game.state.turn, offer);
+        game.actions.announceOffer(game.state.getLocalPlayerNumber(), offer);
         game.menu.displayOffers();
     break;
 
@@ -661,7 +661,7 @@ game.actions.confirmSelect = function(reason, params) {
 
 
 game.actions.acceptOffer = function(from, offer) {
-    game.state['p'+(game.state.turn-1)].ask = offer;
+    game.state['p'+(game.state.getLocalPlayerNumber()-1)].ask = offer;
 
     var sum;
     sum = 0;
@@ -704,6 +704,8 @@ game.actions.announceOffer = function(player, offer) {
     for(var i in offer) { str += offer[i] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][i] + ' '};
     console.log('Player ' + player + ' is offering ' + str);
     game.state['p'+(player-1)].offer = offer;
+    obj['p'+(player-1)] = JSON.stringify(game.state['p'+(player-1)]);
+    gapi.hangout.data.submitDelta(obj);
     game.menu.displayOffers();
 };
 
