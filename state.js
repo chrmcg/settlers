@@ -286,6 +286,7 @@ game.state.download = function(state) {
             }
         }
         game.display.refreshResourceCounts();
+        game.display.refreshDice();
     }
 };
 
@@ -296,4 +297,9 @@ game.state.getLocalPlayerNumber = function() {
             return i + 1;
         }
     }
+};
+
+game.state.setDiceValues = function(d1, d2) {
+    var obj = {d1:d1, d2:d2};
+    gapi.hangout.data.submitDelta(obj);
 };
