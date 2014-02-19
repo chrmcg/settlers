@@ -16,7 +16,8 @@ game.actions.rollDice = function() {
     var d2 = Math.floor(Math.random() * 6) + 1;
     var d = d1 + d2;
 
-    console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
+    //console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
+    game.state.setDiceValues(d1, d2);
     window.diceRolled = true;
 
     if(d == 7) {

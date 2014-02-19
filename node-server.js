@@ -10,6 +10,7 @@ var source_files = [
     'state.js',
     'statusbox.js',
     'display.js'
+    'dice.js',
 ];
 
 var server = http.createServer(function(req, res) {
