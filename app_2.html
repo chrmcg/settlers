@@ -97,6 +97,7 @@ game.startGame = function(count, players) {
         game.statusbox.init();
         game.selectbox.init();
         game.board.draw(700, 390);
+        game.dice.init();
         game.state.download(gapi.hangout.data.getState());
     }
 };
