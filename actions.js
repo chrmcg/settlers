@@ -725,23 +725,6 @@ game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
         obj['p'+(p_from-1)] = JSON.stringify(game.state['p'+(p_from-1)]);
         gapi.hangout.data.submitDelta(obj);
         // Compare with all other proposals in game.state, if match call completeTrade
-        var j;
-        for(var i = 0; i < game.state.player_count; i++) {
-            j = game.state['p'+i].proposal;
-            if(j.from == p_to && j.to == p_from) {
-                var bool = true;
-                for(var k in offer) {
-                    if(offer[k] != j.ask[k]) bool = false;
-                }
-                for(var k in ask) {
-                    if(ask[k] != j.offer[k]) bool = false;
-                }
-                if(bool === true) {
-                    game.actions.completeTrade(p_from, p_to, offer, ask);
-                    console.log('Trade confirmed: Player '+p_from+' trades '+JSON.stringify(offer)+' to player '+ p_to+' for '+JSON.stringify(ask));
-                }
-            }
-        }
     }
 };
 

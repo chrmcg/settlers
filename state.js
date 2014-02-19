@@ -294,6 +294,25 @@ game.state.download = function(state) {
         }
         if(game.selectbox.wrapper_outer.getAttribute('display') !== 'none') {
             game.menu.displayOffers();
+            var j;
+            for(var i = 0; i < game.state.player_count; i++) {
+                j = game.state['p'+i].proposal;
+                for(var m = i+1; m < game.state.player_count; m++) {
+                    if(j.from == m.to && j.to == m.from) {
+                        var bool = true;
+                        for(var k in offer) {
+                            if(m.offer[k] != j.ask[k]) bool = false;
+                        }
+                        for(var k in ask) {
+                            if(m.ask[k] != j.offer[k]) bool = false;
+                        }
+                        if(bool === true) {
+                            game.actions.completeTrade(m.from, m.to, offer, ask);
+                            console.log('Trade confirmed: Player '+m.from+' trades '+JSON.stringify(offer)+' to player '+ m.to+' for '+JSON.stringify(ask));
+                        }
+                    }
+                }
+            }
         }
         game.display.refreshResourceCounts();
         game.display.refreshDice();
