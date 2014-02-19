@@ -717,7 +717,7 @@ game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
         console.log('Player '+p_from+' proposes to trade '+JSON.stringify(offer)+' to player '+ p_to+' for '+JSON.stringify(ask));
 
         game.state['p'+(p_from-1)].proposal = {from: p_from, to: p_to, offer: offer, ask: ask};
-        obj['p'+(p_from-1)] = JSON.stringify(game.state['p'+(p_from-1)];
+        obj['p'+(p_from-1)] = JSON.stringify(game.state['p'+(p_from-1)]);
         gapi.hangout.data.submitDelta(obj);
         // Compare with all other proposals in game.state, if match call completeTrade
         var j;
