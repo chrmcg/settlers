@@ -704,6 +704,7 @@ game.actions.announceOffer = function(player, offer) {
     for(var i in offer) { str += offer[i] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][i] + ' '};
     console.log('Player ' + player + ' is offering ' + str);
     game.state['p'+(player-1)].offer = offer;
+    obj = {};
     obj['p'+(player-1)] = JSON.stringify(game.state['p'+(player-1)]);
     gapi.hangout.data.submitDelta(obj);
     game.menu.displayOffers();
@@ -719,6 +720,7 @@ game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
         console.log('Player '+p_from+' proposes to trade '+JSON.stringify(offer)+' to player '+ p_to+' for '+JSON.stringify(ask));
 
         game.state['p'+(p_from-1)].proposal = {from: p_from, to: p_to, offer: offer, ask: ask};
+        obj = {};
         obj['p'+(p_from-1)] = JSON.stringify(game.state['p'+(p_from-1)]);
         gapi.hangout.data.submitDelta(obj);
         // Compare with all other proposals in game.state, if match call completeTrade
