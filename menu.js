@@ -182,7 +182,7 @@ game.menu.displayOffers = function() {
             str += obj[j] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][j] + ' ';
         }
 
-        if(sum > 0 && (i+1) != game.state.turn) {
+        if(sum > 0 && (i+1) != game.state.getLocalPlayerNumber()) {
             game.menu.offers[k].text.textContent = str;
             game.menu.offers[k].button.setAttribute('visibility','visible');
             game.menu.offers[k].button.setAttribute('class', 'menu-item');
