@@ -9,7 +9,7 @@ var source_files = [
     'startbox.js',
     'state.js',
     'statusbox.js',
-    'display.js'
+    'display.js',
     'dice.js',
 ];
 
