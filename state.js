@@ -285,6 +285,15 @@ game.state.download = function(state) {
                 game.proceed();
             }
         }
+        var offer = false;
+        for(var i = 0; i < this.player_count; i++) {
+            if(Object.keys(game.state['p'+i].offer).length !== 0) {
+                offer = true;
+            }
+        }
+        if(offer === true && game.selectbox.wrapper_outer.getAttribute('display') !== 'none') {
+            game.menu.displayOffers();
+        }
         game.display.refreshResourceCounts();
         game.display.refreshDice();
     }

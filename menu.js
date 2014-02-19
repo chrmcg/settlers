@@ -147,7 +147,7 @@ game.menu.displayOffers = function() {
     // Display your own offer at the top
     var obj, str;
 
-    obj = game.state['p'+(game.state.turn-1)].offer;
+    obj = game.state['p'+(game.state.getLocalPlayerNumber()-1)].offer;
     sum = 0;
     str = 'Your offer: ';
     for(var j in obj) { 
@@ -182,7 +182,7 @@ game.menu.displayOffers = function() {
             str += obj[j] + ' ' + [null, 'wood', 'sheep', 'wheat', 'brick', 'ore'][j] + ' ';
         }
 
-        if(sum > 0 && (i+1) != game.state.turn) {
+        if(sum > 0 && (i+1) != game.state.getLocalPlayerNumber()) {
             game.menu.offers[k].text.textContent = str;
             game.menu.offers[k].button.setAttribute('visibility','visible');
             game.menu.offers[k].button.setAttribute('class', 'menu-item');
