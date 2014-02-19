@@ -236,9 +236,8 @@ game.state.download = function(state) {
                 try {
                     this[key] = JSON.parse(value);
                 } catch(e) {
-                    if (key === 'turn' || key === 'phase') {
+                    if (key === 'turn' || key === 'phase' || key === 'd1' || key === 'd2') {
                         this[key] = parseInt(value);
-                        console.log(key + ': ' + this[key]);
                     } else {
                         this[key] = value;
                     }
@@ -309,6 +308,6 @@ game.state.getLocalPlayerNumber = function() {
 };
 
 game.state.setDiceValues = function(d1, d2) {
-    var obj = {d1:d1, d2:d2};
+    var obj = {d1: ''+d1, d2: ''+d2};
     gapi.hangout.data.submitDelta(obj);
 };
