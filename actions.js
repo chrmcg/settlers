@@ -736,9 +736,7 @@ game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
                     if(ask[k] != j.offer[k]) bool = false;
                 }
                 if(bool === true) {
-                    if(game.state.turn === game.state.getLocalPlayerNumber() || p_to === game.state.turn) {
-                        game.actions.completeTrade(p_from, p_to, offer, ask);
-                    }
+                    game.actions.completeTrade(p_from, p_to, offer, ask);
                     console.log('Trade confirmed: Player '+p_from+' trades '+JSON.stringify(offer)+' to player '+ p_to+' for '+JSON.stringify(ask));
                 }
             }
