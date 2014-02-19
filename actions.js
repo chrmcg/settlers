@@ -672,7 +672,7 @@ game.actions.acceptOffer = function(from, offer) {
     if(sum == 0) {
         console.log('You must offer something');
     } else {
-        game.actions.proposeTrade(game.state.getLocalPlayerNumber(), from, game.state['p'+(game.state.getLocalPlayerNumber()-1)].offer, offer);
+        game.actions.proposeTrade(from, game.state.getLocalPlayerNumber(), offer, game.state['p'+(game.state.getLocalPlayerNumber()-1)].offer);
     }
 
 }
