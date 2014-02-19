@@ -147,7 +147,7 @@ game.menu.displayOffers = function() {
     // Display your own offer at the top
     var obj, str;
 
-    obj = game.state['p'+(game.state.turn-1)].offer;
+    obj = game.state['p'+(game.state.getLocalPlayerNumber()-1)].offer;
     sum = 0;
     str = 'Your offer: ';
     for(var j in obj) { 
