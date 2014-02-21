@@ -202,7 +202,7 @@ game.state.updateVictoryPoints = function(params) {
 
 game.state.download = function(state) {
     console.log(Object.keys(state));
-    
+    var prevPhase = game.state.phase;
     //Apply state_event changes
     for(var i in state) {
         var key = i;
@@ -314,6 +314,10 @@ game.state.download = function(state) {
                     }
                 }
             }
+        }
+        if(prevPhase === 1 && game.state.phase === 2 && game.state.turn !== num && game.state.next_action === 'playerControl') {
+            // Enable trade button on first turn for other players
+            game.display.enableMenuButtons(['offerTrade']);
         }
         game.display.refreshResourceCounts();
         game.display.refreshDice();
