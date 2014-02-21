@@ -11,7 +11,6 @@ game.startGame = function(count, players) {
     });
 
     gapi.hangout.data.onStateChanged.add(function(state_event) {
-        game.state.download(state_event.state);
 
         if (game.startbox.wrapper_outer !== undefined) {
             game.svg.removeChild(game.startbox.wrapper_outer);
@@ -23,6 +22,7 @@ game.startGame = function(count, players) {
             game.dice.init();
             game.state.download(state_event.state);
         }
+        game.state.download(state_event.state);
     });
     var ids = [];
     var participants = gapi.hangout.getEnabledParticipants();
