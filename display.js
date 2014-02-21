@@ -376,8 +376,8 @@ game.display.refreshPlayerFields = function() {
 
 game.display.refreshDice = function() {
 
-    game.dice.visual_d1.textContent = game.state.d1;
-    game.dice.visual_d2.textContent = game.state.d2;
+    game.dice.visual_d1.children[1].textContent = game.state.d1;
+    game.dice.visual_d2.children[1].textContent = game.state.d2;
 
 
 };
