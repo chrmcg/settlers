@@ -300,7 +300,7 @@ game.state.download = function(state) {
                 for(var m = i+1; m < game.state.player_count; m++) {
                     z = game.state['p'+m].proposal;
                     if(j.from === z.to && j.to === z.from) {
-                        var bool = true;
+                        var bool = (z.offer !== undefined && z.ask !== undefined && j.offer !== undefined && j.ask !== undefined);
                         for(var k in z.offer) {
                             if(z.offer[k] !== j.ask[k]) bool = false;
                         }
