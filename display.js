@@ -390,9 +390,9 @@ game.display.refreshDice = function() {
             game.dice.visual_d1.children[2].setAttribute('display', 'none');
             game.dice.visual_d1.children[3].setAttribute('display', 'none');
             game.dice.visual_d1.children[4].setAttribute('display', 'none');
-            game.dice.visual_d1.children[5].setAttribute('display', 'inline');
+            game.dice.visual_d1.children[5].setAttribute('display', 'none');
             game.dice.visual_d1.children[6].setAttribute('display', 'none');
-            game.dice.visual_d1.children[7].setAttribute('display', 'none');
+            game.dice.visual_d1.children[7].setAttribute('display', 'inline');
         break;
         case 3:
             game.dice.visual_d1.children[1].setAttribute('display', 'inline');
@@ -432,61 +432,63 @@ game.display.refreshDice = function() {
         break;
         default: break;
     }
-    switch(game.state.d1) {
+    switch(game.state.d2) {
         case 1:
-            game.dice.visual_d1.children[1].setAttribute('display', 'none');
-            game.dice.visual_d1.children[2].setAttribute('display', 'none');
-            game.dice.visual_d1.children[3].setAttribute('display', 'none');
-            game.dice.visual_d1.children[4].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[5].setAttribute('display', 'none');
-            game.dice.visual_d1.children[6].setAttribute('display', 'none');
-            game.dice.visual_d1.children[7].setAttribute('display', 'none');
+            game.dice.visual_d2.children[1].setAttribute('display', 'none');
+            game.dice.visual_d2.children[2].setAttribute('display', 'none');
+            game.dice.visual_d2.children[3].setAttribute('display', 'none');
+            game.dice.visual_d2.children[4].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[5].setAttribute('display', 'none');
+            game.dice.visual_d2.children[6].setAttribute('display', 'none');
+            game.dice.visual_d2.children[7].setAttribute('display', 'none');
         break;
         case 2:
-            game.dice.visual_d1.children[1].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[2].setAttribute('display', 'none');
-            game.dice.visual_d1.children[3].setAttribute('display', 'none');
-            game.dice.visual_d1.children[4].setAttribute('display', 'none');
-            game.dice.visual_d1.children[5].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[6].setAttribute('display', 'none');
-            game.dice.visual_d1.children[7].setAttribute('display', 'none');
+            game.dice.visual_d2.children[1].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[2].setAttribute('display', 'none');
+            game.dice.visual_d2.children[3].setAttribute('display', 'none');
+            game.dice.visual_d2.children[4].setAttribute('display', 'none');
+            game.dice.visual_d2.children[5].setAttribute('display', 'none');
+            game.dice.visual_d2.children[6].setAttribute('display', 'none');
+            game.dice.visual_d2.children[7].setAttribute('display', 'inline');
         break;
         case 3:
-            game.dice.visual_d1.children[1].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[2].setAttribute('display', 'none');
-            game.dice.visual_d1.children[3].setAttribute('display', 'none');
-            game.dice.visual_d1.children[4].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[5].setAttribute('display', 'none');
-            game.dice.visual_d1.children[6].setAttribute('display', 'none');
-            game.dice.visual_d1.children[7].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[1].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[2].setAttribute('display', 'none');
+            game.dice.visual_d2.children[3].setAttribute('display', 'none');
+            game.dice.visual_d2.children[4].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[5].setAttribute('display', 'none');
+            game.dice.visual_d2.children[6].setAttribute('display', 'none');
+            game.dice.visual_d2.children[7].setAttribute('display', 'inline');
         break;
         case 4:
-            game.dice.visual_d1.children[1].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[2].setAttribute('display', 'none');
-            game.dice.visual_d1.children[3].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[4].setAttribute('display', 'none');
-            game.dice.visual_d1.children[5].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[6].setAttribute('display', 'none');
-            game.dice.visual_d1.children[7].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[1].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[2].setAttribute('display', 'none');
+            game.dice.visual_d2.children[3].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[4].setAttribute('display', 'none');
+            game.dice.visual_d2.children[5].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[6].setAttribute('display', 'none');
+            game.dice.visual_d2.children[7].setAttribute('display', 'inline');
         break;
         case 5:
-            game.dice.visual_d1.children[1].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[2].setAttribute('display', 'none');
-            game.dice.visual_d1.children[3].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[4].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[5].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[6].setAttribute('display', 'none');
-            game.dice.visual_d1.children[7].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[1].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[2].setAttribute('display', 'none');
+            game.dice.visual_d2.children[3].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[4].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[5].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[6].setAttribute('display', 'none');
+            game.dice.visual_d2.children[7].setAttribute('display', 'inline');
         break;
         case 6:
-            game.dice.visual_d1.children[1].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[2].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[3].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[4].setAttribute('display', 'none');
-            game.dice.visual_d1.children[5].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[6].setAttribute('display', 'inline');
-            game.dice.visual_d1.children[7].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[1].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[2].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[3].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[4].setAttribute('display', 'none');
+            game.dice.visual_d2.children[5].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[6].setAttribute('display', 'inline');
+            game.dice.visual_d2.children[7].setAttribute('display', 'inline');
         break;
         default: break;
     }
+    game.dice.visual_d1.children[0].setAttribute('display', 'inline');
+    game.dice.visual_d2.children[0].setAttribute('display', 'inline');
 };
