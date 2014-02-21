@@ -138,6 +138,10 @@ game.display.refreshExchangeButtons = function() {
 game.display.refreshResourceCounts = function() {
     var playerNum = game.state.getLocalPlayerNumber();
     for(var i = 1; i <= 5; i++) {
+        console.log(playerNum+'\n');
+        console.log(JSON.stringify(game.state.p0)+'\n');
+        console.log(JSON.stringify(game.state.p1)+'\n');
+        console.log(JSON.stringify(game.state.p2)+'\n');
         game.statusbox.fields['r'+i].num.textContent = game.state['p'+(playerNum-1)]['r'+i];
     }
 };
