@@ -368,12 +368,14 @@ game.display.refreshVertices = function() {
 game.display.refreshPlayerFields = function() {
     for(var i = 0; i < game.state.player_count; i++) {
         var player_field = game.statusbox.player_fields[i];
-        if(i == game.state.turn-1) {
-            player_field.rect.setAttribute('height', '30px');
-            player_field.rect.setAttribute('transform', 'translate(0, -10)');
-        } else {
-            player_field.rect.setAttribute('height', '20px');
-            player_field.rect.setAttribute('transform', '');
+        if(player_field !== undefined) {
+            if(i == game.state.turn-1) {
+                player_field.rect.setAttribute('height', '30px');
+                player_field.rect.setAttribute('transform', 'translate(0, -10)');
+            } else {
+                player_field.rect.setAttribute('height', '20px');
+                player_field.rect.setAttribute('transform', '');
+            }
         }
     }
 };
