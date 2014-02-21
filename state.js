@@ -315,7 +315,7 @@ game.state.download = function(state) {
                 }
             }
         }
-        if(prevPhase === 1 && game.state.phase === 2 && game.state.turn !== num && game.state.next_action === 'playerControl') {
+        if(prevPhase === 1 && game.state.phase === 2 && game.state.turn !== num) {
             // Enable trade button on first turn for other players
             game.display.enableMenuButtons(['offerTrade']);
         }
