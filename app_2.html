@@ -14,14 +14,14 @@ game.startGame = function(count, players) {
         game.state.download(state_event.state);
 
         if (game.startbox.wrapper_outer !== undefined) {
+            game.svg.removeChild(game.startbox.wrapper_outer);
+            delete game.startbox.wrapper_outer;
             game.menu.init();
             game.statusbox.init();
             game.selectbox.init();
             game.board.draw(700, 390);
             game.dice.init();
             game.state.download(state_event.state);
-            game.svg.removeChild(game.startbox.wrapper_outer);
-            delete game.startbox.wrapper_outer;
         }
     });
     var ids = [];
@@ -93,16 +93,14 @@ game.startGame = function(count, players) {
         }
         obj['devcards']=JSON.stringify(game.state.devcards);
         obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-        gapi.hangout.data.submitDelta(obj);
-
         game.menu.init();
         game.statusbox.init();
         game.selectbox.init();
         game.board.draw(700, 390);
         game.dice.init();
-        game.state.download(gapi.hangout.data.getState());
         game.svg.removeChild(game.startbox.wrapper_outer);
         delete game.startbox.wrapper_outer;
+        gapi.hangout.data.submitDelta(obj);
     }
 };
 
