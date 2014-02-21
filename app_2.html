@@ -6,6 +6,10 @@ game.startGame = function(count, players) {
     gapi.hangout.data.onStateChanged.remove(window.onStateChangedStartBox);
     gapi.hangout.onEnabledParticipantsChanged.remove(window.onEnabledParticipantsChangedStartBox);
 
+    gapi.hangout.data.getKeys().forEach(function (k) {
+        gapi.hangout.data.clearValue(k);
+    });
+
     gapi.hangout.data.onStateChanged.add(function(state_event) {
         game.state.download(state_event.state);
 
