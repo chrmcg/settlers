@@ -892,12 +892,12 @@ game.actions.selectVertex = function(i, type) {
             v.setAttribute('width', '10');
             v.setAttribute('height', '10');
             v.setAttribute('x', vertex.x - 5);
-            v.setAttribute('y', vertex.y. - 5);
+            v.setAttribute('y', vertex.y - 5);
         } else if (vertex.contents === 2) {
             v.setAttribute('width', '20');
             v.setAttribute('height', '20');
             v.setAttribute('x', vertex.x - 10);
-            v.setAttribute('y', vertex.y. - 10);
+            v.setAttribute('y', vertex.y - 10);
         }
         if(vertex.owner !== game.state.getLocalPlayerNumber()) {
             var resources = [];
