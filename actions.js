@@ -129,7 +129,23 @@ game.actions.selectRobber = function(i) {
 };
 
 game.actions.stealFrom = function() {
-    game.board.showAvailableVertices(3, this.getLocalPlayerNumber());
+    var robberhex = null;
+    for(var j = 0; j < 19; j++) {
+        if(game.board.hexes[j].robber == 1) robberhex = j;
+    }
+    var vertices = 0;
+    for(var j = 0; j < 6; j++) {
+        var vertex = game.board.hexes[robberhex].vertices[j];
+        if(vertex.contents === 1 || vertex.contents === 2 && vertex.owner !== game.state.getLocalPlayerNumber()) {
+            vertices++;
+        }
+    }
+    if(vertices > 0) {
+        game.board.showAvailableVertices(3, this.getLocalPlayerNumber());
+    } else {
+        game.state.next_action = 'playerControl';
+        game.proceed();
+    }
 };
 
 game.actions.buyDevCard = function() {

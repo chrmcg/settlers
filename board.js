@@ -499,13 +499,13 @@ game.board.showAvailableVertices = function(type, player) {
         }
         var v;
         for(var j = 0; j < 6; j++) {
-            v = game.board.hexes[robberhex].vertices[i];
+            v = game.board.hexes[robberhex].vertices[j];
             if(this.vertices[v].contents === 1 || this.vertices[v].contents === 2 && this.vertices[v].owner !== player) {
                 this.vertices[v].v.setAttribute('class', 'menu-item');
                 this.vertices[v].v.setAttribute('width', '20');
                 this.vertices[v].v.setAttribute('height', '20');
-                this.vertices[v].v.setAttribute('x', this.vertices[i].x - 10);
-                this.vertices[v].v.setAttribute('y', this.vertices[i].y - 10);
+                this.vertices[v].v.setAttribute('x', this.vertices[v].x - 10);
+                this.vertices[v].v.setAttribute('y', this.vertices[v].y - 10);
                 this.vertices[v].v.setAttribute('onmouseover', 'game.board.highlightVertex('+i+', '+type+', '+player+')');
                 this.vertices[v].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+i+','+type+')');
             }
