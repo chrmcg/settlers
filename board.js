@@ -494,18 +494,18 @@ game.board.showAvailableVertices = function(type, player) {
         }
     } else if(type === 3) {
         var robberhex = null;
-        for(var i = 0; i < 19; i++) {
+        for(var j = 0; j < 19; j++) {
             if(game.board.hexes[j].robber == 1) robberhex = j;
         }
         var v;
-        for(var i = 0; i < 6; i++) {
+        for(var j = 0; j < 6; j++) {
             v = game.board.hexes[robberhex].vertices[i];
             if(this.vertices[v].contents === 1 || this.vertices[v].contents === 2 && this.vertices[v].owner !== player) {
                 this.vertices[v].v.setAttribute('class', 'menu-item');
-                this.vertices[i].v.setAttribute('width', '20');
-                this.vertices[i].v.setAttribute('height', '20');
-                this.vertices[i].v.setAttribute('x', this.vertices[i].x - 10);
-                this.vertices[i].v.setAttribute('y', this.vertices[i].y - 10);
+                this.vertices[v].v.setAttribute('width', '20');
+                this.vertices[v].v.setAttribute('height', '20');
+                this.vertices[v].v.setAttribute('x', this.vertices[i].x - 10);
+                this.vertices[v].v.setAttribute('y', this.vertices[i].y - 10);
                 this.vertices[v].v.setAttribute('onmouseover', 'game.board.highlightVertex('+i+', '+type+', '+player+')');
                 this.vertices[v].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+i+','+type+')');
             }

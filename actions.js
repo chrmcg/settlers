@@ -553,77 +553,6 @@ game.actions.selectCards = function(reason, params) {
             }
         });
         break;
-        case 'S':
-        game.actions.incdec = function(i, amt) {
-            var c = amt+parseInt(game.selectbox.fields['r'+i].num.textContent);
-            game.selectbox.fields['r'+i].num.textContent = c;
-
-            var sum = 0;
-            var obj = {};
-            for(var j = 1; j <= 5; j++) { 
-                obj[j] = parseInt(game.selectbox.fields['r'+j].num.textContent); 
-                sum += obj[j];
-            }
-
-            var limit = game.state['p'+(params-1)]['r'+i];
-
-            if(c >= limit || sum === 1) {
-                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', 'game.actions.incdec('+i+',-1)');
-                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'white');
-                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
-                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
-            } else if(c < limit && c > 0) {
-                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'white');
-                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', 'game.actions.incdec('+i+',-1)');
-                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
-                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
-
-            } else if(c == 0) {
-                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
-                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', '');
-                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
-                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
-            } 
-
-           game.menu.buttons.forEach(function(a){
-                if(a.getAttribute('data-action')=='confirmSelect') {
-                    if(sum > 0) {
-                        a.children[0].setAttribute('fill', 'white');
-                        a.setAttribute('onclick', 'game.actions.confirmSelect("'+reason+'","'+params+'")');
-                        a.setAttribute('class', 'menu-item');
-                    } else {
-                        a.children[0].setAttribute('fill', 'gray');
-                        a.setAttribute('onclick', '');
-                        a.setAttribute('class', '');
-
-                    }
-                }
-            });
-        };
-
-        
-        for(var i = 1; i <= 5; i++) {
-            game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
-            game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('onclick', '');
-
-            if(parseInt(game.state['p'+(params-1)]['r'+i]) > 0) {
-                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
-                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
-            } else {
-                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
-                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
-
-            }
-            game.selectbox.fields['r'+i].num.textContent = '0';
-            game.selectbox.fields['r'+i].num.setAttribute('fill', 'black');
-        }
-
-        game.menu.buttons.forEach(function(a){
-            if(a.getAttribute('data-action')=='confirmSelect'){
-                a.children[1].textContent = 'Steal From';
-            }
-        });
-        break;
         default: break;
     }
 };
@@ -706,15 +635,6 @@ game.actions.confirmSelect = function(reason, params) {
         game.actions.announceOffer(game.state.getLocalPlayerNumber(), offer);
         game.menu.displayOffers();
     break;
-    case 'S':
-        var resources = {}, a;
-        for(var j = 1; j <= 5; j++) {
-            a = parseInt(game.selectbox.fields['r'+j].num.textContent);
-            if(a > 0) resources[j] = a;
-        }
-        game.actions.completeTrade(game.state.turn, params, {}, resources);
-    break;
-
     default: break;
     }
 };
@@ -963,7 +883,24 @@ game.actions.selectVertex = function(i, type) {
             v.setAttribute('x', vertex.x - 10);
             v.setAttribute('y', vertex.y. - 10);
         }
-        game.actions.selectCards('S', vertex.owner);
+        var resources = []
+        var a = 0;
+        for(var j = 1; j <= 5; j++) {
+            if(game.state['p'+(vertex.owner-1)] > 0)
+                resources[a] = j;
+            }
+            a++;
+        }
+        var rand = Math.floor(Math.random() * a);
+        var steal = {};
+        steal[''+resources[rand]] = 1;
+        game.actions.completeTrade(game.state.getLocalPlayerNumber(), vertex.owner, {}, steal);
+        if(type === 3) {
+            game.state.next_action = 'playerControl';
+        } else {
+            game.state.next_action = 'rollDice';
+        }
+        game.proceed();
     }
 };
 
