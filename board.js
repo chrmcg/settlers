@@ -500,7 +500,7 @@ game.board.showAvailableVertices = function(type, player) {
         var v;
         for(var j = 0; j < 6; j++) {
             v = game.board.hexes[robberhex].vertices[j];
-            if(this.vertices[v].contents === 1 || this.vertices[v].contents === 2 && this.vertices[v].owner !== player) {
+            if(this.vertices[v].contents === 1 || this.vertices[v].contents === 2) {
                 this.vertices[v].v.setAttribute('class', 'menu-item');
                 this.vertices[v].v.setAttribute('width', '20');
                 this.vertices[v].v.setAttribute('height', '20');

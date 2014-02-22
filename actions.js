@@ -136,7 +136,7 @@ game.actions.stealFrom = function() {
     var vertices = 0;
     for(var j = 0; j < 6; j++) {
         var vertex = game.board.hexes[robberhex].vertices[j];
-        if(vertex.contents === 1 || vertex.contents === 2 && vertex.owner !== game.state.getLocalPlayerNumber()) {
+        if(vertex.contents === 1 || vertex.contents === 2) {
             vertices++;
         }
     }
@@ -899,18 +899,20 @@ game.actions.selectVertex = function(i, type) {
             v.setAttribute('x', vertex.x - 10);
             v.setAttribute('y', vertex.y. - 10);
         }
-        var resources = []
-        var a = 0;
-        for(var j = 1; j <= 5; j++) {
-            if(game.state['p'+(vertex.owner-1)] > 0)
-                resources[a] = j;
+        if(vertex.owner !== game.state.getLocalPlayerNumber()) {
+            var resources = [];
+            var a = 0;
+            for(var j = 1; j <= 5; j++) {
+                if(game.state['p'+(vertex.owner-1)] > 0) {
+                    resources[a] = j;
+                }
             }
             a++;
+            var rand = Math.floor(Math.random() * a);
+            var steal = {};
+            steal[''+resources[rand]] = 1;
+            game.actions.completeTrade(game.state.getLocalPlayerNumber(), vertex.owner, {}, steal);
         }
-        var rand = Math.floor(Math.random() * a);
-        var steal = {};
-        steal[''+resources[rand]] = 1;
-        game.actions.completeTrade(game.state.getLocalPlayerNumber(), vertex.owner, {}, steal);
         if(type === 3) {
             game.state.next_action = 'playerControl';
         } else {
