@@ -259,21 +259,33 @@ game.state.download = function(state) {
                 game.proceed();
             }
         }
-        if(this.turn !== num && this.next_action === 'getRobbed' && this['p'+(this.getLocalPlayerNumber()-1)].robbed === false) {
+        if(this.turn !== num && this.next_action === 'getRobbed' && this['p'+(num-1)].robbed === false) {
             var cards = 0;
             for(var i = 1; i <= 5; i++) {
-                cards += this['p'+(this.getLocalPlayerNumber()-1)]['r'+i];
+                cards += this['p'+(num-1)]['r'+i];
             }
             if(cards > 7) {
                 game.actions.selectCards('R', {card_count: cards});
-            } else {
-                this.next_action = 'playerControl';
             }
-            this['p'+(this.getLocalPlayerNumber()-1)].robbed = true;
+            this['p'+(num-1)].robbed = true;
             var obj = {};
-            obj['p'+(this.getLocalPlayerNumber()-1)] = JSON.stringify(this['p'+(this.getLocalPlayerNumber()-1)]);
+            obj['p'+(num-1)] = JSON.stringify(this['p'+(num-1)]);
             gapi.hangout.data.submitDelta(obj);
-        } else if (this.turn === num && this.next_action === 'getRobbed') {
+        } else if (this.turn === num && this.next_action === 'getRobbed' && this['p'+(num-1)].robbed === false) {
+            var cards = 0;
+            for(var i = 1; i <= 5; i++) {
+                cards += this['p'+(num-1)]['r'+i];
+            }
+            if(cards > 7) {
+                game.actions.selectCards('R', {card_count: cards});
+                game.display.disableMenuButtons(['endTurn']);
+                game.display.disableAllExchangeButtons();
+            }
+            this['p'+(num-1)].robbed = true;
+            var obj = {};
+            obj['p'+(num-1)] = JSON.stringify(this['p'+(num-1)]);
+            gapi.hangout.data.submitDelta(obj);
+        } else if (this.turn === num && this.next_action === 'getRobbed') { 
             var numrobbed = 0;
             for(var i = 0; i < this.player_count; i++) {
                 if(this['p'+i].robbed === true) {
@@ -281,8 +293,9 @@ game.state.download = function(state) {
                 }
             }
             if(numrobbed === this.player_count) {
-                game.state.next_action = 'moveRobber';
-                gapi.hangout.data.submitDelta({next_action: 'moveRobber'});
+                var obj = {};
+                obj['next_action'] = 'moveRobber';
+                gapi.hangout.data.submitDelta(obj);
                 game.proceed();
             }
         }

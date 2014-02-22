@@ -55,13 +55,12 @@ game.actions.rollDice = function() {
         }
     }
 
-    game.proceed();
     for(var i = 0; i < game.state.player_count; i++) {
         obj['p'+i] = JSON.stringify(game.state['p'+i]);
     }
     gapi.hangout.data.submitDelta(obj);
 };
-
+/*
 game.actions.getRobbed = function() {
     console.log('Each player with >7 cards has to select cards now...');
     var cards = 0; 
@@ -79,7 +78,7 @@ game.actions.getRobbed = function() {
     obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
     gapi.hangout.data.submitDelta(obj);
 };
-
+*/
 
 game.actions.moveRobber = function() {
     // Don't let the user do anything until the robber is moved
@@ -130,26 +129,7 @@ game.actions.selectRobber = function(i) {
 };
 
 game.actions.stealFrom = function() {
-
-    var robberhex = null;
-    for(var j = 0; j < 19; j++) {
-        if(game.board.hexes[j].robber == 1) robberhex = j;
-    }
-
-    var owners = [];
-    var o;
-    for(var i = 0; i < 6; i++) {
-        o = game.board.vertices[game.board.hexes[robberhex].vertices[i]].owner;
-        if(o != null && o != game.state.turn && owners.indexOf(o) == -1) owners.push(o);
-    }
-
-    game.state.next_action = 'playerControl';
-    console.log('Choose one of (' + owners.join(', ') + ') to steal a card from');
-    // TODO: user chooses from (owners) and randomly gets one of their cards
-    game.display.refreshMenuButtons();
-    game.display.refreshExchangeButtons();
-    gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'playerControl'});
-    game.proceed();
+    game.board.showAvailableVertices(3, this.getLocalPlayerNumber());
 };
 
 game.actions.buyDevCard = function() {
@@ -573,6 +553,77 @@ game.actions.selectCards = function(reason, params) {
             }
         });
         break;
+        case 'S':
+        game.actions.incdec = function(i, amt) {
+            var c = amt+parseInt(game.selectbox.fields['r'+i].num.textContent);
+            game.selectbox.fields['r'+i].num.textContent = c;
+
+            var sum = 0;
+            var obj = {};
+            for(var j = 1; j <= 5; j++) { 
+                obj[j] = parseInt(game.selectbox.fields['r'+j].num.textContent); 
+                sum += obj[j];
+            }
+
+            var limit = game.state['p'+(params-1)]['r'+i];
+
+            if(c >= limit || sum === 1) {
+                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', 'game.actions.incdec('+i+',-1)');
+                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'white');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
+            } else if(c < limit && c > 0) {
+                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'white');
+                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', 'game.actions.incdec('+i+',-1)');
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
+
+            } else if(c == 0) {
+                game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
+                game.selectbox.fields['r'+i].dec_button.setAttribute('onclick', '');
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
+            } 
+
+           game.menu.buttons.forEach(function(a){
+                if(a.getAttribute('data-action')=='confirmSelect') {
+                    if(sum > 0) {
+                        a.children[0].setAttribute('fill', 'white');
+                        a.setAttribute('onclick', 'game.actions.confirmSelect("'+reason+'","'+params+'")');
+                        a.setAttribute('class', 'menu-item');
+                    } else {
+                        a.children[0].setAttribute('fill', 'gray');
+                        a.setAttribute('onclick', '');
+                        a.setAttribute('class', '');
+
+                    }
+                }
+            });
+        };
+
+        
+        for(var i = 1; i <= 5; i++) {
+            game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('fill', 'gray');
+            game.selectbox.fields['r'+i].dec_button.children[0].setAttribute('onclick', '');
+
+            if(parseInt(game.state['p'+(params-1)]['r'+i]) > 0) {
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'white');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', 'game.actions.incdec('+i+',1)');
+            } else {
+                game.selectbox.fields['r'+i].inc_button.children[0].setAttribute('fill', 'gray');
+                game.selectbox.fields['r'+i].inc_button.setAttribute('onclick', '');
+
+            }
+            game.selectbox.fields['r'+i].num.textContent = '0';
+            game.selectbox.fields['r'+i].num.setAttribute('fill', 'black');
+        }
+
+        game.menu.buttons.forEach(function(a){
+            if(a.getAttribute('data-action')=='confirmSelect'){
+                a.children[1].textContent = 'Steal From';
+            }
+        });
+        break;
         default: break;
     }
 };
@@ -654,6 +705,14 @@ game.actions.confirmSelect = function(reason, params) {
         }
         game.actions.announceOffer(game.state.getLocalPlayerNumber(), offer);
         game.menu.displayOffers();
+    break;
+    case 'S':
+        var resources = {}, a;
+        for(var j = 1; j <= 5; j++) {
+            a = parseInt(game.selectbox.fields['r'+j].num.textContent);
+            if(a > 0) resources[j] = a;
+        }
+        game.actions.completeTrade(game.state.turn, params, {}, resources);
     break;
 
     default: break;
@@ -838,57 +897,74 @@ game.actions.buildRoad = function(params) {
 game.actions.selectVertex = function(i, type) {
     var playerNum = game.state.getLocalPlayerNumber();
 
-    if(game.state.phase == 0) {
-        game.state['p'+(playerNum-1)].firstSettlement = i;
-        game.state['p'+(playerNum-1)].settlements--;
-    } else if(game.state.phase == 1) {
-        game.state['p'+(playerNum-1)].secondSettlement = i;
-        game.state['p'+(playerNum-1)].settlements--;
-        var obj = {}, b;
-        for(var j = 0; j < game.board.vertices[i].hexes.length; j++) {
-            b = game.board.hexes[game.board.vertices[i].hexes[j]].type;
-            if(obj[b] == null) obj[b] = 0;
-            obj[b]++;
-        }
-        game.state.collect(playerNum, obj);
-    } else if(game.state.phase == 2) {
-        if(type == 1) {
-            game.state.deduct(playerNum, {1: 1, 2: 1, 3: 1, 4: 1});
+    if(type === 1 || type === 2) {
+        if(game.state.phase == 0) {
+            game.state['p'+(playerNum-1)].firstSettlement = i;
             game.state['p'+(playerNum-1)].settlements--;
-        } else if(type == 2 && game.board.vertices[i].owner === playerNum && game.board.vertices[i].contents === 1) {
-            if(game.board.vertices[i].owner === playerNum) {
-                game.state.deduct(playerNum, {3: 2, 5: 3});
-                game.state['p'+(game.state.turn-1)].cities--;
-                game.state['p'+(game.state.turn-1)].settlements++;
+        } else if(game.state.phase == 1) {
+            game.state['p'+(playerNum-1)].secondSettlement = i;
+            game.state['p'+(playerNum-1)].settlements--;
+            var obj = {}, b;
+            for(var j = 0; j < game.board.vertices[i].hexes.length; j++) {
+                b = game.board.hexes[game.board.vertices[i].hexes[j]].type;
+                if(obj[b] == null) obj[b] = 0;
+                obj[b]++;
+            }
+            game.state.collect(playerNum, obj);
+        } else if(game.state.phase == 2) {
+            if(type == 1) {
+                game.state.deduct(playerNum, {1: 1, 2: 1, 3: 1, 4: 1});
+                game.state['p'+(playerNum-1)].settlements--;
+            } else if(type == 2 && game.board.vertices[i].owner === playerNum && game.board.vertices[i].contents === 1) {
+                if(game.board.vertices[i].owner === playerNum) {
+                    game.state.deduct(playerNum, {3: 2, 5: 3});
+                    game.state['p'+(game.state.turn-1)].cities--;
+                    game.state['p'+(game.state.turn-1)].settlements++;
+                }
             }
         }
-    }
 
-    if (type === 1) {
-        game.board.placeSettlement(i);
-    } else if (type === 2) {
-        game.board.placeCity(i);
-    }
-    game.display.hideEmptyVertices();
-
-    var vertices = (function(vertices){ 
-        var obj = [];
-        for (var i = 0; i < vertices.length; i++) {
-            obj.push({contents : vertices[i].contents, owner : vertices[i].owner, port : vertices[i].port});
+        if (type === 1) {
+            game.board.placeSettlement(i);
+        } else if (type === 2) {
+            game.board.placeCity(i);
         }
-        return obj;
-    })(game.board.vertices);
-    var obj = {};
-    game.state.next_action = 'playerControl';
-    obj['next_action'] = 'playerControl';
-    if (game.state.phase == 0 || game.state.phase == 1) {
-        game.state.next_action = 'buildRoad';
-        obj['next_action'] = 'buildRoad';
-    }
-    obj['vertices'] = JSON.stringify(vertices);
-    game.state.updateVictoryPoints(obj);
+        game.display.hideEmptyVertices();
 
-    game.proceed();
+        var vertices = (function(vertices){ 
+            var obj = [];
+            for (var i = 0; i < vertices.length; i++) {
+                obj.push({contents : vertices[i].contents, owner : vertices[i].owner, port : vertices[i].port});
+            }
+            return obj;
+        })(game.board.vertices);
+        var obj = {};
+        game.state.next_action = 'playerControl';
+        obj['next_action'] = 'playerControl';
+        if (game.state.phase == 0 || game.state.phase == 1) {
+            game.state.next_action = 'buildRoad';
+            obj['next_action'] = 'buildRoad';
+        }
+        obj['vertices'] = JSON.stringify(vertices);
+        game.state.updateVictoryPoints(obj);
+
+        game.proceed();
+    } else {
+        var vertex = game.board.vertices[i];
+        var v = vertex.v;
+        if(vertex.contents === 1) {
+            v.setAttribute('width', '10');
+            v.setAttribute('height', '10');
+            v.setAttribute('x', vertex.x - 5);
+            v.setAttribute('y', vertex.y. - 5);
+        } else if (vertex.contents === 2) {
+            v.setAttribute('width', '20');
+            v.setAttribute('height', '20');
+            v.setAttribute('x', vertex.x - 10);
+            v.setAttribute('y', vertex.y. - 10);
+        }
+        game.actions.selectCards('S', vertex.owner);
+    }
 };
 
 game.actions.selectEdge = function(i, player, params) {

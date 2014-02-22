@@ -492,19 +492,37 @@ game.board.showAvailableVertices = function(type, player) {
                 this.vertices[i].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+i+',' + type + ')');
             }
         }
+    } else if(type === 3) {
+        var robberhex = null;
+        for(var i = 0; i < 19; i++) {
+            if(game.board.hexes[j].robber == 1) robberhex = j;
+        }
+        var v;
+        for(var i = 0; i < 6; i++) {
+            v = game.board.hexes[robberhex].vertices[i];
+            if(this.vertices[v].contents === 1 || this.vertices[v].contents === 2 && this.vertices[v].owner !== player) {
+                this.vertices[v].v.setAttribute('class', 'menu-item');
+                this.vertices[i].v.setAttribute('width', '20');
+                this.vertices[i].v.setAttribute('height', '20');
+                this.vertices[i].v.setAttribute('x', this.vertices[i].x - 10);
+                this.vertices[i].v.setAttribute('y', this.vertices[i].y - 10);
+                this.vertices[v].v.setAttribute('onmouseover', 'game.board.highlightVertex('+i+', '+type+', '+player+')');
+                this.vertices[v].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+i+','+type+')');
+            }
+        }
     }
 };
 
 
 game.board.highlightVertex = function(i, type, player) {
     if(game.state.turn == player) {
-        if(type == 1) {
+        if(type === 1) {
             this.vertices[i].v.setAttribute('width', '20');
             this.vertices[i].v.setAttribute('height', '20');
             this.vertices[i].v.setAttribute('x', this.vertices[i].x - 10);
             this.vertices[i].v.setAttribute('y', this.vertices[i].y - 10);
             this.vertices[i].v.setAttribute('fill', game.state['p'+(player-1)].color);
-        } else if(type == 2) {
+        } else if(type === 2 || type === 3) {
             this.vertices[i].v.setAttribute('width', '30');
             this.vertices[i].v.setAttribute('height', '30');
             this.vertices[i].v.setAttribute('x', this.vertices[i].x - 15);
