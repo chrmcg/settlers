@@ -143,7 +143,7 @@ game.actions.stealFrom = function() {
         }
     }
     if(vertices > 0) {
-        game.board.showAvailableVertices(3, this.getLocalPlayerNumber());
+        game.board.showAvailableVertices(3, game.state.getLocalPlayerNumber());
     } else {
         game.state.next_action = 'playerControl';
         game.proceed();
