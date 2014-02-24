@@ -333,6 +333,6 @@ game.state.getLocalPlayerNumber = function() {
 };
 
 game.state.setDiceValues = function(d1, d2) {
-    var obj = {d1: ''+d1, d2: ''+d2};
-    gapi.hangout.data.submitDelta(obj);
+    game.state.d1 = d1;
+    game.state.d2 = d2;
 };
