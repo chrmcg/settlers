@@ -54,15 +54,13 @@ game.actions.rollDice = function() {
             }
         }
     }
-    if (game.state.next_action !== 'getRobbed') {
-        game.proceed();
-    }
+    game.proceed();
     for(var i = 0; i < game.state.player_count; i++) {
         obj['p'+i] = JSON.stringify(game.state['p'+i]);
     }
     gapi.hangout.data.submitDelta(obj);
 };
-/*
+
 game.actions.getRobbed = function() {
     console.log('Each player with >7 cards has to select cards now...');
     var cards = 0; 
@@ -80,7 +78,7 @@ game.actions.getRobbed = function() {
     obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
     gapi.hangout.data.submitDelta(obj);
 };
-*/
+
 
 game.actions.moveRobber = function() {
     // Don't let the user do anything until the robber is moved

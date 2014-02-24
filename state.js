@@ -271,20 +271,6 @@ game.state.download = function(state) {
             var obj = {};
             obj['p'+(num-1)] = JSON.stringify(this['p'+(num-1)]);
             gapi.hangout.data.submitDelta(obj);
-        } else if (this.turn === num && this.next_action === 'getRobbed' && this['p'+(num-1)].robbed === false) {
-            var cards = 0;
-            for(var i = 1; i <= 5; i++) {
-                cards += this['p'+(num-1)]['r'+i];
-            }
-            if(cards > 7) {
-                game.actions.selectCards('R', {card_count: cards});
-                game.display.disableMenuButtons(['endTurn']);
-                game.display.disableAllExchangeButtons();
-            }
-            this['p'+(num-1)].robbed = true;
-            var obj = {};
-            obj['p'+(num-1)] = JSON.stringify(this['p'+(num-1)]);
-            gapi.hangout.data.submitDelta(obj);
         } else if (this.turn === num && this.next_action === 'getRobbed') { 
             var numrobbed = 0;
             for(var i = 0; i < this.player_count; i++) {
