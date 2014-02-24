@@ -54,8 +54,9 @@ game.actions.rollDice = function() {
             }
         }
     }
-
-    game.proceed();
+    if (game.state.next_action !== 'getRobbed') {
+        game.proceed();
+    }
     for(var i = 0; i < game.state.player_count; i++) {
         obj['p'+i] = JSON.stringify(game.state['p'+i]);
     }
