@@ -675,12 +675,17 @@ game.actions.acceptOffer = function(from, offer) {
 }
 
 game.actions.cancelSelect = function(reset_offer) {
+    int num = game.state.getLocalPlayerNumber();
     if(reset_offer === true) {
         // Reset your offer to null
-        game.state['p'+(game.state.getLocalPlayerNumber()-1)].offer = {};
-        game.state['p'+(game.state.getLocalPlayerNumber()-1)].proposal = {};
-        console.log('Player '+game.state.getLocalPlayerNumber()+' has canceled trading');
+        game.state['p'+(num-1)].offer = {};
+        game.state['p'+(num-1)].proposal = {};
+        console.log('Player '+num+' has canceled trading');
     }
+    var obj - {};
+    obj['p'+(num-1)] = JSON.stringify(game.state['p'+(player-1)]);
+    gapi.hangout.data.submitDelta(obj);
+
 
     game.display.showMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard']);
     game.display.disableMenuButtons(['confirmSelect', 'cancelSelect']);

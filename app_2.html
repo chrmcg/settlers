@@ -2,6 +2,9 @@
 game.startGame = function(count, players) {
 
     game.board.init();
+    game.menu.init();
+    game.statusbox.init();
+    game.selectbox.init();
 
     gapi.hangout.data.onStateChanged.remove(window.onStateChangedStartBox);
     gapi.hangout.onEnabledParticipantsChanged.remove(window.onEnabledParticipantsChangedStartBox);
@@ -11,9 +14,9 @@ game.startGame = function(count, players) {
         if (game.startbox.wrapper_outer !== undefined) {
             game.svg.removeChild(game.startbox.wrapper_outer);
             delete game.startbox.wrapper_outer;
-            game.menu.init();
-            game.statusbox.init();
-            game.selectbox.init();
+            //game.menu.init();
+            //game.statusbox.init();
+            //game.selectbox.init();
             game.board.draw(700, 390);
             game.dice.init();
             game.state.download(state_event.state);
@@ -93,9 +96,9 @@ game.startGame = function(count, players) {
         }
         obj['devcards']=JSON.stringify(game.state.devcards);
         obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-        game.menu.init();
-        game.statusbox.init();
-        game.selectbox.init();
+        //game.menu.init();
+        //game.statusbox.init();
+        //game.selectbox.init();
         game.board.draw(700, 390);
         game.dice.init();
         game.svg.removeChild(game.startbox.wrapper_outer);
