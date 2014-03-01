@@ -8,7 +8,6 @@ game.menu = {
 };
 
 game.menu.init = function() {
-    console.log('game.menu.init'+game.state.player_count);
     var actions = { 
         'buildRoad': 'Road',
         'buildSettlement': 'Settlement',
