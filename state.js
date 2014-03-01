@@ -256,6 +256,7 @@ game.state.download = function(state) {
     if (game.startbox.wrapper_outer === undefined) {
         if(this.turn === num) {
             if((this.next_action === 'rollDice' && window.diceRolled === false) || ((this.phase === 0 || this.phase === 1) && this.next_action === 'buildSettlement')) {
+                game.actions.cancelSelect();
                 game.proceed();
             }
         }
