@@ -59,8 +59,8 @@ game.actions.rollDice = function() {
     }
     obj['d1'] = ''+d1;
     obj['d2'] = ''+d2;
-    gapi.hangout.data.submitDelta(obj);
     game.proceed();
+    gapi.hangout.data.submitDelta(obj);
 };
 
 game.actions.getRobbed = function() {
