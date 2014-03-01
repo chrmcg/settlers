@@ -85,6 +85,7 @@ game.startGame = function(count, players) {
         game.dice.init();
         game.svg.removeChild(game.startbox.wrapper_outer);
         delete game.startbox.wrapper_outer;
+        gapi.hangout.data.submitDelta(obj);
     }
     gapi.hangout.data.onStateChanged.add(function(state_event) {
         game.state.download(state_event.state);
@@ -95,11 +96,9 @@ game.startGame = function(count, players) {
             game.statusbox.init();
             game.menu.init();
             game.dice.init();
+            game.state.download(state_event.state);
         }
     });
-    if (gapi.hangout.getLocalParticipant().person.id === lowest) {
-        gapi.hangout.data.submitDelta(obj);
-    }
 };
 
 game.proceed = function() {
