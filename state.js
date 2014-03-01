@@ -319,7 +319,9 @@ game.state.download = function(state) {
             game.display.enableMenuButtons(['offerTrade']);
         }
         game.display.refreshResourceCounts();
-        game.display.refreshDice();
+        if(game.state.phase === 2) {
+            game.display.refreshDice();
+        }
     }
 };
 
