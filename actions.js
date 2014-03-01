@@ -203,6 +203,7 @@ game.actions.playDevCard = function(type) {
         game.actions.moveRobber();
     break;
     case 'Y': 
+        game.state['p'+(game.state.turn-1)].cY--;
         game.actions.selectCards('Y');
     break;
     case 'R':
@@ -214,6 +215,7 @@ game.actions.playDevCard = function(type) {
         }
     break;
     case 'M':
+        game.state['p'+(game.state.turn-1)].cM--;
         game.actions.selectCards('M');
     break;
     default: break;
