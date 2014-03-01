@@ -792,7 +792,7 @@ game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
     }
     gapi.hangout.data.submitDelta(obj);
     game.display.refreshExchangeButtons();
-    //TODO: Check if playerControl needs to be called or if cancelSelect suffices
+    game.actions.playerControl();
 };
 
 // 1 = WOOD, 2 = SHEEP, 3 = WHEAT, 4 = BRICK, 5 = ORE
