@@ -4,90 +4,90 @@ game.startGame = function(count, players) {
     game.board.init();
     game.selectbox.init();
 
-    if(count !== undefined) {
+    if(count !== undefined && players !== undefined) {
         gapi.hangout.data.onStateChanged.remove(window.onStateChangedStartBox);
         gapi.hangout.onEnabledParticipantsChanged.remove(window.onEnabledParticipantsChangedStartBox);
-    }
 
-    var ids = [];
-    var participants = gapi.hangout.getEnabledParticipants();
-    // set temporary array ids to each person's id
-    for(var i = 0; i < participants.length; i++) {
-        ids.push(participants[i].person.id);
-    }
-
-    var lowest = '9999999999999999999999';
-    for(var i = 0; i < ids.length; i++) {
-        if (ids[i] < lowest) {
-            lowest = ids[i];
+        var ids = [];
+        var participants = gapi.hangout.getEnabledParticipants();
+        // set temporary array ids to each person's id
+        for(var i = 0; i < participants.length; i++) {
+            ids.push(participants[i].person.id);
         }
-    }
 
-    var obj = {};
-
-    if(count !== undefined && gapi.hangout.getLocalParticipant().person.id === lowest) {
-
-        // Randomize players
-        var start_state = [];
-        // Randomize ids
-        var idsobj = {};
+        var lowest = '9999999999999999999999';
         for(var i = 0; i < ids.length; i++) {
-            idsobj[i] = ids[i];
-        }
-        ids = [];
-        for(var i = 0; i < count; i++) {
-            var j = 0, randid = null;
-            for(var key in idsobj) {
-                if (Math.random() < 1 / ++j) {
-                    randid = key;
-                }
+            if (ids[i] < lowest) {
+                lowest = ids[i];
             }
-            ids[i] = idsobj[randid];
-            delete idsobj[randid];
-        }
-        for(var i = 0; i < ids.length; i++) {
-            start_state.push({id: ids[i], color: players[ids[i]].color});
         }
 
-        // Randomize board
-        game.board.randomize();
+        var obj = {};
 
-        // Initialize state.pX and randomize dev cards
-        game.state.init(count, start_state);
+        if(gapi.hangout.getLocalParticipant().person.id === lowest) {
 
-        // Pass hexes, vertices, AND players to shared state
-        var obj = {
-            'vertices' : JSON.stringify(
-            (function(vertices){
-                var arr = [];
-                for(var i = 0; i < vertices.length; i++) { 
-                    arr.push({contents: vertices[i].contents, owner: vertices[i].owner, port : vertices[i].port}); 
+            // Randomize players
+            var start_state = [];
+            // Randomize ids
+            var idsobj = {};
+            for(var i = 0; i < ids.length; i++) {
+                idsobj[i] = ids[i];
+            }
+            ids = [];
+            for(var i = 0; i < count; i++) {
+                var j = 0, randid = null;
+                for(var key in idsobj) {
+                    if (Math.random() < 1 / ++j) {
+                        randid = key;
+                    }
                 }
-                return arr; 
-            })(game.board.vertices)),
-            'hexes' : JSON.stringify(
-            (function(hexes){
-                var arr = [];
-                for(var i = 0; i < hexes.length; i++) {
-                    arr.push({num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
-                }
-                return arr;
-            })(game.board.hexes)),
-            'player_count' : ''+game.state.player_count,
-            'startbox_done' : 'true',
-        };
-        for(var i = 0 ; i < game.state.player_count; i++) {
-            obj['p'+i] = JSON.stringify(game.state['p'+i]);
+                ids[i] = idsobj[randid];
+                delete idsobj[randid];
+            }
+            for(var i = 0; i < ids.length; i++) {
+                start_state.push({id: ids[i], color: players[ids[i]].color});
+            }
+
+            // Randomize board
+            game.board.randomize();
+
+            // Initialize state.pX and randomize dev cards
+            game.state.init(count, start_state);
+
+            // Pass hexes, vertices, AND players to shared state
+            var obj = {
+                'vertices' : JSON.stringify(
+                        (function(vertices){
+                         var arr = [];
+                         for(var i = 0; i < vertices.length; i++) { 
+                         arr.push({contents: vertices[i].contents, owner: vertices[i].owner, port : vertices[i].port}); 
+                         }
+                         return arr; 
+                         })(game.board.vertices)),
+                'hexes' : JSON.stringify(
+                        (function(hexes){
+                         var arr = [];
+                         for(var i = 0; i < hexes.length; i++) {
+                         arr.push({num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
+                         }
+                         return arr;
+                         })(game.board.hexes)),
+                'player_count' : ''+game.state.player_count,
+                'startbox_done' : 'true',
+            };
+            for(var i = 0 ; i < game.state.player_count; i++) {
+                obj['p'+i] = JSON.stringify(game.state['p'+i]);
+            }
+            obj['devcards']=JSON.stringify(game.state.devcards);
+            obj['id'] = gapi.hangout.getLocalParticipant().person.id;
+            game.menu.init();
+            game.statusbox.init();
+            game.board.draw(700, 390);
+            game.dice.init();
+            game.svg.removeChild(game.startbox.wrapper_outer);
+            delete game.startbox.wrapper_outer;
+            gapi.hangout.data.submitDelta(obj);
         }
-        obj['devcards']=JSON.stringify(game.state.devcards);
-        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-        game.menu.init();
-        game.statusbox.init();
-        game.board.draw(700, 390);
-        game.dice.init();
-        game.svg.removeChild(game.startbox.wrapper_outer);
-        delete game.startbox.wrapper_outer;
-        gapi.hangout.data.submitDelta(obj);
     }
     gapi.hangout.data.onStateChanged.add(function(state_event) {
         game.state.download(state_event.state);
