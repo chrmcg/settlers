@@ -252,15 +252,7 @@ game.state.download = function(state) {
         game.board.redraw();
     }
     var num = this.getLocalPlayerNumber();
-    if (game.startbox.wrapper_outer !== undefined) {
-        game.svg.removeChild(game.startbox.wrapper_outer);
-        delete game.startbox.wrapper_outer;
-        game.board.draw(700, 390);
-        game.statusbox.init();
-        game.menu.init();
-        game.dice.init();
-    }
-   // This makes sure that this doesn't happen before everything is initialized
+    // This makes sure that this doesn't happen before everything is initialized
     if (game.startbox.wrapper_outer === undefined) {
         if(this.turn === num) {
             if((this.next_action === 'rollDice' && window.diceRolled === false) || ((this.phase === 0 || this.phase === 1) && this.next_action === 'buildSettlement')) {
