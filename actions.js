@@ -675,7 +675,7 @@ game.actions.acceptOffer = function(from, offer) {
 }
 
 game.actions.cancelSelect = function(reset_offer) {
-    int num = game.state.getLocalPlayerNumber();
+    var num = game.state.getLocalPlayerNumber();
     if(reset_offer === true) {
         // Reset your offer to null
         game.state['p'+(num-1)].offer = {};
