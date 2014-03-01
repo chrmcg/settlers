@@ -92,8 +92,10 @@ game.startGame = function(count, players) {
     gapi.hangout.data.onStateChanged.add(function(state_event) {
         game.state.download(state_event.state);
         if (window.drawn === false) {
-            game.svg.removeChild(game.startbox.wrapper_outer);
-            delete game.startbox.wrapper_outer;
+            if(game.startbox.wrapper_outer !== undefined) {
+                game.svg.removeChild(game.startbox.wrapper_outer);
+                delete game.startbox.wrapper_outer;
+            }
             game.board.draw(700, 390);
             game.statusbox.init();
             game.menu.init();
