@@ -8,6 +8,7 @@ game.menu = {
 };
 
 game.menu.init = function() {
+    console.log('game.menu.init'+game.state.player_count);
     var actions = { 
         'buildRoad': 'Road',
         'buildSettlement': 'Settlement',
@@ -142,6 +143,7 @@ game.menu.init = function() {
     game.svg.appendChild(g);
 };
 
+
 game.menu.displayOffers = function() {
     // Display your own offer at the top
     var obj, str;
@@ -162,10 +164,8 @@ game.menu.displayOffers = function() {
         game.menu.offers[0].button.children[0].setAttribute('stroke', 'none');
         game.menu.offers[0].button.setAttribute('onclick', '');
     } else {
-        if (game.menu.offers[0] !== undefined) {
-            game.menu.offers[0].button.setAttribute('visibility','hidden');
-            game.menu.offers[0].button.setAttribute('onclick', '');
-        }
+        game.menu.offers[0].button.setAttribute('visibility','hidden');
+        game.menu.offers[0].button.setAttribute('onclick', '');
     }
 
 
