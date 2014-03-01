@@ -682,7 +682,7 @@ game.actions.cancelSelect = function(reset_offer) {
         game.state['p'+(num-1)].proposal = {};
         console.log('Player '+num+' has canceled trading');
     }
-    var obj - {};
+    var obj = {};
     obj['p'+(num-1)] = JSON.stringify(game.state['p'+(player-1)]);
     gapi.hangout.data.submitDelta(obj);
 
