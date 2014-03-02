@@ -23,9 +23,6 @@ game.actions.rollDice = function() {
     if(d == 7) {
         game.state.next_action = 'getRobbed';
         obj['next_action'] = 'getRobbed';
-        for(var i = 0; i < game.state.player_count; i++) {
-            game.state['p'+i].robbed = false;
-        }
     } else {
         var h, v, o;
         for(var i = 0; i < 19; i++) {
@@ -54,13 +51,15 @@ game.actions.rollDice = function() {
             }
         }
     }
-    for(var i = 0; i < game.state.player_count; i++) {
-        obj['p'+i] = JSON.stringify(game.state['p'+i]);
-    }
     obj['d1'] = ''+d1;
     obj['d2'] = ''+d2;
-    game.proceed();
+    if(game.state.next_action !== 'getRobbed') {
+        for(var i = 0; i < game.state.player_count; i++) {
+            obj['p'+i] = JSON.stringify(game.state['p'+i]);
+        }
+    }
     gapi.hangout.data.submitDelta(obj);
+    game.proceed();
 };
 
 game.actions.getRobbed = function() {
@@ -105,7 +104,7 @@ game.actions.moveRobber = function() {
             return arr;
         })(game.board.hexes))
     };
-    //gapi.hangout.data.submitDelta(obj);
+    gapi.hangout.data.submitDelta(obj);
 };
 
 game.actions.selectRobber = function(i) {
@@ -747,8 +746,6 @@ game.actions.offerTrade = function() {
 
 
 game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
-    var stop = false;
-
     // "Player 0" is the bank
 
     if(p_A == 0) {
@@ -783,12 +780,10 @@ game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
         game.actions.cancelSelect();
     }
     obj = {};
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     for(var i = 0; i < game.state.player_count; i++) {
         obj['p'+i] = JSON.stringify(game.state['p'+i]);
     }
     gapi.hangout.data.submitDelta(obj);
-    game.display.refreshExchangeButtons();
     game.actions.playerControl();
 };
 
@@ -810,7 +805,6 @@ game.actions.buildSettlement = function() {
 game.actions.buildCity = function() {
     var playerNum = game.state.getLocalPlayerNumber();
     if(game.state.phase == 2 && (game.state.playerHas(playerNum, {3: 2, 5: 3}))) {
-        game.state.next_action = 'playerControl';
         game.board.showAvailableVertices(2, playerNum);
     } else {
         console.log('Cannot build. You have insufficient resources');
@@ -1008,9 +1002,11 @@ game.actions.endTurn = function() {
     window.diceRolled = false;
     game.state['p'+(game.state.turn-1)].newcards = {};
     var obj = {'next_action': 'rollDice'};
+    for(var i = 0; i < game.state.player_count; i++) {
+        game.state['p'+i].robbed = false;
+        obj['p'+i] = JSON.stringify(game.state['p'+i]);
+    }
     obj['turn'] = ''+game.state.turn;
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
     gapi.hangout.data.submitDelta(obj);
 }
 

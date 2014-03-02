@@ -77,7 +77,7 @@ game.display.refreshMenuButtons = function() {
             'buildSettlement': false,
             'buildCity': false,
             'buyDevCard': false,
-            'endTurn': true,
+            'endTurn': false,
         };
 
     }
