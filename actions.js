@@ -999,6 +999,7 @@ game.actions.endTurn = function() {
     game.state.next_action = 'rollDice';
     game.state.turn = game.state.turn == game.state.player_count ? 1 : game.state.turn+1;
 
+    game.display.refreshDevCards();
     window.diceRolled = false;
     game.state['p'+(game.state.turn-1)].newcards = {};
     var obj = {'next_action': 'rollDice'};
