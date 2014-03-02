@@ -506,8 +506,8 @@ game.board.showAvailableVertices = function(type, player) {
                 this.vertices[v].v.setAttribute('height', '20');
                 this.vertices[v].v.setAttribute('x', this.vertices[v].x - 10);
                 this.vertices[v].v.setAttribute('y', this.vertices[v].y - 10);
-                this.vertices[v].v.setAttribute('onmouseover', 'game.board.highlightVertex('+i+', '+type+', '+player+')');
-                this.vertices[v].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+i+','+type+')');
+                this.vertices[v].v.setAttribute('onmouseover', 'game.board.highlightVertex('+v+', '+type+', '+player+')');
+                this.vertices[v].v.setAttribute('onmouseout', 'game.board.unhighlightVertex('+v+','+type+')');
             }
         }
     }

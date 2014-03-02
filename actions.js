@@ -137,7 +137,7 @@ game.actions.stealFrom = function() {
     }
     var vertices = 0;
     for(var j = 0; j < 6; j++) {
-        var vertex = game.board.hexes[robberhex].vertices[j];
+        var vertex = game.board.vertices[game.board.hexes[robberhex].vertices[j]];
         if(vertex.contents === 1 || vertex.contents === 2) {
             vertices++;
         }
