@@ -638,7 +638,7 @@ game.actions.confirmSelect = function(reason, params) {
         }
         
         game.actions.cancelSelect();
-        game.actions.proposeTrade(params.from, params.to, params.offer, ask);
+        game.actions.completeTrade(params.from, 0, params.offer, ask);
     break;
     case 'O':
         var offer = {}, a;
@@ -710,20 +710,14 @@ game.actions.announceOffer = function(player, offer) {
 };
 
 game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
-
     // Bank accepts or denies trade immediately based on 4:1, 3:1, 2:1 rules
-    if(p_to == 0) {
-        game.actions.completeTrade(p_from, p_to, offer, ask);
+    console.log('Player '+p_from+' proposes to trade '+JSON.stringify(offer)+' to player '+ p_to+' for '+JSON.stringify(ask));
 
-    } else {
-        console.log('Player '+p_from+' proposes to trade '+JSON.stringify(offer)+' to player '+ p_to+' for '+JSON.stringify(ask));
-
-        game.state['p'+(p_from-1)].proposal = {from: p_from, to: p_to, offer: offer, ask: ask};
-        var obj = {};
-        obj['p'+(p_from-1)] = JSON.stringify(game.state['p'+(p_from-1)]);
-        gapi.hangout.data.submitDelta(obj);
-        // Compare with all other proposals in game.state, if match call completeTrade
-    }
+    game.state['p'+(p_from-1)].proposal = {from: p_from, to: p_to, offer: offer, ask: ask};
+    var obj = {};
+    obj['p'+(p_from-1)] = JSON.stringify(game.state['p'+(p_from-1)]);
+    gapi.hangout.data.submitDelta(obj);
+    // Compare with all other proposals in game.state, if match call completeTrade
 };
 
 game.actions.setupTrade = function(p_from, p_to, offer) {
