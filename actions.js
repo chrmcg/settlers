@@ -74,9 +74,9 @@ game.actions.getRobbed = function() {
         game.display.disableAllExchangeButtons();
         game.actions.selectCards('R', {card_count: cards});
     } else {
-        game.state['p'+(game.state.getLocalPlayerNumber()-1)].robbed = true;
+        game.state['p'+(game.state.turn-1)].robbed = true;
         var obj = {};
-        obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
+        obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
         gapi.hangout.data.submitDelta(obj);
     }
 };
@@ -893,11 +893,13 @@ game.actions.selectVertex = function(i, type) {
             v.setAttribute('y', vertex.y - 10);
         }
         v.setAttribute('onclick', '');
+        v.setAttribute('onmouseover', '');
+        v.setAttribute('onmouseout','');
         if(vertex.owner !== game.state.getLocalPlayerNumber()) {
             var resources = [];
             var a = 0;
             for(var j = 1; j <= 5; j++) {
-                if(game.state['p'+(vertex.owner-1)] > 0) {
+                if(game.state['p'+(vertex.owner-1)]['r'+j] > 0) {
                     resources[a] = j;
                     a++;
                 }
@@ -906,6 +908,7 @@ game.actions.selectVertex = function(i, type) {
             var steal = {};
             steal[''+resources[rand]] = 1;
             game.actions.completeTrade(game.state.getLocalPlayerNumber(), vertex.owner, {}, steal);
+            console.log("Player "+game.state.getLocalPlayerNumber()+" stole "+JSON.stringify(steal)+" from player "+vertex.owner);
         }
         if(type === 3) {
             game.state.next_action = 'playerControl';
