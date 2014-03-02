@@ -73,11 +73,12 @@ game.actions.getRobbed = function() {
         game.display.disableMenuButtons(['endTurn']);
         game.display.disableAllExchangeButtons();
         game.actions.selectCards('R', {card_count: cards});
+    } else {
+        game.state['p'+(game.state.getLocalPlayerNumber()-1)].robbed = true;
+        var obj = {};
+        obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
+        gapi.hangout.data.submitDelta(obj);
     }
-    game.state['p'+(game.state.getLocalPlayerNumber()-1)].robbed = true;
-    var obj = {};
-    obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
-    gapi.hangout.data.submitDelta(obj);
 };
 
 
@@ -625,9 +626,9 @@ game.actions.confirmSelect = function(reason, params) {
             if(a > 0) robbed[j] = a;
         }
         game.state.deduct(game.state.getLocalPlayerNumber(), robbed);
+        game.state['p'+(game.state.getLocalPlayerNumber()-1)].robbed = true;
         var obj = {};
         obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
-        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
         game.actions.cancelSelect();
     break;
     case '1':
