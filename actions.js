@@ -89,11 +89,13 @@ game.actions.moveRobber = function() {
 
     // Move the robber
     for (var i = 0; i < 19; i++) {
+        if(game.board.hexes[i].robber === 0) {
+            game.board.hexes[i].circle.setAttribute('class', 'menu-item');
+            game.board.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
+            game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
+            game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
+        }
         game.board.hexes[i].robber = 0;
-        game.board.hexes[i].circle.setAttribute('class', 'menu-item');
-        game.board.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
-        game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
-        game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
     }
 
     var obj = {'hexes' : JSON.stringify(
