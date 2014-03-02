@@ -3,63 +3,86 @@ game.actions = {
 };
 
 
-game.actions.rollDice = function() {
+game.actions.rollDice = function(knight) {
     game.display.refreshDevCards();
 
-    var obj = {};
-
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    obj['next_action'] = 'playerControl';
-    game.state.next_action = 'playerControl';
-
-    var d1 = Math.floor(Math.random() * 6) + 1;
-    var d2 = Math.floor(Math.random() * 6) + 1;
-    var d = d1 + d2;
-
-    //console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
-    game.state.setDiceValues(d1, d2);
-    window.diceRolled = true;
-
-    if(d == 7) {
-        game.state.next_action = 'getRobbed';
-        obj['next_action'] = 'getRobbed';
+    if(knight === undefined) {
+        if(game.state['p'+(game.state.turn-1)].cK > 0) {        
+            game.display.hideMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard','confirmSelect', 'cancelSelect']);
+            game.display.showMenuButtons(['rollDice', 'playKnight']);
+            game.menu.buttons.forEach(function(a){
+                if(a.getAttribute('data-action')=='rollDice') {
+                    a.children[0].setAttribute('fill', 'white');
+                    a.setAttribute('onclick', 'game.actions.rollDice(1)');
+                    a.setAttribute('class', 'menu-item');
+                }
+            });
+            game.menu.buttons.forEach(function(a){
+                if(a.getAttribute('data-action')=='playKnight') {
+                    a.children[0].setAttribute('fill', 'white');
+                    a.setAttribute('onclick', 'game.actions.playDevCard("K")');
+                    a.setAttribute('class', 'menu-item');
+                }
+            });
+        } else {
+            game.actions.rollDice(1);
+        }
     } else {
-        var h, v, o;
-        for(var i = 0; i < 19; i++) {
-            o = {};
-            h = game.board.hexes[i]
-            if(h.num == d) {
-                for(var j = 0; j < game.board.hexes[i].vertices.length; j++) {
-                    if(game.board.hexes[i].robber == 0) {
-                        v = game.board.vertices[game.board.hexes[i].vertices[j]];
-                        obj = {};
-                        switch(v.contents) {
-                            case 1:
-                                o[h.type] = 1;
-                                game.state.collect(v.owner, o);
-                            break;
-                            case 2:
-                                o[h.type] = 2;
-                                game.state.collect(v.owner, o);
-                            break;
-                            case 0: default:
+        var obj = {};
 
-                            break;
+        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
+        obj['next_action'] = 'playerControl';
+        game.state.next_action = 'playerControl';
+
+        var d1 = Math.floor(Math.random() * 6) + 1;
+        var d2 = Math.floor(Math.random() * 6) + 1;
+        var d = d1 + d2;
+
+        //console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
+        game.state.setDiceValues(d1, d2);
+        window.diceRolled = true;
+
+        if(d == 7) {
+            game.state.next_action = 'getRobbed';
+            obj['next_action'] = 'getRobbed';
+        } else {
+            var h, v, o;
+            for(var i = 0; i < 19; i++) {
+                o = {};
+                h = game.board.hexes[i]
+                    if(h.num == d) {
+                        for(var j = 0; j < game.board.hexes[i].vertices.length; j++) {
+                            if(game.board.hexes[i].robber == 0) {
+                                v = game.board.vertices[game.board.hexes[i].vertices[j]];
+                                obj = {};
+                                switch(v.contents) {
+                                    case 1:
+                                        o[h.type] = 1;
+                                        game.state.collect(v.owner, o);
+                                        break;
+                                    case 2:
+                                        o[h.type] = 2;
+                                        game.state.collect(v.owner, o);
+                                        break;
+                                    case 0: default:
+
+                                        break;
+                                }
+                            }
                         }
                     }
-                }
             }
         }
-    }
-    obj['d1'] = ''+d1;
-    obj['d2'] = ''+d2;
-    if(game.state.next_action !== 'getRobbed') {
-        for(var i = 0; i < game.state.player_count; i++) {
-            obj['p'+i] = JSON.stringify(game.state['p'+i]);
+        obj['d1'] = ''+d1;
+        obj['d2'] = ''+d2;
+        if(game.state.next_action !== 'getRobbed') {
+            for(var i = 0; i < game.state.player_count; i++) {
+                obj['p'+i] = JSON.stringify(game.state['p'+i]);
+            }
         }
+        gapi.hangout.data.submitDelta(obj);
+        game.proceed();
     }
-    gapi.hangout.data.submitDelta(obj);
-    game.proceed();
 };
 
 game.actions.getRobbed = function() {
@@ -202,8 +225,10 @@ game.actions.playDevCard = function(type) {
         game.state['p'+(game.state.turn-1)].cK--;
         game.state.updateVictoryPoints();
         game.display.refreshDevCards();
-
-        game.actions.moveRobber();
+        game.display.showMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard']);
+        game.display.hideMenuButtons(['rollDice', 'playKnight']);
+        game.display.disableMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard']);
+        game.actions.moveRobber('K');
     break;
     case 'Y': 
         game.state['p'+(game.state.turn-1)].cY--;
@@ -912,12 +937,13 @@ game.actions.selectVertex = function(i, type) {
             game.actions.completeTrade(game.state.getLocalPlayerNumber(), vertex.owner, {}, steal);
             console.log("Player "+game.state.getLocalPlayerNumber()+" stole "+JSON.stringify(steal)+" from player "+vertex.owner);
         }
-        if(type === 3) {
+        if(window.dicerolled === true) {
             game.state.next_action = 'playerControl';
+            game.proceed();
         } else {
             game.state.next_action = 'rollDice';
+            game.actions.rollDice(1);
         }
-        game.proceed();
     }
 };
 
