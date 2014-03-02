@@ -189,8 +189,17 @@ game.display.refreshDevCards = function() {
         letters[i] = 'Y';
         i++;
     }
+    if(p.cV > 0) {
+        game.menu.devcards[i].text.setAttribute('visibility', 'visible');
+        game.menu.devcards[i].button.setAttribute('visibility', 'visible');
+        game.menu.devcards[i].text.textContent = 'Victory Point' + (p.cV > 1 ? ' x'+p.cV : '');
+        game.menu.devcards[i].button.setAttribute('onclick', '');
+        letters[i] = 'V';
+        i++;
+    }
+
     for(var i = 0; i < game.menu.devcards.length; i++) {
-        if(game.menu.devcards[i].text.textContent.length > 0 && game.state.turn === playerNum
+        if(game.menu.devcards[i].button.getAttribute('onclick') !== '' && game.menu.devcards[i].text.textContent.length > 0 && game.state.turn === playerNum
                 && (p.newcards[letters[i]] === undefined || ['c'+letters[i]] > p.newcards[letters[i]])) {
             game.menu.devcards[i].button.children[0].setAttribute('fill', 'white');
         } else {

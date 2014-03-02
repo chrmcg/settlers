@@ -67,7 +67,7 @@ game.menu.init = function() {
     // Display dev cards
     g = document.createElementNS(game.ns, 'g');
     var g2, text2;
-    for(var i = 1; i <= 4; i++) { 
+    for(var i = 1; i <= 5; i++) { 
         g2 = document.createElementNS(game.ns, 'g');
         g2.setAttribute('transform', 'translate(110, ' + (25 * (i-1)) + ')');
 
