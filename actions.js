@@ -8,12 +8,13 @@ game.actions.rollDice = function(knight) {
 
     if(knight === undefined) {
         if(game.state['p'+(game.state.turn-1)].cK > 0) {        
-            game.display.hideMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard','confirmSelect', 'cancelSelect']);
+            game.display.hideMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn', 'confirmSelect', 'cancelSelect']);
             game.display.showMenuButtons(['rollDice', 'playKnight']);
+            game.devcardbox.setAttribute('display', 'none');
             game.menu.buttons.forEach(function(a){
                 if(a.getAttribute('data-action')=='rollDice') {
                     a.children[0].setAttribute('fill', 'white');
-                    a.setAttribute('onclick', 'game.actions.rollDice(1)');
+                    a.setAttribute('onclick', 'game.actions.rollDice(2)');
                     a.setAttribute('class', 'menu-item');
                 }
             });
@@ -28,6 +29,12 @@ game.actions.rollDice = function(knight) {
             game.actions.rollDice(1);
         }
     } else {
+        if(knight === 2) {
+            game.display.showMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn']);
+            game.display.hideMenuButtons(['rollDice', 'playKnight']);
+            game.devcardbox.setAttribute('display', 'inline');
+            game.display.refreshDevCards();
+        }
         var obj = {};
 
         obj['id'] = gapi.hangout.getLocalParticipant().person.id;
@@ -130,6 +137,7 @@ game.actions.moveRobber = function() {
             return arr;
         })(game.board.hexes))
     };
+    obj['next_action'] = game.state.next_action;
     gapi.hangout.data.submitDelta(obj);
 };
 
@@ -223,12 +231,14 @@ game.actions.playDevCard = function(type) {
     case 'K':
         game.state['p'+(game.state.turn-1)].army++;
         game.state['p'+(game.state.turn-1)].cK--;
-        game.state.updateVictoryPoints();
+        game.devcardbox.setAttribute('display', 'inline');
         game.display.refreshDevCards();
-        game.display.showMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard']);
+        game.display.showMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn']);
         game.display.hideMenuButtons(['rollDice', 'playKnight']);
-        game.display.disableMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard']);
-        game.actions.moveRobber('K');
+        game.display.disableMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn']);
+        game.state.next_action = 'moveRobber';
+        game.state.updateVictoryPoints({'next_action': 'moveRobber'});
+        game.actions.moveRobber();
     break;
     case 'Y': 
         game.state['p'+(game.state.turn-1)].cY--;
@@ -931,13 +941,15 @@ game.actions.selectVertex = function(i, type) {
                     a++;
                 }
             }
-            var rand = Math.floor(Math.random() * a);
-            var steal = {};
-            steal[''+resources[rand]] = 1;
-            game.actions.completeTrade(game.state.getLocalPlayerNumber(), vertex.owner, {}, steal);
-            console.log("Player "+game.state.getLocalPlayerNumber()+" stole "+JSON.stringify(steal)+" from player "+vertex.owner);
+            if (a > 0) {
+                var rand = Math.floor(Math.random() * a);
+                var steal = {};
+                steal[''+resources[rand]] = 1;
+                game.actions.completeTrade(game.state.getLocalPlayerNumber(), vertex.owner, {}, steal);
+                console.log("Player "+game.state.getLocalPlayerNumber()+" stole "+JSON.stringify(steal)+" from player "+vertex.owner);
+            }
         }
-        if(window.dicerolled === true) {
+        if(window.diceRolled === true) {
             game.state.next_action = 'playerControl';
             game.proceed();
         } else {
