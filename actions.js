@@ -891,6 +891,7 @@ game.actions.selectVertex = function(i, type) {
             v.setAttribute('x', vertex.x - 10);
             v.setAttribute('y', vertex.y - 10);
         }
+        v.setAttribute('onclick', '');
         if(vertex.owner !== game.state.getLocalPlayerNumber()) {
             var resources = [];
             var a = 0;
