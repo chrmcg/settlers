@@ -898,9 +898,9 @@ game.actions.selectVertex = function(i, type) {
             for(var j = 1; j <= 5; j++) {
                 if(game.state['p'+(vertex.owner-1)] > 0) {
                     resources[a] = j;
+                    a++;
                 }
             }
-            a++;
             var rand = Math.floor(Math.random() * a);
             var steal = {};
             steal[''+resources[rand]] = 1;
