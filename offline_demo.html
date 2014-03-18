@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Catan</title>
+        <style type="text/css">
+        <!--
+        body {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            overflow: hidden;
+            height: 0px; /* dumb hack to make the page not scroll */
+        }    
+        #board {
+            text-align: center;
+        }
+        svg {
+            margin: auto;
+            border: 1px solid black;
+        }
+        .menu-item {
+            cursor: pointer;
+        }
+        text {
+            cursor: default;
+        }
+        .menu-item text {
+            cursor: pointer;
+        }
+        .hex-content {
+            font-family: sans-serif;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        }
+        -->
+        </style>
+    </head>
+<body>
+
+<script>
+    // Fake API to use if coding offline
+    gapi = {
+        hangout: {
+            onApiReady: {
+                add: function(f) {f({isApiReady:true});},
+            },
+            data : {
+                onStateChanged: null,
+                values: {},
+                getValue: function(v) {
+                    return this.values[v];
+                },
+                submitDelta: function(obj) {
+                    for(var i in obj) {
+                        this.values[i] = obj[i];
+                    }
+                },
+                getState: function() {
+                    return this.values;
+                }
+            }
+        },
+
+    };
+</script>
+
+
+<div id="board"></div>
+
+<script>
+window.game = {};
+game.ns = 'http://www.w3.org/2000/svg';
+</script>
+
+<script src="http://localhost/offline-scripts"></script>
+
+<script>
+game.startGame = function(count, players) {
+
+    game.board.init();
+
+    /*
+    gapi.hangout.data.onStateChanged.remove(window.onStateChangedStartBox);
+    gapi.hangout.onEnabledParticipantsChanged.remove(window.onEnabledParticipantsChangedStartBox);
+
+    gapi.hangout.data.onStateChanged.add(function(state_event) {
+        game.state.download(state_event.state);
+
+        if (game.startbox.wrapper_outer !== undefined) {
+            game.svg.removeChild(game.startbox.wrapper_outer);
+            delete game.startbox.wrapper_outer;
+            game.menu.init();
+            game.statusbox.init();
+            game.selectbox.init();
+            game.board.draw(700, 390);
+            game.dice.init();
+            game.state.download(state_event.state);
+        }
+    });
+    
+    var ids = [];
+    var participants = gapi.hangout.getEnabledParticipants();
+    // set temporary array ids to each person's id
+    for(var i = 0; i < participants.length; i++) {
+        ids.push(participants[i].person.id);
+    }
+
+    var lowest = '9999999999999999999999';
+    for(var i = 0; i < ids.length; i++) {
+        if (ids[i] < lowest) {
+            lowest = ids[i];
+        }
+    }
+
+    if(gapi.hangout.getLocalParticipant().person.id === lowest) {
+        // Randomize players
+        var start_state = [];
+        // Randomize ids
+        var idsobj = {};
+        for(var i = 0; i < ids.length; i++) {
+            idsobj[i] = ids[i];
+        }
+        ids = [];
+        for(var i = 0; i < count; i++) {
+            var j = 0, randid = null;
+            for(var key in idsobj) {
+                if (Math.random() < 1 / ++j) {
+                    randid = key;
+                }
+            }
+            ids[i] = idsobj[randid];
+            delete idsobj[randid];
+        }
+        for(var i = 0; i < ids.length; i++) {
+            start_state.push({id: ids[i], color: players[ids[i]].color});
+        }
+        */
+
+        // Fake some players
+        var start_state = [];
+        for(var i = 0; i < 4; i++) {
+            start_state.push({id: i, color: 'blue'});
+        }
+
+        // Randomize board
+        game.board.randomize();
+
+        // Initialize state.pX and randomize dev cards
+        game.state.init(count, start_state);
+
+        // Pass hexes, vertices, AND players to shared state
+        var obj = {
+            'vertices' : JSON.stringify(
+            (function(vertices){
+                var arr = [];
+                for(var i = 0; i < vertices.length; i++) { 
+                    arr.push({contents: vertices[i].contents, owner: vertices[i].owner, port : vertices[i].port}); 
+                }
+                return arr; 
+            })(game.board.vertices)),
+            'hexes' : JSON.stringify(
+            (function(hexes){
+                var arr = [];
+                for(var i = 0; i < hexes.length; i++) {
+                    arr.push({num: hexes[i].num, type: hexes[i].type, robber: hexes[i].robber});
+                }
+                return arr;
+            })(game.board.hexes)),
+            'player_count' : ''+game.state.player_count,
+            'startbox_done' : 'true',
+        };
+        for(var i = 0 ; i < game.state.player_count; i++) {
+            obj['p'+i] = JSON.stringify(game.state['p'+i]);
+        }
+        obj['devcards']=JSON.stringify(game.state.devcards);
+        //obj['id'] = gapi.hangout.getLocalParticipant().person.id;
+        gapi.hangout.data.submitDelta(obj);
+
+        //game.svg.removeChild(game.startbox.wrapper_outer);
+        //delete game.startbox.wrapper_outer;
+        game.menu.init();
+        game.statusbox.init();
+        game.selectbox.init();
+        game.board.draw(700, 390);
+        game.dice.init();
+        game.state.download(gapi.hangout.data.getState());
+        /*
+    }
+    */
+};
+
+game.proceed = function() {
+    console.log('%cPlayer '+this.state.turn+'\'s turn; Action: ' + this.state.next_action, 'color: '+game.state['p'+(this.state.turn-1)].color);
+    if(game.state.turn === game.state.getLocalPlayerNumber()) {
+        this.actions[this.state.next_action]();
+    }
+};
+
+// For debugging
+game.autosettle = function() {
+    game.actions.selectVertex(10, 1);
+    game.actions.selectEdge(7);
+    game.actions.selectVertex(4, 1);
+    game.actions.selectEdge(8);
+    game.actions.selectVertex(21, 1);
+    game.actions.selectEdge(27);
+    game.actions.selectVertex(30, 1);
+    game.actions.selectEdge(42);
+    game.actions.selectVertex(42, 1);
+    game.actions.selectEdge(58);
+    game.actions.selectVertex(44, 1);
+    game.actions.selectEdge(59);
+    if(game.state.player_count > 3) {
+        game.actions.selectVertex(24, 1);
+        game.actions.selectEdge(31);
+        game.actions.selectVertex(39, 1);
+        game.actions.selectEdge(55);
+    }
+};
+
+window.onEnabledParticipantsChangedStartBox = function(participant_event) {
+    game.startbox.onChanged(participant_event.enabledParticipants);
+};
+
+window.onStateChangedStartBox = function(state_event) {
+    game.startbox.refresh(state_event.state);
+};
+
+window.init = function() {
+    game.svg = document.createElementNS(game.ns, 'svg');
+    game.svg.setAttribute('width', '700');
+    game.svg.setAttribute('height', '430');
+    document.getElementById("board").appendChild(game.svg);
+
+    window.drawn = false;
+    window.diceRolled = false;
+
+    // When API is ready...
+    /*
+    gapi.hangout.onApiReady.add(function(eventObj) {
+        if (eventObj.isApiReady) {
+            console.log('API is ready!');
+            gapi.hangout.onEnabledParticipantsChanged.add(window.onEnabledParticipantsChangedStartBox);
+            gapi.hangout.data.onStateChanged.add(window.onStateChangedStartBox);
+            game.startbox.init();
+        }
+    });
+    game.startbox.init();
+    */
+}
+
+// Wait for gadget to load.                                                       
+//gadgets.util.registerOnLoadHandler(window.init);
+init();
+game.startGame(null, 4);
+</script>
+</body>
+</html>
