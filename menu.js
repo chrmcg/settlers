@@ -17,7 +17,8 @@ game.menu.init = function() {
         'endTurn': 'DONE',
         'confirmSelect': 'Confirm',
         'cancelSelect': 'Cancel',
-
+        'rollDice': 'Roll Dice',
+        'playKnight': 'Play Knight',
     };
 
     var positions = {
@@ -29,6 +30,8 @@ game.menu.init = function() {
         'endTurn':          [550, 360, 150],
         'confirmSelect':    [500, 200, 80],
         'cancelSelect':     [590, 200, 80],
+        'rollDice':         [475, 310, 100],
+        'playKnight':       [615, 310, 80],
     };
 
     var r, text, g, i = 0;
@@ -56,7 +59,7 @@ game.menu.init = function() {
         g.appendChild(r);
         g.appendChild(text);
 
-        if(['confirmSelect', 'cancelSelect'].indexOf(a) > -1) g.setAttribute('visibility', 'hidden');
+        if(['confirmSelect', 'cancelSelect', 'rollDice', 'playKnight'].indexOf(a) > -1) g.setAttribute('visibility', 'hidden');
         
         game.svg.appendChild(g);
         this.buttons.push(g);
@@ -67,7 +70,7 @@ game.menu.init = function() {
     // Display dev cards
     g = document.createElementNS(game.ns, 'g');
     var g2, text2;
-    for(var i = 1; i <= 4; i++) { 
+    for(var i = 1; i <= 5; i++) { 
         g2 = document.createElementNS(game.ns, 'g');
         g2.setAttribute('transform', 'translate(110, ' + (25 * (i-1)) + ')');
 
@@ -142,8 +145,8 @@ game.menu.init = function() {
     game.svg.appendChild(g);
 };
 
-game.menu.displayOffers = function() {
 
+game.menu.displayOffers = function() {
     // Display your own offer at the top
     var obj, str;
 
@@ -165,7 +168,6 @@ game.menu.displayOffers = function() {
     } else {
         game.menu.offers[0].button.setAttribute('visibility','hidden');
         game.menu.offers[0].button.setAttribute('onclick', '');
-
     }
 
 

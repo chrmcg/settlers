@@ -3,63 +3,93 @@ game.actions = {
 };
 
 
-game.actions.rollDice = function() {
+game.actions.rollDice = function(knight) {
     game.display.refreshDevCards();
 
-    var obj = {};
-
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    obj['next_action'] = 'playerControl';
-    game.state.next_action = 'playerControl';
-
-    var d1 = Math.floor(Math.random() * 6) + 1;
-    var d2 = Math.floor(Math.random() * 6) + 1;
-    var d = d1 + d2;
-
-    //console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
-    game.state.setDiceValues(d1, d2);
-    window.diceRolled = true;
-
-    if(d == 7) {
-        game.state.next_action = 'getRobbed';
-        obj['next_action'] = 'getRobbed';
-        for(var i = 0; i < game.state.player_count; i++) {
-            game.state['p'+i].robbed = false;
+    if(knight === undefined) {
+        if(game.state['p'+(game.state.turn-1)].cK > 0) {        
+            game.display.hideMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn', 'confirmSelect', 'cancelSelect']);
+            game.display.showMenuButtons(['rollDice', 'playKnight']);
+            game.devcardbox.setAttribute('display', 'none');
+            game.menu.buttons.forEach(function(a){
+                if(a.getAttribute('data-action')=='rollDice') {
+                    a.children[0].setAttribute('fill', 'white');
+                    a.setAttribute('onclick', 'game.actions.rollDice(2)');
+                    a.setAttribute('class', 'menu-item');
+                }
+            });
+            game.menu.buttons.forEach(function(a){
+                if(a.getAttribute('data-action')=='playKnight') {
+                    a.children[0].setAttribute('fill', 'white');
+                    a.setAttribute('onclick', 'game.actions.playDevCard("K")');
+                    a.setAttribute('class', 'menu-item');
+                }
+            });
+        } else {
+            game.actions.rollDice(1);
         }
     } else {
-        var h, v, o;
-        for(var i = 0; i < 19; i++) {
-            o = {};
-            h = game.board.hexes[i]
-            if(h.num == d) {
-                for(var j = 0; j < game.board.hexes[i].vertices.length; j++) {
-                    if(game.board.hexes[i].robber == 0) {
-                        v = game.board.vertices[game.board.hexes[i].vertices[j]];
-                        obj = {};
-                        switch(v.contents) {
-                            case 1:
-                                o[h.type] = 1;
-                                game.state.collect(v.owner, o);
-                            break;
-                            case 2:
-                                o[h.type] = 2;
-                                game.state.collect(v.owner, o);
-                            break;
-                            case 0: default:
+        if(knight === 2) {
+            game.display.showMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn']);
+            game.display.hideMenuButtons(['rollDice', 'playKnight']);
+            game.devcardbox.setAttribute('display', 'inline');
+            game.display.refreshDevCards();
+        }
+        var obj = {};
 
-                            break;
+        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
+        obj['next_action'] = 'playerControl';
+        game.state.next_action = 'playerControl';
+
+        var d1 = Math.floor(Math.random() * 6) + 1;
+        var d2 = Math.floor(Math.random() * 6) + 1;
+        var d = d1 + d2;
+
+        //console.log('['+d1+']['+d2+'] = ' + d + ' rolled');
+        game.state.setDiceValues(d1, d2);
+        window.diceRolled = true;
+
+        if(d == 7) {
+            game.state.next_action = 'getRobbed';
+            obj['next_action'] = 'getRobbed';
+        } else {
+            var h, v, o;
+            for(var i = 0; i < 19; i++) {
+                o = {};
+                h = game.board.hexes[i]
+                    if(h.num == d) {
+                        for(var j = 0; j < game.board.hexes[i].vertices.length; j++) {
+                            if(game.board.hexes[i].robber == 0) {
+                                v = game.board.vertices[game.board.hexes[i].vertices[j]];
+                                obj = {};
+                                switch(v.contents) {
+                                    case 1:
+                                        o[h.type] = 1;
+                                        game.state.collect(v.owner, o);
+                                        break;
+                                    case 2:
+                                        o[h.type] = 2;
+                                        game.state.collect(v.owner, o);
+                                        break;
+                                    case 0: default:
+
+                                        break;
+                                }
+                            }
                         }
                     }
-                }
             }
         }
+        obj['d1'] = ''+d1;
+        obj['d2'] = ''+d2;
+        if(game.state.next_action !== 'getRobbed') {
+            for(var i = 0; i < game.state.player_count; i++) {
+                obj['p'+i] = JSON.stringify(game.state['p'+i]);
+            }
+        }
+        gapi.hangout.data.submitDelta(obj);
+        game.proceed();
     }
-
-    game.proceed();
-    for(var i = 0; i < game.state.player_count; i++) {
-        obj['p'+i] = JSON.stringify(game.state['p'+i]);
-    }
-    gapi.hangout.data.submitDelta(obj);
 };
 
 game.actions.getRobbed = function() {
@@ -73,11 +103,12 @@ game.actions.getRobbed = function() {
         game.display.disableMenuButtons(['endTurn']);
         game.display.disableAllExchangeButtons();
         game.actions.selectCards('R', {card_count: cards});
+    } else {
+        game.state['p'+(game.state.turn-1)].robbed = true;
+        var obj = {};
+        obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
+        gapi.hangout.data.submitDelta(obj);
     }
-    game.state['p'+(game.state.getLocalPlayerNumber()-1)].robbed = true;
-    var obj = {};
-    obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
-    gapi.hangout.data.submitDelta(obj);
 };
 
 
@@ -88,11 +119,13 @@ game.actions.moveRobber = function() {
 
     // Move the robber
     for (var i = 0; i < 19; i++) {
+        if(game.board.hexes[i].robber === 0) {
+            game.board.hexes[i].circle.setAttribute('class', 'menu-item');
+            game.board.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
+            game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
+            game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
+        }
         game.board.hexes[i].robber = 0;
-        game.board.hexes[i].circle.setAttribute('class', 'menu-item');
-        game.board.hexes[i].circle.setAttribute('fill', 'rgba(0,0,0,0)');
-        game.board.hexes[i].circle.setAttribute('onmouseover', 'game.board.highlightRobber(' + i + ')');
-        game.board.hexes[i].circle.setAttribute('onmouseout', 'game.board.unhighlightRobber(' + i + ')');
     }
 
     var obj = {'hexes' : JSON.stringify(
@@ -104,6 +137,7 @@ game.actions.moveRobber = function() {
             return arr;
         })(game.board.hexes))
     };
+    obj['next_action'] = game.state.next_action;
     gapi.hangout.data.submitDelta(obj);
 };
 
@@ -124,32 +158,30 @@ game.actions.selectRobber = function(i) {
             return arr;
         })(game.board.hexes))
     };
-    gapi.hangout.data.submitDelta(obj);
     game.state.next_action = 'stealFrom';
+    obj['next_action'] = 'stealFrom';
+    gapi.hangout.data.submitDelta(obj);
     game.proceed();
 };
 
 game.actions.stealFrom = function() {
-
     var robberhex = null;
     for(var j = 0; j < 19; j++) {
-        if(game.board.hexes[j].robber == 1) robberhex = j;
+        if(game.board.hexes[j].robber === 1) robberhex = j;
     }
-
-    var owners = [];
-    var o;
-    for(var i = 0; i < 6; i++) {
-        o = game.board.vertices[game.board.hexes[robberhex].vertices[i]].owner;
-        if(o != null && o != game.state.turn && owners.indexOf(o) == -1) owners.push(o);
+    var vertices = 0;
+    for(var j = 0; j < 6; j++) {
+        var vertex = game.board.vertices[game.board.hexes[robberhex].vertices[j]];
+        if(vertex.contents === 1 || vertex.contents === 2) {
+            vertices++;
+        }
     }
-
-    game.state.next_action = 'playerControl';
-    console.log('Choose one of (' + owners.join(', ') + ') to steal a card from');
-    // TODO: user chooses from (owners) and randomly gets one of their cards
-    game.display.refreshMenuButtons();
-    game.display.refreshExchangeButtons();
-    gapi.hangout.data.submitDelta({'id': gapi.hangout.getLocalParticipant().person.id, 'next_action': 'playerControl'});
-    game.proceed();
+    if(vertices > 0) {
+        game.board.showAvailableVertices(3, game.state.getLocalPlayerNumber());
+    } else {
+        game.state.next_action = 'playerControl';
+        game.proceed();
+    }
 };
 
 game.actions.buyDevCard = function() {
@@ -199,12 +231,17 @@ game.actions.playDevCard = function(type) {
     case 'K':
         game.state['p'+(game.state.turn-1)].army++;
         game.state['p'+(game.state.turn-1)].cK--;
-        game.state.updateVictoryPoints();
+        game.devcardbox.setAttribute('display', 'inline');
         game.display.refreshDevCards();
-
+        game.display.showMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn']);
+        game.display.hideMenuButtons(['rollDice', 'playKnight']);
+        game.display.disableMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard', 'endTurn']);
+        game.state.next_action = 'moveRobber';
+        game.state.updateVictoryPoints({'next_action': 'moveRobber'});
         game.actions.moveRobber();
     break;
     case 'Y': 
+        game.state['p'+(game.state.turn-1)].cY--;
         game.actions.selectCards('Y');
     break;
     case 'R':
@@ -216,6 +253,7 @@ game.actions.playDevCard = function(type) {
         }
     break;
     case 'M':
+        game.state['p'+(game.state.turn-1)].cM--;
         game.actions.selectCards('M');
     break;
     default: break;
@@ -625,16 +663,10 @@ game.actions.confirmSelect = function(reason, params) {
             if(a > 0) robbed[j] = a;
         }
         game.state.deduct(game.state.getLocalPlayerNumber(), robbed);
+        game.state['p'+(game.state.getLocalPlayerNumber()-1)].robbed = true;
         var obj = {};
         obj['p'+(game.state.getLocalPlayerNumber()-1)] = JSON.stringify(game.state['p'+(game.state.getLocalPlayerNumber()-1)]);
-        obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-        obj['next_action'] = 'moveRobber';
-        game.state.next_action = 'moveRobber';
-        gapi.hangout.data.submitDelta(obj);
         game.actions.cancelSelect();
-        if(game.state.turn === game.state.getLocalPlayerNumber()) {
-            game.proceed();
-        }
     break;
     case '1':
         var ask = {}, a;
@@ -644,7 +676,7 @@ game.actions.confirmSelect = function(reason, params) {
         }
         
         game.actions.cancelSelect();
-        game.actions.proposeTrade(params.from, params.to, params.offer, ask);
+        game.actions.completeTrade(params.from, 0, params.offer, ask);
     break;
     case 'O':
         var offer = {}, a;
@@ -655,7 +687,6 @@ game.actions.confirmSelect = function(reason, params) {
         game.actions.announceOffer(game.state.getLocalPlayerNumber(), offer);
         game.menu.displayOffers();
     break;
-
     default: break;
     }
 };
@@ -678,12 +709,17 @@ game.actions.acceptOffer = function(from, offer) {
 }
 
 game.actions.cancelSelect = function(reset_offer) {
+    var num = game.state.getLocalPlayerNumber();
     if(reset_offer === true) {
         // Reset your offer to null
-        game.state['p'+(game.state.getLocalPlayerNumber()-1)].offer = {};
-        game.state['p'+(game.state.getLocalPlayerNumber()-1)].proposal = {};
-        console.log('Player '+game.state.getLocalPlayerNumber()+' has canceled trading');
+        game.state['p'+(num-1)].offer = {};
+        game.state['p'+(num-1)].proposal = {};
+        console.log('Player '+num+' has canceled trading');
     }
+    var obj = {};
+    obj['p'+(num-1)] = JSON.stringify(game.state['p'+(num-1)]);
+    gapi.hangout.data.submitDelta(obj);
+
 
     game.display.showMenuButtons(['offerTrade','buildRoad','buildSettlement','buildCity','buyDevCard']);
     game.display.disableMenuButtons(['confirmSelect', 'cancelSelect']);
@@ -712,20 +748,14 @@ game.actions.announceOffer = function(player, offer) {
 };
 
 game.actions.proposeTrade = function(p_from, p_to, offer, ask) {
-
     // Bank accepts or denies trade immediately based on 4:1, 3:1, 2:1 rules
-    if(p_to == 0) {
-        game.actions.completeTrade(p_from, p_to, offer, ask);
+    console.log('Player '+p_from+' proposes to trade '+JSON.stringify(offer)+' to player '+ p_to+' for '+JSON.stringify(ask));
 
-    } else {
-        console.log('Player '+p_from+' proposes to trade '+JSON.stringify(offer)+' to player '+ p_to+' for '+JSON.stringify(ask));
-
-        game.state['p'+(p_from-1)].proposal = {from: p_from, to: p_to, offer: offer, ask: ask};
-        var obj = {};
-        obj['p'+(p_from-1)] = JSON.stringify(game.state['p'+(p_from-1)]);
-        gapi.hangout.data.submitDelta(obj);
-        // Compare with all other proposals in game.state, if match call completeTrade
-    }
+    game.state['p'+(p_from-1)].proposal = {from: p_from, to: p_to, offer: offer, ask: ask};
+    var obj = {};
+    obj['p'+(p_from-1)] = JSON.stringify(game.state['p'+(p_from-1)]);
+    gapi.hangout.data.submitDelta(obj);
+    // Compare with all other proposals in game.state, if match call completeTrade
 };
 
 game.actions.setupTrade = function(p_from, p_to, offer) {
@@ -748,8 +778,6 @@ game.actions.offerTrade = function() {
 
 
 game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
-    var stop = false;
-
     // "Player 0" is the bank
 
     if(p_A == 0) {
@@ -784,13 +812,11 @@ game.actions.completeTrade = function(p_A, p_B, r_A, r_B) {
         game.actions.cancelSelect();
     }
     obj = {};
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
     for(var i = 0; i < game.state.player_count; i++) {
         obj['p'+i] = JSON.stringify(game.state['p'+i]);
     }
     gapi.hangout.data.submitDelta(obj);
-    game.display.refreshExchangeButtons();
-    //TODO: Check if playerControl needs to be called or if cancelSelect suffices
+    game.actions.playerControl();
 };
 
 // 1 = WOOD, 2 = SHEEP, 3 = WHEAT, 4 = BRICK, 5 = ORE
@@ -811,7 +837,6 @@ game.actions.buildSettlement = function() {
 game.actions.buildCity = function() {
     var playerNum = game.state.getLocalPlayerNumber();
     if(game.state.phase == 2 && (game.state.playerHas(playerNum, {3: 2, 5: 3}))) {
-        game.state.next_action = 'playerControl';
         game.board.showAvailableVertices(2, playerNum);
     } else {
         console.log('Cannot build. You have insufficient resources');
@@ -838,57 +863,100 @@ game.actions.buildRoad = function(params) {
 game.actions.selectVertex = function(i, type) {
     var playerNum = game.state.getLocalPlayerNumber();
 
-    if(game.state.phase == 0) {
-        game.state['p'+(playerNum-1)].firstSettlement = i;
-        game.state['p'+(playerNum-1)].settlements--;
-    } else if(game.state.phase == 1) {
-        game.state['p'+(playerNum-1)].secondSettlement = i;
-        game.state['p'+(playerNum-1)].settlements--;
-        var obj = {}, b;
-        for(var j = 0; j < game.board.vertices[i].hexes.length; j++) {
-            b = game.board.hexes[game.board.vertices[i].hexes[j]].type;
-            if(obj[b] == null) obj[b] = 0;
-            obj[b]++;
-        }
-        game.state.collect(playerNum, obj);
-    } else if(game.state.phase == 2) {
-        if(type == 1) {
-            game.state.deduct(playerNum, {1: 1, 2: 1, 3: 1, 4: 1});
+    if(type === 1 || type === 2) {
+        if(game.state.phase == 0) {
+            game.state['p'+(playerNum-1)].firstSettlement = i;
             game.state['p'+(playerNum-1)].settlements--;
-        } else if(type == 2 && game.board.vertices[i].owner === playerNum && game.board.vertices[i].contents === 1) {
-            if(game.board.vertices[i].owner === playerNum) {
-                game.state.deduct(playerNum, {3: 2, 5: 3});
-                game.state['p'+(game.state.turn-1)].cities--;
-                game.state['p'+(game.state.turn-1)].settlements++;
+        } else if(game.state.phase == 1) {
+            game.state['p'+(playerNum-1)].secondSettlement = i;
+            game.state['p'+(playerNum-1)].settlements--;
+            var obj = {}, b;
+            for(var j = 0; j < game.board.vertices[i].hexes.length; j++) {
+                b = game.board.hexes[game.board.vertices[i].hexes[j]].type;
+                if(obj[b] == null) obj[b] = 0;
+                obj[b]++;
+            }
+            game.state.collect(playerNum, obj);
+        } else if(game.state.phase == 2) {
+            if(type == 1) {
+                game.state.deduct(playerNum, {1: 1, 2: 1, 3: 1, 4: 1});
+                game.state['p'+(playerNum-1)].settlements--;
+            } else if(type == 2 && game.board.vertices[i].owner === playerNum && game.board.vertices[i].contents === 1) {
+                if(game.board.vertices[i].owner === playerNum) {
+                    game.state.deduct(playerNum, {3: 2, 5: 3});
+                    game.state['p'+(game.state.turn-1)].cities--;
+                    game.state['p'+(game.state.turn-1)].settlements++;
+                }
             }
         }
-    }
 
-    if (type === 1) {
-        game.board.placeSettlement(i);
-    } else if (type === 2) {
-        game.board.placeCity(i);
-    }
-    game.display.hideEmptyVertices();
-
-    var vertices = (function(vertices){ 
-        var obj = [];
-        for (var i = 0; i < vertices.length; i++) {
-            obj.push({contents : vertices[i].contents, owner : vertices[i].owner, port : vertices[i].port});
+        if (type === 1) {
+            game.board.placeSettlement(i);
+        } else if (type === 2) {
+            game.board.placeCity(i);
         }
-        return obj;
-    })(game.board.vertices);
-    var obj = {};
-    game.state.next_action = 'playerControl';
-    obj['next_action'] = 'playerControl';
-    if (game.state.phase == 0 || game.state.phase == 1) {
-        game.state.next_action = 'buildRoad';
-        obj['next_action'] = 'buildRoad';
-    }
-    obj['vertices'] = JSON.stringify(vertices);
-    game.state.updateVictoryPoints(obj);
+        game.display.hideEmptyVertices();
 
-    game.proceed();
+        var vertices = (function(vertices){ 
+            var obj = [];
+            for (var i = 0; i < vertices.length; i++) {
+                obj.push({contents : vertices[i].contents, owner : vertices[i].owner, port : vertices[i].port});
+            }
+            return obj;
+        })(game.board.vertices);
+        var obj = {};
+        game.state.next_action = 'playerControl';
+        obj['next_action'] = 'playerControl';
+        if (game.state.phase == 0 || game.state.phase == 1) {
+            game.state.next_action = 'buildRoad';
+            obj['next_action'] = 'buildRoad';
+        }
+        obj['vertices'] = JSON.stringify(vertices);
+        game.state.updateVictoryPoints(obj);
+
+        game.proceed();
+    } else {
+        var vertex = game.board.vertices[i];
+        var v = vertex.v;
+        if(vertex.contents === 1) {
+            v.setAttribute('width', '10');
+            v.setAttribute('height', '10');
+            v.setAttribute('x', vertex.x - 5);
+            v.setAttribute('y', vertex.y - 5);
+        } else if (vertex.contents === 2) {
+            v.setAttribute('width', '20');
+            v.setAttribute('height', '20');
+            v.setAttribute('x', vertex.x - 10);
+            v.setAttribute('y', vertex.y - 10);
+        }
+        v.setAttribute('onclick', '');
+        v.setAttribute('onmouseover', '');
+        v.setAttribute('onmouseout','');
+        if(vertex.owner !== game.state.getLocalPlayerNumber()) {
+            var resources = [];
+            var a = 0;
+            for(var j = 1; j <= 5; j++) {
+                if(game.state['p'+(vertex.owner-1)]['r'+j] > 0) {
+                    resources[a] = j;
+                    a++;
+                }
+            }
+            if (a > 0) {
+                var rand = Math.floor(Math.random() * a);
+                var steal = {};
+                steal[''+resources[rand]] = 1;
+                game.actions.completeTrade(game.state.getLocalPlayerNumber(), vertex.owner, {}, steal);
+                console.log("Player "+game.state.getLocalPlayerNumber()+" stole "+JSON.stringify(steal)+" from player "+vertex.owner);
+            }
+        }
+        if(window.diceRolled === true) {
+            game.state.next_action = 'playerControl';
+            game.proceed();
+        } else {
+            game.state.next_action = 'rollDice';
+            game.actions.rollDice(1);
+        }
+    }
 };
 
 game.actions.selectEdge = function(i, player, params) {
@@ -970,12 +1038,15 @@ game.actions.endTurn = function() {
     game.state.next_action = 'rollDice';
     game.state.turn = game.state.turn == game.state.player_count ? 1 : game.state.turn+1;
 
+    game.display.refreshDevCards();
     window.diceRolled = false;
     game.state['p'+(game.state.turn-1)].newcards = {};
     var obj = {'next_action': 'rollDice'};
+    for(var i = 0; i < game.state.player_count; i++) {
+        game.state['p'+i].robbed = false;
+        obj['p'+i] = JSON.stringify(game.state['p'+i]);
+    }
     obj['turn'] = ''+game.state.turn;
-    obj['id'] = gapi.hangout.getLocalParticipant().person.id;
-    obj['p'+(game.state.turn-1)] = JSON.stringify(game.state['p'+(game.state.turn-1)]);
     gapi.hangout.data.submitDelta(obj);
 }
 

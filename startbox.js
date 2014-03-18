@@ -149,7 +149,7 @@ game.startbox.refresh = function(state) {
         this.button.setAttribute('onclick', '');
     }
 
-    if(num_ready > 1) {
+    if(num_ready === ids.length) {
         game.startGame(ids.length, this.players);
     }
 };

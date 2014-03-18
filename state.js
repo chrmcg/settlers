@@ -238,7 +238,7 @@ game.state.download = function(state) {
                 try {
                     this[key] = JSON.parse(value);
                 } catch(e) {
-                    if (key === 'turn' || key === 'phase' || key === 'd1' || key === 'd2') {
+                    if (key === 'turn' || key === 'phase' || key === 'd1' || key === 'd2' || key === 'player_count') {
                         this[key] = parseInt(value);
                     } else {
                         this[key] = value;
@@ -248,32 +248,31 @@ game.state.download = function(state) {
         }
     }
 
-    if(window.drawn === true) {
-        game.board.redraw();
-    }
     var num = this.getLocalPlayerNumber();
     // This makes sure that this doesn't happen before everything is initialized
-    if (game.startbox.wrapper_outer === undefined) {
+    if (window.drawn === true) {
+        game.board.redraw();
         if(this.turn === num) {
             if((this.next_action === 'rollDice' && window.diceRolled === false) || ((this.phase === 0 || this.phase === 1) && this.next_action === 'buildSettlement')) {
+                game.actions.cancelSelect();
                 game.proceed();
             }
         }
-        if(this.turn !== num && this.next_action === 'getRobbed' && this['p'+(this.getLocalPlayerNumber()-1)].robbed === false) {
+        if(this.next_action === 'getRobbed' && this['p'+(num-1)].robbed === false) {
             var cards = 0;
             for(var i = 1; i <= 5; i++) {
-                cards += this['p'+(this.getLocalPlayerNumber()-1)]['r'+i];
+                cards += this['p'+(num-1)]['r'+i];
             }
             if(cards > 7) {
                 game.actions.selectCards('R', {card_count: cards});
             } else {
-                this.next_action = 'playerControl';
+                this['p'+(num-1)].robbed = true;
+                var obj = {};
+                obj['p'+(num-1)] = JSON.stringify(this['p'+(num-1)]);
+                gapi.hangout.data.submitDelta(obj);
             }
-            this['p'+(this.getLocalPlayerNumber()-1)].robbed = true;
-            var obj = {};
-            obj['p'+(this.getLocalPlayerNumber()-1)] = JSON.stringify(this['p'+(this.getLocalPlayerNumber()-1)]);
-            gapi.hangout.data.submitDelta(obj);
-        } else if (this.turn === num && this.next_action === 'getRobbed') {
+        }
+        if (this.turn === num && this.next_action === 'getRobbed') { 
             var numrobbed = 0;
             for(var i = 0; i < this.player_count; i++) {
                 if(this['p'+i].robbed === true) {
@@ -281,8 +280,10 @@ game.state.download = function(state) {
                 }
             }
             if(numrobbed === this.player_count) {
+                var obj = {};
                 game.state.next_action = 'moveRobber';
-                gapi.hangout.data.submitDelta({next_action: 'moveRobber'});
+                obj['next_action'] = 'moveRobber';
+                gapi.hangout.data.submitDelta(obj);
                 game.proceed();
             }
         }
@@ -320,7 +321,9 @@ game.state.download = function(state) {
             game.display.enableMenuButtons(['offerTrade']);
         }
         game.display.refreshResourceCounts();
-        game.display.refreshDice();
+        if(game.state.phase === 2) {
+            game.display.refreshDice();
+        }
     }
 };
 
@@ -334,6 +337,6 @@ game.state.getLocalPlayerNumber = function() {
 };
 
 game.state.setDiceValues = function(d1, d2) {
-    var obj = {d1: ''+d1, d2: ''+d2};
-    gapi.hangout.data.submitDelta(obj);
+    game.state.d1 = d1;
+    game.state.d2 = d2;
 };
